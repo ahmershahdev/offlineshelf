@@ -6,9 +6,18 @@ OfflineShelf stores article titles and IDs, never article text. Text is fetched 
 
 ## Pages
 
-- [Home](https://offlineshelf.ahmershah.dev/): what OfflineShelf does, the four builders, combinations, rebuilds, exports and FAQ
-- [How it works](https://offlineshelf.ahmershah.dev/how-it-works): build pipeline, limits and API endpoints
-- [Privacy](https://offlineshelf.ahmershah.dev/privacy): what is stored and the single cookie
+- [Home](https://offlineshelf.ahmershah.dev/): what OfflineShelf does, example lists, combinations, rebuilds, exports
+- [How it works](https://offlineshelf.ahmershah.dev/how-it-works): the build pipeline and limits
+- [Builders](https://offlineshelf.ahmershah.dev/builders): category, Wikidata SPARQL, pasted titles, top pageviews
+- [Exports](https://offlineshelf.ahmershah.dev/exports): TSV, static HTML bundle, ZIM for Kiwix, attribution
+- [Developers](https://offlineshelf.ahmershah.dev/developers): JSON API, sessions and CSRF, errors, rate limits
+- [Self-hosting](https://offlineshelf.ahmershah.dev/self-host): Docker Compose install, configuration, backups
+- [Roadmap](https://offlineshelf.ahmershah.dev/roadmap): milestones M1 to M6 and their status
+- [FAQ](https://offlineshelf.ahmershah.dev/faq): common questions
+- [About](https://offlineshelf.ahmershah.dev/about): why it exists, principles, the maker
+- [Security](https://offlineshelf.ahmershah.dev/security): protections and how to report a vulnerability
+- [Contact](https://offlineshelf.ahmershah.dev/contact): support@ahmershah.dev
+- [Privacy](https://offlineshelf.ahmershah.dev/privacy) and [Terms](https://offlineshelf.ahmershah.dev/terms)
 
 ## Developers
 
@@ -19,4 +28,4 @@ OfflineShelf stores article titles and IDs, never article text. Text is fetched 
 ## Optional
 
 - [Full text for LLMs](https://offlineshelf.ahmershah.dev/llms-full.txt): every public page in one plain-text file
-- [Author](https://ahmershah.dev): Syed Ahmer Shah
+- [Author](https://ahmershah.dev): Syed Ahmer Shah, creator and maintainer (support@ahmershah.dev)

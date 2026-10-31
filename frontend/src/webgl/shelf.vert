@@ -11,6 +11,8 @@ varying vec3 vNormal;
 varying float vTone;
 varying float vAccent;
 varying float vDepth;
+varying vec3 vWorld;
+varying vec3 vWorldNormal;
 
 mat3 rotX(float a) { float c = cos(a), s = sin(a); return mat3(1., 0., 0., 0., c, s, 0., -s, c); }
 mat3 rotY(float a) { float c = cos(a), s = sin(a); return mat3(c, 0., -s, 0., 1., 0., s, 0., c); }
@@ -52,5 +54,7 @@ void main() {
   vAccent = step(.968, aRand.y);
   vec4 mv = modelViewMatrix * vec4(world, 1.);
   vDepth = -mv.z;
+  vWorld = world;
+  vWorldNormal = r * normal;
   gl_Position = projectionMatrix * mv;
 }

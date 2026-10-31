@@ -1,33 +1,38 @@
 @import 'tailwindcss';
-@import '@fontsource-variable/inter-tight';
-@import '@fontsource-variable/jetbrains-mono';
-@import '@fontsource/instrument-serif/400.css';
-@import '@fontsource/instrument-serif/400-italic.css';
+@import '@fontsource-variable/fraunces/full.css';
+@import '@fontsource-variable/fraunces/full-italic.css';
+@import '@fontsource-variable/geist';
+@import '@fontsource-variable/geist-mono';
 @import 'lenis/dist/lenis.css';
 
 @theme {
   --color-ink: #0b0b0a;
-  --color-ink-2: #141412;
-  --color-ink-3: #1d1d1a;
+  --color-ink-2: #121210;
+  --color-ink-3: #1b1a17;
   --color-paper: #ece6da;
-  --color-dim: #8f897d;
-  --color-faint: #57534b;
+  --color-paper-2: #d9d1c1;
+  --color-dim: #948d80;
+  --color-faint: #5a554c;
   --color-signal: #ff5a1f;
+  --color-ember: #ffb37a;
   --color-line: rgb(236 230 218 / 0.12);
 
-  --font-sans: 'Inter Tight Variable', ui-sans-serif, system-ui, sans-serif;
-  --font-serif: 'Instrument Serif', ui-serif, Georgia, serif;
-  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+  --font-sans: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'Fraunces Variable', ui-serif, Georgia, serif;
+  --font-mono: 'Geist Mono Variable', ui-monospace, monospace;
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
 
-  --text-display: clamp(3.25rem, 11.5vw, 12.5rem);
-  --text-display--line-height: 0.86;
-  --text-display--letter-spacing: -0.035em;
-  --text-headline: clamp(2.5rem, 6.5vw, 6.5rem);
+  --text-display: clamp(3.4rem, 11.8vw, 13rem);
+  --text-display--line-height: 0.84;
+  --text-display--letter-spacing: -0.045em;
+  --text-headline: clamp(2.6rem, 6.4vw, 6.75rem);
   --text-headline--line-height: 0.92;
-  --text-headline--letter-spacing: -0.03em;
+  --text-headline--letter-spacing: -0.035em;
+  --text-title: clamp(1.9rem, 3vw, 2.75rem);
+  --text-title--line-height: 1.02;
+  --text-title--letter-spacing: -0.025em;
 }
 
 @layer base {
@@ -40,6 +45,8 @@
     background: var(--color-ink);
     color: var(--color-paper);
     font-family: var(--font-sans);
+    font-size: 100%;
+    font-feature-settings: 'ss01', 'cv11';
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
@@ -51,6 +58,24 @@
     background: var(--color-ink);
     min-height: 100dvh;
     overflow-x: clip;
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    letter-spacing: -0.008em;
+  }
+
+  /* Fraunces at display sizes: high optical size, full softness and the "wonky" alternates give
+     it the bookish, hand-set feel. Body-size serif text keeps the defaults. */
+  .font-serif {
+    font-optical-sizing: auto;
+    font-variation-settings:
+      'SOFT' 100,
+      'WONK' 1;
+    font-weight: 330;
+  }
+  .font-serif em,
+  em.font-serif {
+    font-style: italic;
+    font-weight: 300;
   }
 
   ::selection {
@@ -94,7 +119,7 @@
   .label {
     font-family: var(--font-mono);
     font-size: 0.6875rem;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--color-dim);
   }
@@ -103,7 +128,6 @@
     border-color: var(--color-line);
   }
 
-  /* Underline that draws in from the left on hover. */
   .link-draw {
     background-image: linear-gradient(currentColor, currentColor);
     background-size: 0% 1px;
@@ -178,9 +202,79 @@
   .field::placeholder {
     color: var(--color-faint);
   }
+
+  /* Long-form text on the content pages. */
+  .prose-shelf {
+    max-width: 44rem;
+    color: color-mix(in srgb, var(--color-paper) 80%, transparent);
+    font-size: 1.125rem;
+    line-height: 1.7;
+  }
+  .prose-shelf > * + * {
+    margin-top: 1.1em;
+  }
+  .prose-shelf h3 {
+    margin-top: 2.2em;
+    font-family: var(--font-serif);
+    font-size: 1.75rem;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--color-paper);
+  }
+  .prose-shelf strong {
+    color: var(--color-paper);
+    font-weight: 600;
+  }
+  .prose-shelf a {
+    color: var(--color-paper);
+    text-decoration: underline;
+    text-decoration-color: var(--color-signal);
+    text-underline-offset: 0.2em;
+    text-decoration-thickness: 1px;
+  }
+  .prose-shelf a:hover {
+    color: var(--color-signal);
+  }
+  .prose-shelf ul,
+  .prose-shelf ol {
+    padding-left: 1.2em;
+  }
+  .prose-shelf ul {
+    list-style: none;
+  }
+  .prose-shelf ul > li {
+    position: relative;
+  }
+  .prose-shelf ul > li::before {
+    content: '';
+    position: absolute;
+    left: -1.1em;
+    top: 0.72em;
+    width: 0.45em;
+    height: 1px;
+    background: var(--color-signal);
+  }
+  .prose-shelf ol {
+    list-style: decimal-leading-zero;
+  }
+  .prose-shelf ol > li::marker {
+    font-family: var(--font-mono);
+    font-size: 0.8em;
+    color: var(--color-signal);
+  }
+  .prose-shelf li + li {
+    margin-top: 0.5em;
+  }
+  .prose-shelf code {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    padding: 0.1em 0.35em;
+    border-radius: 4px;
+    background: var(--color-ink-3);
+    color: var(--color-paper);
+  }
 }
 
-/* Film grain over everything; pointer-events none so it never blocks a click. */
 .grain {
   position: fixed;
   inset: -50%;
@@ -212,8 +306,7 @@
   }
 }
 
-/* Reveal on scroll. Hidden only once JS has said motion is on, so the prerendered page is
-   readable without JavaScript. */
+/* Hidden only once JS has said motion is on, so prerendered pages read fine without JS. */
 html[data-motion='on'] [data-reveal] {
   opacity: 0;
   transform: translateY(2.5rem);
@@ -226,51 +319,57 @@ html[data-motion='on'] [data-reveal][data-in='true'] {
   transform: none;
 }
 
-/* Word-by-word headline rise. Delays come from nth-child so the markup needs no inline
-   style attributes, which the CSP would block. */
+/* Stagger delays come from nth-child: inline style attributes would be blocked by the CSP. */
 .split > span {
   display: inline-block;
   overflow: hidden;
   vertical-align: top;
-  padding-bottom: 0.08em;
-  margin-bottom: -0.08em;
+  padding-bottom: 0.1em;
+  margin-bottom: -0.1em;
 }
 .split > span > span {
   display: inline-block;
 }
 html[data-motion='on'] .split > span > span {
-  transform: translateY(105%);
-  transition: transform 1.3s var(--ease-out-expo);
+  transform: translateY(108%) rotate(4deg);
+  transform-origin: 0 100%;
+  transition: transform 1.4s var(--ease-out-expo);
 }
 html[data-motion='on'] .split[data-in='true'] > span > span {
   transform: none;
 }
 .split > span:nth-child(2) > span {
-  transition-delay: 0.06s;
+  transition-delay: 0.05s;
 }
 .split > span:nth-child(3) > span {
-  transition-delay: 0.12s;
+  transition-delay: 0.1s;
 }
 .split > span:nth-child(4) > span {
-  transition-delay: 0.18s;
+  transition-delay: 0.15s;
 }
 .split > span:nth-child(5) > span {
-  transition-delay: 0.24s;
+  transition-delay: 0.2s;
 }
 .split > span:nth-child(6) > span {
-  transition-delay: 0.3s;
+  transition-delay: 0.25s;
 }
 .split > span:nth-child(7) > span {
-  transition-delay: 0.36s;
+  transition-delay: 0.3s;
 }
 .split > span:nth-child(8) > span {
-  transition-delay: 0.42s;
+  transition-delay: 0.35s;
 }
 .split > span:nth-child(9) > span {
-  transition-delay: 0.48s;
+  transition-delay: 0.4s;
 }
 .split > span:nth-child(10) > span {
-  transition-delay: 0.54s;
+  transition-delay: 0.45s;
+}
+.split > span:nth-child(11) > span {
+  transition-delay: 0.5s;
+}
+.split > span:nth-child(12) > span {
+  transition-delay: 0.55s;
 }
 
 .marquee {
@@ -287,11 +386,20 @@ html[data-motion='on'] .split[data-in='true'] > span > span {
   }
 }
 
-/* Custom cursor: only for a fine pointer with motion allowed (set by Cursor.tsx). */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Torch cursor (Cursor.tsx): a warm light that follows the pointer over a slightly darkened page,
+   like reading the stacks of an unlit library. Only for a fine pointer with motion allowed. */
 html.has-cursor,
 html.has-cursor a,
 html.has-cursor button,
-html.has-cursor summary {
+html.has-cursor summary,
+html.has-cursor [data-cursor] {
   cursor: none;
 }
 html.has-cursor input,
@@ -299,44 +407,160 @@ html.has-cursor textarea,
 html.has-cursor select {
   cursor: text;
 }
-.cursor-dot,
-.cursor-ring {
+
+.torch {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  pointer-events: none;
+  background: radial-gradient(
+    circle var(--torch-r, 340px) at var(--tx, 50%) var(--ty, 40%),
+    rgb(255 196 140 / 0.14),
+    rgb(255 120 40 / 0.05) 38%,
+    transparent 70%
+  );
+  mix-blend-mode: screen;
+  transition: opacity 0.6s;
+}
+.torch-shade {
+  position: fixed;
+  inset: 0;
+  z-index: 54;
+  pointer-events: none;
+  background: radial-gradient(
+    circle 760px at var(--tx, 50%) var(--ty, 40%),
+    transparent 0%,
+    rgb(4 4 3 / 0.38) 100%
+  );
+  transition: opacity 0.6s;
+}
+html[data-cursor-mode='text'] .torch,
+html[data-cursor-mode='text'] .torch-shade {
+  opacity: 0.35;
+}
+
+.cursor {
   position: fixed;
   top: 0;
   left: 0;
   z-index: 70;
   pointer-events: none;
-  border-radius: 999px;
-  mix-blend-mode: difference;
 }
-.cursor-dot {
-  width: 6px;
-  height: 6px;
-  margin: -3px 0 0 -3px;
-  background: var(--color-paper);
+.cursor-core {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 999px;
+  background: #fff3e4;
+  box-shadow:
+    0 0 10px 3px rgb(255 160 90 / 0.75),
+    0 0 34px 10px rgb(255 90 31 / 0.35);
+  transition:
+    transform 0.35s var(--ease-out-expo),
+    opacity 0.25s;
 }
 .cursor-ring {
-  width: 36px;
-  height: 36px;
-  margin: -18px 0 0 -18px;
-  border: 1px solid var(--color-paper);
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  margin: -20px 0 0 -20px;
+  border-radius: 999px;
+  border: 1px solid rgb(255 214 170 / 0.45);
   transition:
-    width 0.4s var(--ease-out-expo),
-    height 0.4s var(--ease-out-expo),
-    margin 0.4s var(--ease-out-expo),
-    background-color 0.4s;
+    width 0.5s var(--ease-out-expo),
+    height 0.5s var(--ease-out-expo),
+    margin 0.5s var(--ease-out-expo),
+    background-color 0.4s,
+    border-color 0.4s,
+    opacity 0.3s;
 }
-.cursor-ring[data-hover='true'] {
+.cursor-hand {
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  margin: -13px 0 0 -13px;
+  color: var(--color-ink);
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity 0.25s,
+    transform 0.35s var(--ease-out-expo);
+}
+.cursor-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-ink);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+
+.cursor[data-mode='link'] .cursor-ring {
+  width: 64px;
+  height: 64px;
+  margin: -32px 0 0 -32px;
+  border-color: transparent;
+  background: rgb(255 214 170 / 0.92);
+}
+.cursor[data-mode='link'] .cursor-core {
+  transform: scale(0);
+}
+.cursor[data-mode='link'][data-label='true'] .cursor-ring {
+  width: 84px;
+  height: 84px;
+  margin: -42px 0 0 -42px;
+}
+.cursor[data-mode='link'][data-label='true'] .cursor-label {
+  opacity: 1;
+}
+
+.cursor[data-mode='grab'] .cursor-ring,
+.cursor[data-mode='grabbing'] .cursor-ring {
   width: 72px;
   height: 72px;
   margin: -36px 0 0 -36px;
-  background: var(--color-paper);
+  border-color: transparent;
+  background: var(--color-ember);
+}
+.cursor[data-mode='grabbing'] .cursor-ring {
+  width: 58px;
+  height: 58px;
+  margin: -29px 0 0 -29px;
+  background: var(--color-signal);
+}
+.cursor[data-mode='grab'] .cursor-core,
+.cursor[data-mode='grabbing'] .cursor-core {
+  transform: scale(0);
+}
+.cursor[data-mode='grab'] .cursor-hand[data-hand='open'],
+.cursor[data-mode='grabbing'] .cursor-hand[data-hand='closed'] {
+  opacity: 1;
+  transform: scale(1);
 }
 
-.hero-a,
-.hero-b {
-  transition: none;
+.cursor[data-mode='text'] .cursor-ring {
+  width: 3px;
+  height: 28px;
+  margin: -14px 0 0 -1.5px;
+  border-radius: 2px;
+  border-color: transparent;
+  background: var(--color-ember);
 }
+.cursor[data-mode='text'] .cursor-core {
+  opacity: 0;
+}
+
+.cursor[data-pressed='true'] .cursor-ring {
+  transform: scale(0.86);
+}
+
 .hero-b {
   opacity: 0;
 }

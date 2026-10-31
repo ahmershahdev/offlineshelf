@@ -2,6 +2,7 @@
 
 Source: https://offlineshelf.ahmershah.dev
 Author: Syed Ahmer Shah (https://ahmershah.dev)
+Contact: support@ahmershah.dev
 License: code MIT; Wikipedia content in exports CC BY-SA 4.0
 Status: in development, launching February 2027
 
@@ -55,6 +56,22 @@ JSON under /api/v1, errors as RFC 9457 problem details. Unsafe requests need the
 - GET /api/v1/auth/me
 - GET, POST /api/v1/lists
 - GET, DELETE /api/v1/lists/{id}
+- POST /api/v1/lists/{id}/build (202, version queued; 409 if a build is active)
+- GET /api/v1/lists/{id}/versions, /versions/{v}, /versions/{v}/articles
+
+Builds move queued, building, then ready or failed. Network errors with Wikimedia are retried after 1, 5 and 15 minutes. Rate limits: 300 requests a minute per IP; sign-in 10 a minute per IP and per email; builds 20 an hour.
+
+## Self-hosting
+
+Docker Compose runs nginx, the Flask API, an RQ worker, MariaDB 11.4 and Redis. Requirements: Docker 24+, about 2 GB RAM, outbound HTTPS to Wikimedia. Install: clone the repository, copy .env.example to .env, set OFFLINESHELF_SECRET_KEY and the MariaDB passwords, run docker compose up -d --build. Settings use the OFFLINESHELF_ environment prefix.
+
+## Security
+
+Argon2id password hashing, per-session CSRF tokens plus same-origin checks, HttpOnly SameSite cookies (Secure and __Host- prefixed in production), a per-request CSP nonce with strict-dynamic, rate limits at the edge and in the app, owner-scoped queries, a Wikimedia host allow list, non-root read-only containers. Report vulnerabilities privately via GitHub security advisories or support@ahmershah.dev. security.txt: /.well-known/security.txt
+
+## Contact
+
+Email support@ahmershah.dev. Bugs and features: GitHub issues. The maker: https://ahmershah.dev
 
 ## FAQ
 

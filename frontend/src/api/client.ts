@@ -5,6 +5,7 @@ export type ShelfList = components['schemas']['ShelfList']
 export type ListPage = components['schemas']['ListPage']
 export type ListCreate = components['schemas']['ListCreate']
 export type Problem = components['schemas']['Problem']
+export type ListVersion = components['schemas']['ListVersion']
 
 export class ApiError extends Error {
   constructor(
@@ -14,7 +15,6 @@ export class ApiError extends Error {
     super(problem?.detail ?? problem?.title ?? `Request failed with ${status}`)
   }
 
-  /** First validation message, phrased for a form. */
   get fieldMessage(): string {
     const first = this.problem?.errors?.[0]
     if (!first) return this.message
@@ -75,4 +75,5 @@ export const api = {
     request<ListPage>('GET', `/lists${cursor ? `?cursor=${cursor}` : ''}`),
   createList: (data: ListCreate) => request<ShelfList>('POST', '/lists', data),
   deleteList: (id: number) => request<undefined>('DELETE', `/lists/${id}`),
+  buildList: (id: number) => request<ListVersion>('POST', `/lists/${id}/build`),
 }

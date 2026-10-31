@@ -378,18 +378,40 @@ export function AppPage() {
                       {l.schedule === 'monthly' ? ' / monthly' : ''}
                     </p>
                   </div>
-                  <button
-                    type="button"
-                    className="label link-draw hover:text-signal"
-                    aria-label={`Delete ${l.name}`}
-                    onClick={() => {
-                      void api.deleteList(l.id).then(() => {
-                        setLists((prev) => prev.filter((x) => x.id !== l.id))
-                      })
-                    }}
-                  >
-                    Delete
-                  </button>
+                  <div className="flex items-center gap-5">
+                    <button
+                      type="button"
+                      className="label link-draw hover:text-paper"
+                      aria-label={`Build ${l.name}`}
+                      disabled={l.latest_status === 'queued' || l.latest_status === 'building'}
+                      onClick={() => {
+                        void api
+                          .buildList(l.id)
+                          .then((v) => {
+                            setLists((prev) =>
+                              prev.map((x) =>
+                                x.id === l.id ? { ...x, latest_status: v.status } : x,
+                              ),
+                            )
+                          })
+                          .catch(() => undefined)
+                      }}
+                    >
+                      Build
+                    </button>
+                    <button
+                      type="button"
+                      className="label link-draw hover:text-signal"
+                      aria-label={`Delete ${l.name}`}
+                      onClick={() => {
+                        void api.deleteList(l.id).then(() => {
+                          setLists((prev) => prev.filter((x) => x.id !== l.id))
+                        })
+                      }}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </li>
               ))}
             </ul>
@@ -403,7 +425,8 @@ export function AppPage() {
             }}
           />
           <p className="mt-8 text-sm text-dim">
-            Builds start once the builders land (milestone M2). Saved lists keep their settings.
+            Builds run in a background queue. Until the builders land (milestone M2) a build ends as
+            failed with "not implemented yet"; your lists keep their settings.
           </p>
         </div>
       </div>

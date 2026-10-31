@@ -65,5 +65,19 @@ Sitemap: ${siteUrl}/sitemap.xml
 `,
 )
 
+// RFC 9116. Expires must be in the future and under a year away, so it is generated per build.
+const expires = new Date(Date.now() + 330 * 24 * 3600 * 1000).toISOString()
+await mkdir(join(dist, '.well-known'), { recursive: true })
+await writeFile(
+  join(dist, '.well-known', 'security.txt'),
+  `Contact: mailto:support@ahmershah.dev
+Contact: https://github.com/ahmershahdev/offlineshelf/security/advisories/new
+Expires: ${expires}
+Preferred-Languages: en
+Canonical: ${siteUrl}/.well-known/security.txt
+Policy: ${siteUrl}/security
+`,
+)
+
 await rm(join(root, 'dist-ssr'), { recursive: true, force: true })
 console.log('sitemap.xml and robots.txt written')

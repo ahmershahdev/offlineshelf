@@ -115,10 +115,22 @@ Typing: mypy strict and Pydantic on the backend; TypeScript strict with
 
 ## Frontend
 
-React 19, React Router 7, Tailwind 4, Lenis for smooth scrolling, three.js for the hero.
-three.js loads lazily after first paint and is skipped when WebGL is missing or Save-Data is on.
-With `prefers-reduced-motion`, Lenis, the custom cursor and animations are off and the hero
-renders one still frame. The custom cursor only appears with a fine pointer.
+React 19, React Router 8, Tailwind 4, Lenis for smooth scrolling, three.js for the hero, lucide
+icons. Type: Fraunces (variable, with the SOFT and WONK axes) for display, Geist for text, Geist
+Mono for code, all self-hosted.
+
+- Pages: home, how it works, builders, exports, developers, self-hosting, roadmap, FAQ, about,
+  security, contact, privacy, terms, the app and a 404. Content pages share `components/Page.tsx`.
+- Cursor (`components/Cursor.tsx`): a flickering torch light over a slightly darkened page; a
+  disc with an optional label (`data-cursor-label`) over links; an open hand over
+  `data-cursor="grab"` areas and a closed hand while dragging; a caret over inputs. The hero
+  shader has a matching warm point light under the pointer.
+- three.js loads lazily after first paint and is skipped when WebGL is missing or Save-Data is
+  on. With `prefers-reduced-motion`, Lenis, the cursor and animations are off and the hero renders
+  one still frame. The cursor only appears with a fine pointer; touch keeps native scrolling.
+- Brand assets come from `src/assets/source/brand` (the emblem); `scripts/images.mjs` builds the
+  favicon, app icons (including a maskable one), header emblem and the share image.
+- `/.well-known/security.txt` (RFC 9116) is generated at build time with a fresh expiry.
 
 ## Decisions
 

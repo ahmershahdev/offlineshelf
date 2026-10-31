@@ -8,6 +8,7 @@ import {
   Scene,
   ShaderMaterial,
   Vector2,
+  Vector3,
   WebGLRenderer,
 } from 'three'
 
@@ -109,6 +110,8 @@ export function createShelfScene({ canvas, progress, animate }: Options): ShelfS
     uPaper: { value: new Color('#ece6da') },
     uInk: { value: new Color('#0b0b0a') },
     uSignal: { value: new Color('#ff5a1f') },
+    uTorch: { value: new Vector3(0, 0, 3) },
+    uTorchPower: { value: animate ? 2.4 : 0 },
   }
   const material = new ShaderMaterial({ vertexShader, fragmentShader, uniforms })
   const mesh = new Mesh(geometry, material)
@@ -156,6 +159,9 @@ export function createShelfScene({ canvas, progress, animate }: Options): ShelfS
     camera.position.x = uniforms.uMouse.value.x * 0.35
     camera.position.y = uniforms.uMouse.value.y * 0.2
     camera.lookAt(0, 0, 0)
+    const depth = camera.position.z - 3
+    const halfH = Math.tan((camera.fov * Math.PI) / 360) * depth
+    uniforms.uTorch.value.set(mouse.x * halfH * camera.aspect, mouse.y * halfH, 3)
     renderer.render(scene, camera)
   }
 
