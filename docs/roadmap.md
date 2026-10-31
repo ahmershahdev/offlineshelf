@@ -9,12 +9,15 @@ in CI, and seed data.
 
 ## M1. Skeleton (target 2026-11-15)
 
-- [ ] Flask app factory, config per environment (`dev`, `test`, `prod`), health endpoint
-- [ ] SQLAlchemy 2 + Alembic against MariaDB 11.4 in Docker Compose (MariaDB in tests too, never SQLite)
-- [ ] Redis and one RQ worker in Compose; a test job that runs end to end
-- [ ] pytest with coverage, Ruff, mypy (strict)
-- [ ] GitHub Actions: `backend` job, CodeQL; add both as required checks in the ruleset
-- [ ] Dependabot for Actions and Python
+- [x] Flask app factory, config per environment (`dev`, `test`, `prod`), health endpoint
+- [x] SQLAlchemy 2 + Alembic against MariaDB 11.4 in Docker Compose (MariaDB in tests too, never SQLite)
+- [x] Redis and one RQ worker in Compose; a test job that runs end to end
+- [x] pytest with coverage, Ruff, mypy (strict)
+- [x] GitHub Actions: `backend` job, CodeQL
+- [ ] Add `backend`, `frontend` and `codeql` as required checks in the ruleset
+- [x] Extra: accounts (Argon2id), CSRF, rate limits, security headers, list CRUD, OpenAPI contract
+- [x] Extra: prerendered landing site with SEO (meta, JSON-LD, sitemap, robots, llms.txt)
+- [x] Dependabot for Actions, Python, npm and Docker
 
 ## M2. Builders (target 2026-11-29)
 

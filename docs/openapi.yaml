@@ -1,0 +1,212 @@
+openapi: 3.1.0
+info:
+  title: OfflineShelf API
+  version: 0.1.0
+  description: >
+    Build Wikipedia reading lists. Every unsafe request (POST, PUT, PATCH, DELETE) needs the
+    session cookie and the token from GET /auth/csrf in the X-CSRF-Token header. Errors use
+    RFC 9457 problem details.
+  license:
+    name: MIT
+    identifier: MIT
+servers:
+  - url: /api/v1
+paths:
+  /health:
+    get:
+      operationId: health
+      responses:
+        '200': { description: All dependencies up, content: { application/json: { schema: { $ref: '#/components/schemas/Health' } } } }
+        '503': { description: A dependency is down, content: { application/json: { schema: { $ref: '#/components/schemas/Health' } } } }
+  /auth/csrf:
+    get:
+      operationId: getCsrf
+      responses:
+        '200': { description: Token for this session, content: { application/json: { schema: { $ref: '#/components/schemas/CsrfToken' } } } }
+  /auth/register:
+    post:
+      operationId: register
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/Credentials' } } } }
+      responses:
+        '201': { description: Account created and signed in, content: { application/json: { schema: { $ref: '#/components/schemas/AuthResult' } } } }
+        '409': { $ref: '#/components/responses/Problem' }
+        '422': { $ref: '#/components/responses/Problem' }
+        '429': { $ref: '#/components/responses/Problem' }
+  /auth/login:
+    post:
+      operationId: login
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/Credentials' } } } }
+      responses:
+        '200': { description: Signed in, content: { application/json: { schema: { $ref: '#/components/schemas/AuthResult' } } } }
+        '401': { $ref: '#/components/responses/Problem' }
+        '429': { $ref: '#/components/responses/Problem' }
+  /auth/logout:
+    post:
+      operationId: logout
+      responses:
+        '200': { description: Signed out; a fresh token for the new session, content: { application/json: { schema: { $ref: '#/components/schemas/CsrfOnly' } } } }
+  /auth/logout-everywhere:
+    post:
+      operationId: logoutEverywhere
+      responses:
+        '200': { description: Every session of this account ended, content: { application/json: { schema: { $ref: '#/components/schemas/CsrfOnly' } } } }
+        '401': { $ref: '#/components/responses/Problem' }
+  /auth/me:
+    get:
+      operationId: me
+      responses:
+        '200': { description: The signed-in user, content: { application/json: { schema: { type: object, required: [user], properties: { user: { $ref: '#/components/schemas/User' } } } } } }
+        '401': { $ref: '#/components/responses/Problem' }
+  /lists:
+    get:
+      operationId: listLists
+      parameters:
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
+        - { name: cursor, in: query, schema: { type: integer } }
+      responses:
+        '200': { description: Newest first, content: { application/json: { schema: { $ref: '#/components/schemas/ListPage' } } } }
+        '401': { $ref: '#/components/responses/Problem' }
+    post:
+      operationId: createList
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/ListCreate' } } } }
+      responses:
+        '201': { description: Created, content: { application/json: { schema: { $ref: '#/components/schemas/ShelfList' } } } }
+        '401': { $ref: '#/components/responses/Problem' }
+        '422': { $ref: '#/components/responses/Problem' }
+  /lists/{listId}:
+    parameters:
+      - { name: listId, in: path, required: true, schema: { type: integer } }
+    get:
+      operationId: getList
+      responses:
+        '200': { description: The list, content: { application/json: { schema: { $ref: '#/components/schemas/ShelfList' } } } }
+        '404': { $ref: '#/components/responses/Problem' }
+    delete:
+      operationId: deleteList
+      responses:
+        '204': { description: Deleted }
+        '404': { $ref: '#/components/responses/Problem' }
+components:
+  responses:
+    Problem:
+      description: Error
+      content: { application/problem+json: { schema: { $ref: '#/components/schemas/Problem' } } }
+  schemas:
+    Health:
+      type: object
+      required: [status, checks]
+      properties:
+        status: { type: string, enum: [ok, degraded] }
+        checks: { type: object, additionalProperties: { type: string, enum: [ok, down] } }
+    CsrfToken:
+      type: object
+      required: [token]
+      properties: { token: { type: string } }
+    CsrfOnly:
+      type: object
+      required: [csrf]
+      properties: { csrf: { type: string } }
+    Credentials:
+      type: object
+      additionalProperties: false
+      required: [email, password]
+      properties:
+        email: { type: string, format: email, maxLength: 254 }
+        password: { type: string, minLength: 12, maxLength: 256 }
+    User:
+      type: object
+      required: [id, email]
+      properties: { id: { type: integer }, email: { type: string } }
+    AuthResult:
+      type: object
+      required: [user, csrf]
+      properties: { user: { $ref: '#/components/schemas/User' }, csrf: { type: string } }
+    BuilderKind: { type: string, enum: [category, wikidata, pasted, pageviews] }
+    Schedule: { type: string, enum: [none, monthly] }
+    VersionStatus: { type: string, enum: [queued, building, ready, failed] }
+    CategoryParams:
+      type: object
+      additionalProperties: false
+      required: [kind, category]
+      properties:
+        kind: { const: category }
+        category: { type: string, minLength: 1, maxLength: 255 }
+        depth: { type: integer, minimum: 0, maximum: 5, default: 0 }
+    WikidataParams:
+      type: object
+      additionalProperties: false
+      required: [kind, sparql]
+      properties:
+        kind: { const: wikidata }
+        sparql: { type: string, minLength: 1, maxLength: 10000 }
+    PastedParams:
+      type: object
+      additionalProperties: false
+      required: [kind, titles]
+      properties:
+        kind: { const: pasted }
+        titles: { type: array, minItems: 1, maxItems: 20000, items: { type: string, minLength: 1, maxLength: 255 } }
+    PageviewsParams:
+      type: object
+      additionalProperties: false
+      required: [kind, year, month, limit]
+      properties:
+        kind: { const: pageviews }
+        year: { type: integer, minimum: 2016 }
+        month: { type: integer, minimum: 1, maximum: 12 }
+        limit: { type: integer, minimum: 1, maximum: 1000 }
+    ListCreate:
+      type: object
+      additionalProperties: false
+      required: [name, wiki, params]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 120 }
+        wiki: { type: string, maxLength: 64, examples: [en.wikipedia.org] }
+        params:
+          oneOf:
+            - $ref: '#/components/schemas/CategoryParams'
+            - $ref: '#/components/schemas/WikidataParams'
+            - $ref: '#/components/schemas/PastedParams'
+            - $ref: '#/components/schemas/PageviewsParams'
+          discriminator:
+            propertyName: kind
+            mapping:
+              category: '#/components/schemas/CategoryParams'
+              wikidata: '#/components/schemas/WikidataParams'
+              pasted: '#/components/schemas/PastedParams'
+              pageviews: '#/components/schemas/PageviewsParams'
+        schedule: { $ref: '#/components/schemas/Schedule' }
+    ShelfList:
+      type: object
+      required: [id, name, wiki, builder, params, schedule, created_at, latest_status]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        wiki: { type: string }
+        builder: { $ref: '#/components/schemas/BuilderKind' }
+        params: { type: object, additionalProperties: true }
+        schedule: { $ref: '#/components/schemas/Schedule' }
+        created_at: { type: string, format: date-time }
+        latest_status: { oneOf: [{ $ref: '#/components/schemas/VersionStatus' }, { type: 'null' }] }
+    ListPage:
+      type: object
+      required: [items, next_cursor]
+      properties:
+        items: { type: array, items: { $ref: '#/components/schemas/ShelfList' } }
+        next_cursor: { oneOf: [{ type: integer }, { type: 'null' }] }
+    Problem:
+      type: object
+      required: [type, title, status]
+      properties:
+        type: { type: string }
+        title: { type: string }
+        status: { type: integer }
+        detail: { type: string }
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              loc: { type: array, items: { oneOf: [{ type: string }, { type: integer }] } }
+              msg: { type: string }
+              type: { type: string }

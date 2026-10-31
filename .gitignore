@@ -37,3 +37,7 @@ CLAUDE.local.md
 # OfflineShelf exports and local data
 exports/
 *.zim
+
+# Frontend build output
+frontend/dist/
+frontend/dist-ssr/

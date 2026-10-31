@@ -1,0 +1,22 @@
+# OfflineShelf
+
+> OfflineShelf builds Wikipedia reading lists for places without internet: schools, libraries and clinics. You build a list from a category, a Wikidata SPARQL query, pasted titles or the most-read articles, combine lists with set operations, rebuild them monthly and export them (TSV, static HTML, and later ZIM for Kiwix). Open source (MIT), self-hostable, launching February 2027 at https://offlineshelf.ahmershah.dev.
+
+OfflineShelf stores article titles and IDs, never article text. Text is fetched from Wikimedia only while an export is written, and every export carries the CC BY-SA 4.0 attribution. It is an independent project, not affiliated with the Wikimedia Foundation.
+
+## Pages
+
+- [Home](https://offlineshelf.ahmershah.dev/): what OfflineShelf does, the four builders, combinations, rebuilds, exports and FAQ
+- [How it works](https://offlineshelf.ahmershah.dev/how-it-works): build pipeline, limits and API endpoints
+- [Privacy](https://offlineshelf.ahmershah.dev/privacy): what is stored and the single cookie
+
+## Developers
+
+- [Source code](https://github.com/ahmershahdev/offlineshelf): Python (Flask, SQLAlchemy, RQ), MariaDB, Redis, React
+- [OpenAPI schema](https://github.com/ahmershahdev/offlineshelf/blob/main/docs/openapi.yaml): the JSON API under /api/v1
+- [Roadmap](https://github.com/ahmershahdev/offlineshelf/blob/main/docs/roadmap.md): milestones M1 to M6
+
+## Optional
+
+- [Full text for LLMs](https://offlineshelf.ahmershah.dev/llms-full.txt): every public page in one plain-text file
+- [Author](https://ahmershah.dev): Syed Ahmer Shah

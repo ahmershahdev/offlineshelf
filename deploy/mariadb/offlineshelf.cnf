@@ -1,0 +1,7 @@
+[mysqld]
+character-set-server = utf8mb4
+collation-server = utf8mb4_unicode_520_ci
+transaction-isolation = READ-COMMITTED
+max_connections = 200
+max_allowed_packet = 16M
+skip-name-resolve

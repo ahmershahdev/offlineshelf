@@ -1,0 +1,12 @@
+{
+  "name": "offlineshelf",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "dev:down": "docker compose stop mariadb redis",
+    "start": "docker compose up -d --build",
+    "stop": "docker compose down"
+  }
+}

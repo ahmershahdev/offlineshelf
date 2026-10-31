@@ -1,0 +1,80 @@
+name: offlineshelf
+
+x-backend-env: &backend-env
+  OFFLINESHELF_ENV: ${OFFLINESHELF_ENV:-dev}
+  OFFLINESHELF_SECRET_KEY: ${OFFLINESHELF_SECRET_KEY:?set OFFLINESHELF_SECRET_KEY in .env}
+  OFFLINESHELF_DATABASE_URL: mariadb+pymysql://offlineshelf:${MARIADB_PASSWORD:?}@mariadb:3306/offlineshelf
+  OFFLINESHELF_REDIS_URL: redis://redis:6379/0
+  OFFLINESHELF_SITE_URL: ${OFFLINESHELF_SITE_URL:-http://localhost:8080}
+  OFFLINESHELF_TRUSTED_PROXIES: "1"
+
+services:
+  mariadb:
+    image: mariadb:11.4
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:?}
+      MARIADB_DATABASE: offlineshelf
+      MARIADB_USER: offlineshelf
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD:?}
+    volumes:
+      - mariadb-data:/var/lib/mysql
+      - ./deploy/mariadb/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./deploy/mariadb/offlineshelf.cnf:/etc/mysql/conf.d/offlineshelf.cnf:ro
+    ports: ["127.0.0.1:3306:3306"]
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  redis:
+    image: redis:7.4-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
+    volumes: [redis-data:/data]
+    ports: ["127.0.0.1:6379:6379"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build: ./backend
+    restart: unless-stopped
+    environment: *backend-env
+    command: ["sh", "-c", "alembic upgrade head && exec gunicorn -c gunicorn.conf.py app.wsgi:app"]
+    depends_on:
+      mariadb: {condition: service_healthy}
+      redis: {condition: service_healthy}
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
+
+  worker:
+    build: ./backend
+    restart: unless-stopped
+    environment: *backend-env
+    command: ["python", "-m", "app.worker"]
+    depends_on:
+      api: {condition: service_started}
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
+
+  web:
+    build: ./frontend
+    restart: unless-stopped
+    ports: ["127.0.0.1:8080:8080"]
+    depends_on: [api]
+    read_only: true
+    tmpfs: [/tmp, /var/cache/nginx, /var/run]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
+
+volumes:
+  mariadb-data:
+  redis-data:

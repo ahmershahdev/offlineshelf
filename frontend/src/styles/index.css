@@ -1,0 +1,355 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/inter-tight';
+@import '@fontsource-variable/jetbrains-mono';
+@import '@fontsource/instrument-serif/400.css';
+@import '@fontsource/instrument-serif/400-italic.css';
+@import 'lenis/dist/lenis.css';
+
+@theme {
+  --color-ink: #0b0b0a;
+  --color-ink-2: #141412;
+  --color-ink-3: #1d1d1a;
+  --color-paper: #ece6da;
+  --color-dim: #8f897d;
+  --color-faint: #57534b;
+  --color-signal: #ff5a1f;
+  --color-line: rgb(236 230 218 / 0.12);
+
+  --font-sans: 'Inter Tight Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'Instrument Serif', ui-serif, Georgia, serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+
+  --text-display: clamp(3.25rem, 11.5vw, 12.5rem);
+  --text-display--line-height: 0.86;
+  --text-display--letter-spacing: -0.035em;
+  --text-headline: clamp(2.5rem, 6.5vw, 6.5rem);
+  --text-headline--line-height: 0.92;
+  --text-headline--letter-spacing: -0.03em;
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+    --gutter: clamp(1rem, 3.2vw, 3rem);
+  }
+
+  html {
+    background: var(--color-ink);
+    color: var(--color-paper);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    scrollbar-color: color-mix(in srgb, var(--color-paper) 28%, transparent) var(--color-ink);
+    scrollbar-width: thin;
+  }
+
+  body {
+    background: var(--color-ink);
+    min-height: 100dvh;
+    overflow-x: clip;
+  }
+
+  ::selection {
+    background: var(--color-signal);
+    color: var(--color-ink);
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-ink);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--color-paper) 22%, transparent);
+    border: 3px solid var(--color-ink);
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-signal);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-signal);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+}
+
+@layer components {
+  .gutter {
+    padding-inline: var(--gutter);
+  }
+
+  .label {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-dim);
+  }
+
+  .hairline {
+    border-color: var(--color-line);
+  }
+
+  /* Underline that draws in from the left on hover. */
+  .link-draw {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size 0.6s var(--ease-out-expo);
+  }
+  .link-draw:hover,
+  .link-draw:focus-visible {
+    background-size: 100% 1px;
+  }
+
+  .btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    overflow: hidden;
+    isolation: isolate;
+    border-radius: 999px;
+    padding: 0.95rem 1.5rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    transition: color 0.5s var(--ease-out-expo);
+  }
+  .btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    transform: translateY(101%);
+    transition: transform 0.6s var(--ease-out-expo);
+  }
+  .btn:hover::before,
+  .btn:focus-visible::before {
+    transform: translateY(0);
+  }
+  .btn-solid {
+    background: var(--color-paper);
+    color: var(--color-ink);
+  }
+  .btn-solid::before {
+    background: var(--color-signal);
+  }
+  .btn-ghost {
+    box-shadow: inset 0 0 0 1px var(--color-line);
+    color: var(--color-paper);
+  }
+  .btn-ghost::before {
+    background: var(--color-paper);
+  }
+  .btn-ghost:hover,
+  .btn-ghost:focus-visible {
+    color: var(--color-ink);
+  }
+
+  .field {
+    width: 100%;
+    background: transparent;
+    border-bottom: 1px solid var(--color-line);
+    padding: 0.85rem 0;
+    font-size: 1.0625rem;
+    color: var(--color-paper);
+    transition: border-color 0.3s;
+  }
+  .field:focus {
+    outline: none;
+    border-color: var(--color-signal);
+  }
+  .field::placeholder {
+    color: var(--color-faint);
+  }
+}
+
+/* Film grain over everything; pointer-events none so it never blocks a click. */
+.grain {
+  position: fixed;
+  inset: -50%;
+  z-index: 60;
+  pointer-events: none;
+  background-image: url('/img/grain.webp');
+  background-size: 256px;
+  opacity: 0.07;
+  animation: grain 1.2s steps(6) infinite;
+}
+@keyframes grain {
+  0% {
+    transform: translate(0, 0);
+  }
+  20% {
+    transform: translate(-3%, 2%);
+  }
+  40% {
+    transform: translate(2%, -4%);
+  }
+  60% {
+    transform: translate(-4%, 1%);
+  }
+  80% {
+    transform: translate(3%, 3%);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+/* Reveal on scroll. Hidden only once JS has said motion is on, so the prerendered page is
+   readable without JavaScript. */
+html[data-motion='on'] [data-reveal] {
+  opacity: 0;
+  transform: translateY(2.5rem);
+  transition:
+    opacity 1.1s var(--ease-out-expo),
+    transform 1.1s var(--ease-out-expo);
+}
+html[data-motion='on'] [data-reveal][data-in='true'] {
+  opacity: 1;
+  transform: none;
+}
+
+/* Word-by-word headline rise. Delays come from nth-child so the markup needs no inline
+   style attributes, which the CSP would block. */
+.split > span {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+.split > span > span {
+  display: inline-block;
+}
+html[data-motion='on'] .split > span > span {
+  transform: translateY(105%);
+  transition: transform 1.3s var(--ease-out-expo);
+}
+html[data-motion='on'] .split[data-in='true'] > span > span {
+  transform: none;
+}
+.split > span:nth-child(2) > span {
+  transition-delay: 0.06s;
+}
+.split > span:nth-child(3) > span {
+  transition-delay: 0.12s;
+}
+.split > span:nth-child(4) > span {
+  transition-delay: 0.18s;
+}
+.split > span:nth-child(5) > span {
+  transition-delay: 0.24s;
+}
+.split > span:nth-child(6) > span {
+  transition-delay: 0.3s;
+}
+.split > span:nth-child(7) > span {
+  transition-delay: 0.36s;
+}
+.split > span:nth-child(8) > span {
+  transition-delay: 0.42s;
+}
+.split > span:nth-child(9) > span {
+  transition-delay: 0.48s;
+}
+.split > span:nth-child(10) > span {
+  transition-delay: 0.54s;
+}
+
+.marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 38s linear infinite;
+}
+.marquee:hover {
+  animation-play-state: paused;
+}
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Custom cursor: only for a fine pointer with motion allowed (set by Cursor.tsx). */
+html.has-cursor,
+html.has-cursor a,
+html.has-cursor button,
+html.has-cursor summary {
+  cursor: none;
+}
+html.has-cursor input,
+html.has-cursor textarea,
+html.has-cursor select {
+  cursor: text;
+}
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 70;
+  pointer-events: none;
+  border-radius: 999px;
+  mix-blend-mode: difference;
+}
+.cursor-dot {
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  background: var(--color-paper);
+}
+.cursor-ring {
+  width: 36px;
+  height: 36px;
+  margin: -18px 0 0 -18px;
+  border: 1px solid var(--color-paper);
+  transition:
+    width 0.4s var(--ease-out-expo),
+    height 0.4s var(--ease-out-expo),
+    margin 0.4s var(--ease-out-expo),
+    background-color 0.4s;
+}
+.cursor-ring[data-hover='true'] {
+  width: 72px;
+  height: 72px;
+  margin: -36px 0 0 -36px;
+  background: var(--color-paper);
+}
+
+.hero-a,
+.hero-b {
+  transition: none;
+}
+.hero-b {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .grain {
+    animation: none;
+  }
+}
