@@ -1,0 +1,68 @@
+[
+ {
+  "request": {
+   "method": "GET",
+   "url": "https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikipedia/all-access/2026/08/all-days",
+   "params": {}
+  },
+  "response": {
+   "status": 200,
+   "headers": {
+    "content-type": "application/json; charset=utf-8"
+   },
+   "body": {
+    "items": [
+     {
+      "project": "en.wikipedia",
+      "access": "all-access",
+      "year": "2026",
+      "month": "08",
+      "day": "all-days",
+      "articles": [
+       {
+        "article": "Main_Page",
+        "views": 216848380,
+        "rank": 1
+       },
+       {
+        "article": "Special:Search",
+        "views": 25909984,
+        "rank": 2
+       },
+       {
+        "article": "Wikipedia:Featured_pictures",
+        "views": 21855862,
+        "rank": 3
+       },
+       {
+        "article": "Hayden_Panettiere",
+        "views": 15252992,
+        "rank": 4
+       },
+       {
+        "article": "Dolly_Parton",
+        "views": 12589565,
+        "rank": 5
+       },
+       {
+        "article": "Spider-Man:_Brand_New_Day",
+        "views": 9774898,
+        "rank": 6
+       },
+       {
+        "article": "The_Odyssey_(2026_film)",
+        "views": 6074649,
+        "rank": 7
+       },
+       {
+        "article": "Tim_Curry",
+        "views": 5756761,
+        "rank": 8
+       }
+      ]
+     }
+    ]
+   }
+  }
+ }
+]

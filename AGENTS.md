@@ -52,9 +52,15 @@ docs/                roadmap, architecture, status
 
 ## Comments
 
-Default is no comment. Write one only for what the code can't say: why it's done this way, an API
-or data quirk, a source, or a trap for the next person. Not: restating the code, section banners,
-history, owner-less TODOs, or filler (simply, robust, seamless, ensure, leverage, comprehensive).
+Default is no comment. This is a hard rule, enforced in review.
+
+- Write one only when the code can't say it: why it is done this way, an API or data quirk, a
+  source or spec, a security reason, or a trap for the next person.
+- Never: restating what the code does, section banners, history ("changed X to Y"), owner-less
+  TODOs, commented-out code, or filler (simply, robust, seamless, ensure, leverage, comprehensive).
+- A docstring is a comment: only for public functions whose behaviour isn't obvious from the name
+  and types.
+- When you touch a file, delete the unnecessary comments you find in it.
 
 ## Workflow
 

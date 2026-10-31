@@ -1,0 +1,97 @@
+[
+ {
+  "request": {
+   "method": "GET",
+   "url": "https://en.wikipedia.org/w/api.php",
+   "params": {
+    "action": "query",
+    "prop": "info",
+    "redirects": "1",
+    "titles": "Physics|albert einstein|UK|OfflineShelf no such page 7731|Talk:"
+   }
+  },
+  "response": {
+   "status": 200,
+   "headers": {
+    "content-type": "application/json; charset=utf-8"
+   },
+   "body": {
+    "batchcomplete": true,
+    "query": {
+     "normalized": [
+      {
+       "fromencoded": false,
+       "from": "albert einstein",
+       "to": "Albert einstein"
+      }
+     ],
+     "redirects": [
+      {
+       "from": "Albert einstein",
+       "to": "Albert Einstein"
+      },
+      {
+       "from": "UK",
+       "to": "United Kingdom"
+      }
+     ],
+     "pages": [
+      {
+       "ns": 0,
+       "title": "OfflineShelf no such page 7731",
+       "missing": true,
+       "contentmodel": "wikitext",
+       "pagelanguage": "en",
+       "pagelanguagehtmlcode": "en",
+       "pagelanguagedir": "ltr"
+      },
+      {
+       "title": "Talk:",
+       "invalidreason": {
+        "code": "title-invalid-empty",
+        "text": "The requested page title is empty or contains only a namespace prefix."
+       },
+       "invalid": true
+      },
+      {
+       "pageid": 736,
+       "ns": 0,
+       "title": "Albert Einstein",
+       "contentmodel": "wikitext",
+       "pagelanguage": "en",
+       "pagelanguagehtmlcode": "en",
+       "pagelanguagedir": "ltr",
+       "touched": "2026-10-30T03:47:32Z",
+       "lastrevid": 1382733774,
+       "length": 239826
+      },
+      {
+       "pageid": 22939,
+       "ns": 0,
+       "title": "Physics",
+       "contentmodel": "wikitext",
+       "pagelanguage": "en",
+       "pagelanguagehtmlcode": "en",
+       "pagelanguagedir": "ltr",
+       "touched": "2026-10-30T07:44:05Z",
+       "lastrevid": 1381045695,
+       "length": 91798
+      },
+      {
+       "pageid": 31717,
+       "ns": 0,
+       "title": "United Kingdom",
+       "contentmodel": "wikitext",
+       "pagelanguage": "en",
+       "pagelanguagehtmlcode": "en",
+       "pagelanguagedir": "ltr",
+       "touched": "2026-10-31T18:41:42Z",
+       "lastrevid": 1382704842,
+       "length": 373745
+      }
+     ]
+    }
+   }
+  }
+ }
+]

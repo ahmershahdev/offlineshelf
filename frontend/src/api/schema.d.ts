@@ -150,6 +150,81 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/lists/{listId}/build": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                listId: number;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Queues a build. The new version starts as queued; poll it until ready or failed. */
+        post: operations["buildList"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/lists/{listId}/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                listId: number;
+            };
+            cookie?: never;
+        };
+        get: operations["listVersions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/lists/{listId}/versions/{versionId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                listId: number;
+                versionId: number;
+            };
+            cookie?: never;
+        };
+        get: operations["getVersion"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/lists/{listId}/versions/{versionId}/articles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                listId: number;
+                versionId: number;
+            };
+            cookie?: never;
+        };
+        get: operations["listArticles"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -244,6 +319,30 @@ export interface components {
         };
         ListPage: {
             items: components["schemas"]["ShelfList"][];
+            next_cursor: number | null;
+        };
+        ListVersion: {
+            id: number;
+            status: components["schemas"]["VersionStatus"];
+            started_at: string | null;
+            finished_at: string | null;
+            article_count: number;
+            error: string | null;
+            report: {
+                [key: string]: unknown;
+            } | null;
+        };
+        VersionPage: {
+            items: components["schemas"]["ListVersion"][];
+            next_cursor: number | null;
+        };
+        Article: {
+            page_id: number;
+            title: string;
+            revision_id: number | null;
+        };
+        ArticlePage: {
+            items: components["schemas"]["Article"][];
             next_cursor: number | null;
         };
         Problem: {
@@ -532,6 +631,108 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            404: components["responses"]["Problem"];
+        };
+    };
+    buildList: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                listId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Build queued */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListVersion"];
+                };
+            };
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    listVersions: {
+        parameters: {
+            query?: {
+                limit?: number;
+                cursor?: number;
+            };
+            header?: never;
+            path: {
+                listId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Newest first */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VersionPage"];
+                };
+            };
+            404: components["responses"]["Problem"];
+        };
+    };
+    getVersion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                listId: number;
+                versionId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The version */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListVersion"];
+                };
+            };
+            404: components["responses"]["Problem"];
+        };
+    };
+    listArticles: {
+        parameters: {
+            query?: {
+                limit?: number;
+                cursor?: number;
+            };
+            header?: never;
+            path: {
+                listId: number;
+                versionId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description In insertion order */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ArticlePage"];
+                };
             };
             404: components["responses"]["Problem"];
         };

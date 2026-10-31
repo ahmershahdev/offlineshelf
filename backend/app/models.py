@@ -101,6 +101,7 @@ class ListVersion(Base):
     finished_at: Mapped[datetime | None] = mapped_column(DateTime)
     article_count: Mapped[int] = mapped_column(Integer, default=0)
     error: Mapped[str | None] = mapped_column(Text)
+    report: Mapped[dict[str, Any] | None] = mapped_column(JSON)
 
     shelf_list: Mapped[ShelfList] = relationship(back_populates="versions")
 

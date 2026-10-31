@@ -21,11 +21,13 @@ app only calls the API. Builds never run inside a web request.
 
 | Path | Holds |
 |---|---|
-| `backend/app/core/` | Pure list logic, written by the maintainer (see AGENTS.md). Empty until M2. |
-| `backend/app/wiki/` | The only code that calls Wikimedia. Empty until M2. |
+| `backend/app/core/` | Pure list logic, written by the maintainer (see AGENTS.md and [core-contract.md](core-contract.md)) |
+| `backend/app/contract.py` | Standard-library types shared by core and the job: `Page`, `TitleBatch`, `WikiSource`, `Builder` |
+| `backend/app/wiki/` | The only code that calls Wikimedia: `client.py` (User-Agent, maxlag, retries, continuation), `source.py` (implements `WikiSource`) |
 | `backend/app/api/` | Blueprints: `health`, `auth`, `lists`; `errors.py` (problem+json), `util.py` |
 | `backend/app/security/` | Password hashing, CSRF, session cookie, headers, rate limits, wiki allow list |
-| `backend/app/jobs/` | RQ queue and jobs (`ping` for now) |
+| `backend/app/jobs/` | RQ queue; `build.py` queues and runs builds |
+| `backend/scripts/record_wiki.py` | Re-records the Wikimedia responses in `tests/wiki/recordings` (manual, never in CI) |
 | `backend/app/schemas.py` | Pydantic request and response models; all input limits live here |
 | `backend/migrations/` | Alembic |
 | `frontend/src/seo/` | Route table (titles, descriptions, JSON-LD), head rendering |
@@ -47,12 +49,12 @@ Rule: OfflineShelf stores titles and IDs, not article text.
 
 ## Data model
 
-Built (migration `512c42b8a106`):
+Built (migrations `512c42b8a106`, `7f9fad1c53cf`):
 
 ```
 user          id, email (unique), password_hash, session_epoch, created_at
 shelf_list    id, owner_id, name, wiki, builder, params (JSON), schedule, row_version, created_at
-list_version  id, list_id, status, started_at, finished_at, article_count, error
+list_version  id, list_id, status, started_at, finished_at, article_count, error, report (JSON)
 list_article  id, version_id, page_id, title (utf8mb4_bin), revision_id; unique (version_id, page_id)
 ```
 
@@ -61,8 +63,19 @@ Planned for M4: `combination_src (combination_id, source_list_id, operation)`,
 
 ## API
 
-Built: see `docs/openapi.yaml`. Planned next: `POST /lists/<id>/build`, `GET /lists/<id>/versions`,
-`GET /lists/<id>/versions/<v>/diff`, `POST /lists/<id>/exports`, `GET /exports/<id>`.
+Built: see `docs/openapi.yaml` (health, auth, lists, build, versions, articles). Planned next:
+`GET /lists/<id>/versions/<v>/diff` (M3), `POST /lists/<id>/exports` and `GET /exports/<id>` (M4).
+
+## Builds
+
+1. `POST /lists/<id>/build` locks the list row, refuses with 409 if a version is queued or
+   building, creates a `queued` version and enqueues `run_build` (job ID `build-<version>`).
+2. The worker marks it `building`, calls the core builder through `WikiSource`, and writes the
+   articles in batches of 1000 inside one transaction.
+3. Success: `ready` with the count and the builder's report. `WikiNetworkError` with retries
+   left: back to `queued` and RQ retries after 1, 5 and 15 minutes. Anything else: `failed`,
+   partial rows rolled back, earlier versions untouched. Unexpected errors are logged and shown
+   to the user only as "The build failed unexpectedly."
 
 ## Security
 
@@ -122,6 +135,9 @@ renders one still frame. The custom cursor only appears with a fine pointer.
 | PyMySQL driver | Pure Python, same on Windows, Linux and CI; speed is irrelevant next to Wikimedia API latency |
 | TypeScript 5.9, not 7 | openapi-typescript and typescript-eslint do not support 6 or 7 yet |
 | Cookie sessions, not server-side | No session store to run; `session_epoch` covers revocation |
+| httpx for Wikimedia | Timeouts and connection pooling built in; `MockTransport` replays recordings without a mocking library |
+| Neutral `app/contract.py` | Core stays importable without Flask, SQLAlchemy or httpx, and is tested with fakes |
+| Pageviews project without `.org` | The REST API answers 404 for `en.wikipedia.org`; it wants `en.wikipedia` |
 
 ## Open questions
 

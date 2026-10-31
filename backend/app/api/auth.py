@@ -34,8 +34,8 @@ def register() -> tuple[Response, int]:
         SessionLocal.commit()
     except IntegrityError:
         SessionLocal.rollback()
-        # Same status and message whether or not the address exists would need email
-        # confirmation to be meaningful; until accounts send mail, a 409 is the honest answer.
+        # This reveals that the address has an account. Hiding it needs email confirmation,
+        # which arrives with outgoing mail in M3.
         abort(409, description="An account with this email already exists.")
     token = log_in(user)
     return jsonify(user=_user_out(user), csrf=token), 201

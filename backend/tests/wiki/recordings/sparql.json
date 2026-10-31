@@ -1,0 +1,58 @@
+[
+ {
+  "request": {
+   "method": "POST",
+   "url": "https://query.wikidata.org/sparql",
+   "params": {
+    "query": "SELECT ?item WHERE { ?item wdt:P31 wd:Q3918 ; wdt:P17 wd:Q843 . } LIMIT 5"
+   }
+  },
+  "response": {
+   "status": 200,
+   "headers": {
+    "content-type": "application/sparql-results+json;charset=utf-8"
+   },
+   "body": {
+    "head": {
+     "vars": [
+      "item"
+     ]
+    },
+    "results": {
+     "bindings": [
+      {
+       "item": {
+        "type": "uri",
+        "value": "http://www.wikidata.org/entity/Q45312"
+       }
+      },
+      {
+       "item": {
+        "type": "uri",
+        "value": "http://www.wikidata.org/entity/Q125623"
+       }
+      },
+      {
+       "item": {
+        "type": "uri",
+        "value": "http://www.wikidata.org/entity/Q4790314"
+       }
+      },
+      {
+       "item": {
+        "type": "uri",
+        "value": "http://www.wikidata.org/entity/Q4794214"
+       }
+      },
+      {
+       "item": {
+        "type": "uri",
+        "value": "http://www.wikidata.org/entity/Q4831776"
+       }
+      }
+     ]
+    }
+   }
+  }
+ }
+]

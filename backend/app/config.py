@@ -26,8 +26,10 @@ class Settings(BaseSettings):
     rate_limit_default: str = "300 per minute;5000 per hour"
     rate_limit_auth: str = "10 per minute;50 per hour"
     rate_limit_write: str = "30 per minute"
+    rate_limit_build: str = "20 per hour"
 
     max_lists_per_user: int = 100
+    max_articles_per_list: int = 100_000
     max_category_depth: int = 5
     max_pasted_titles: int = 20_000
     max_sparql_chars: int = 10_000
@@ -52,7 +54,6 @@ def get_settings() -> Settings:
 
 
 def current_settings() -> Settings:
-    """Settings of the running Flask app, falling back to the environment outside a request."""
     from flask import current_app, has_app_context
 
     if has_app_context():

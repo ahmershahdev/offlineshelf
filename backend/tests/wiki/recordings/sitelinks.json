@@ -1,0 +1,257 @@
+[
+ {
+  "request": {
+   "method": "GET",
+   "url": "https://ur.wikipedia.org/w/api.php",
+   "params": {
+    "action": "query",
+    "meta": "siteinfo"
+   }
+  },
+  "response": {
+   "status": 200,
+   "headers": {
+    "content-type": "application/json; charset=utf-8"
+   },
+   "body": {
+    "batchcomplete": true,
+    "query": {
+     "general": {
+      "mainpage": "صفحۂ اول",
+      "base": "https://ur.wikipedia.org/wiki/%D8%B5%D9%81%D8%AD%DB%82_%D8%A7%D9%88%D9%84",
+      "sitename": "ویکیپیڈیا",
+      "mainpageisdomainroot": false,
+      "logo": "//ur.wikipedia.org/static/images/project-logos/urwiki.png",
+      "generator": "MediaWiki 1.48.0-wmf.1",
+      "phpversion": "8.3",
+      "phpsapi": "fpm-fcgi",
+      "dbtype": "mysql",
+      "dbversion": "10.11.16-MariaDB-log",
+      "imagewhitelistenabled": false,
+      "langconversion": true,
+      "linkconversion": true,
+      "titleconversion": true,
+      "linkprefixcharset": "",
+      "linkprefix": "",
+      "linktrail": "/^([ابپتٹثجچحخدڈذر​ڑ​زژسشصضطظعغفقکگل​م​نںوؤہھیئےآأءۃ]+)(.*)$/sDu",
+      "legaltitlechars": " %!\"$&'()*,\\-.\\/0-9:;=?@A-Z\\\\^_`a-z~\\x80-\\xFF+",
+      "invalidusernamechars": "@:>=",
+      "allunicodefixes": false,
+      "git-hash": "7bb77dca695d445702109ae278db6e1750cb612f",
+      "git-branch": "wmf/1.48.0-wmf.1",
+      "case": "first-letter",
+      "lang": "ur",
+      "fallback": [
+       {
+        "code": "en"
+       }
+      ],
+      "rtl": true,
+      "fallback8bitEncoding": "windows-1256",
+      "readonly": false,
+      "writeapi": true,
+      "maxarticlesize": 2097152,
+      "timezone": "UTC",
+      "timeoffset": 0,
+      "articlepath": "/wiki/$1",
+      "scriptpath": "/w",
+      "script": "/w/index.php",
+      "variantarticlepath": false,
+      "server": "//ur.wikipedia.org",
+      "servername": "ur.wikipedia.org",
+      "wikiid": "urwiki",
+      "time": "2026-10-31T19:47:50Z",
+      "misermode": true,
+      "uploadsenabled": true,
+      "maxuploadsize": 5368709120,
+      "minuploadchunksize": 1024,
+      "galleryoptions": {
+       "imagesPerRow": 0,
+       "imageWidth": 120,
+       "imageHeight": 120,
+       "captionLength": true,
+       "showBytes": true,
+       "mode": "traditional",
+       "showDimensions": true
+      },
+      "thumblimits": {
+       "0": 180,
+       "1": 250,
+       "2": 400
+      },
+      "imagelimits": {
+       "0": {
+        "width": 320,
+        "height": 240
+       },
+       "1": {
+        "width": 640,
+        "height": 480
+       },
+       "2": {
+        "width": 800,
+        "height": 600
+       },
+       "3": {
+        "width": 1024,
+        "height": 768
+       },
+       "4": {
+        "width": 1280,
+        "height": 1024
+       },
+       "5": {
+        "width": 2560,
+        "height": 2048
+       }
+      },
+      "favicon": "https://ur.wikipedia.org/static/favicon/wikipedia.ico",
+      "centralidlookupprovider": "CentralAuth",
+      "allcentralidlookupproviders": [
+       "CentralAuth",
+       "local"
+      ],
+      "interwikimagic": true,
+      "magiclinks": {
+       "ISBN": true,
+       "PMID": true,
+       "RFC": true
+      },
+      "categorycollation": "uppercase",
+      "nofollowlinks": true,
+      "nofollownsexceptions": [],
+      "nofollowdomainexceptions": [
+       "mediawiki.org",
+       "wikibooks.org",
+       "wikimedia.com",
+       "wikimedia.org",
+       "wikinews.org",
+       "wikipedia.org",
+       "wikiquote.org",
+       "wikisource.org",
+       "wikiversity.org",
+       "wiktionary.org",
+       "wikivoyage.org",
+       "wikidata.org",
+       "wikifunctions.org",
+       "tools.wmflabs.org",
+       "toolforge.org",
+       "etherpad.wmflabs.org"
+      ],
+      "externallinktarget": false,
+      "wmf-config": {
+       "wmfMasterDatacenter": "codfw",
+       "wmfEtcdLastModifiedIndex": 6562073
+      },
+      "citeresponsivereferences": false,
+      "max-page-id": 3165440,
+      "linter": {
+       "high": [
+        "deletable-table-tag",
+        "duplicate-ids",
+        "html5-misnesting",
+        "misc-tidy-replacement-issues",
+        "multiline-html-table-in-list",
+        "multiple-unclosed-formatting-tags",
+        "pwrap-bug-workaround",
+        "self-closed-tag",
+        "template-arg-in-extension-tag",
+        "tidy-font-bug",
+        "tidy-whitespace-bug",
+        "unclosed-quotes-in-heading"
+       ],
+       "medium": [
+        "bogus-image-options",
+        "fostered",
+        "misnested-tag",
+        "multi-colon-escape",
+        "wikilink-in-extlink"
+       ],
+       "low": [
+        "empty-heading",
+        "missing-end-tag",
+        "missing-end-tag-in-heading",
+        "night-mode-unaware-background-color",
+        "obsolete-tag",
+        "pre-expansion",
+        "stripped-tag"
+       ]
+      },
+      "mobileserver": "https://ur.wikipedia.org",
+      "pageviewservice-supported-metrics": {
+       "pageviews": {
+        "pageviews": true,
+        "uniques": false
+       },
+       "siteviews": {
+        "pageviews": true,
+        "uniques": true
+       },
+       "mostviewed": {
+        "pageviews": true,
+        "uniques": false
+       }
+      },
+      "readinglists-config": {
+       "maxListsPerUser": 100,
+       "maxEntriesPerList": 5000,
+       "deletedRetentionDays": 30
+      }
+     }
+    }
+   }
+  }
+ },
+ {
+  "request": {
+   "method": "GET",
+   "url": "https://www.wikidata.org/w/api.php",
+   "params": {
+    "action": "wbgetentities",
+    "ids": "Q42|Q937|Q4115189",
+    "props": "sitelinks",
+    "sitefilter": "urwiki"
+   }
+  },
+  "response": {
+   "status": 200,
+   "headers": {
+    "content-type": "application/json; charset=utf-8"
+   },
+   "body": {
+    "entities": {
+     "Q42": {
+      "type": "item",
+      "id": "Q42",
+      "sitelinks": {
+       "urwiki": {
+        "site": "urwiki",
+        "title": "ڈگلس ایڈمس",
+        "badges": []
+       }
+      }
+     },
+     "Q937": {
+      "type": "item",
+      "id": "Q937",
+      "sitelinks": {
+       "urwiki": {
+        "site": "urwiki",
+        "title": "البرٹ آئنسٹائن",
+        "badges": [
+         "Q17437796"
+        ]
+       }
+      }
+     },
+     "Q4115189": {
+      "type": "item",
+      "id": "Q4115189",
+      "sitelinks": {}
+     }
+    },
+    "success": 1
+   }
+  }
+ }
+]

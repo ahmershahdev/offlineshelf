@@ -63,8 +63,6 @@ def redis() -> Iterator[Redis]:
 
 
 class ApiClient:
-    """Test client that behaves like the frontend: fetches a CSRF token and sends it back."""
-
     def __init__(self, client: FlaskClient) -> None:
         self.client = client
         self.token = ""

@@ -1,0 +1,194 @@
+[
+ {
+  "request": {
+   "method": "GET",
+   "url": "https://en.wikipedia.org/w/api.php",
+   "params": {
+    "action": "query",
+    "cmlimit": "max",
+    "cmnamespace": "14",
+    "cmprop": "ids|title",
+    "cmtitle": "Category:Vaccines",
+    "cmtype": "subcat",
+    "list": "categorymembers"
+   }
+  },
+  "response": {
+   "status": 200,
+   "headers": {
+    "content-type": "application/json; charset=utf-8"
+   },
+   "body": {
+    "batchcomplete": true,
+    "limits": {
+     "categorymembers": 500
+    },
+    "query": {
+     "categorymembers": [
+      {
+       "pageid": 83241980,
+       "ns": 14,
+       "title": "Category:Vaccines by disease"
+      },
+      {
+       "pageid": 19227055,
+       "ns": 14,
+       "title": "Category:Animal vaccines"
+      },
+      {
+       "pageid": 57765896,
+       "ns": 14,
+       "title": "Category:Combination vaccines"
+      },
+      {
+       "pageid": 56949877,
+       "ns": 14,
+       "title": "Category:Inactivated vaccines"
+      },
+      {
+       "pageid": 12956008,
+       "ns": 14,
+       "title": "Category:Live vaccines"
+      },
+      {
+       "pageid": 61409152,
+       "ns": 14,
+       "title": "Category:MMR vaccine and autism"
+      },
+      {
+       "pageid": 63142422,
+       "ns": 14,
+       "title": "Category:Nucleic acid vaccines"
+      },
+      {
+       "pageid": 56948562,
+       "ns": 14,
+       "title": "Category:Subunit vaccines"
+      },
+      {
+       "pageid": 57782524,
+       "ns": 14,
+       "title": "Category:Toxoid vaccines"
+      },
+      {
+       "pageid": 47651674,
+       "ns": 14,
+       "title": "Category:Vaccines against drugs"
+      },
+      {
+       "pageid": 67567710,
+       "ns": 14,
+       "title": "Category:Viral vector vaccines"
+      },
+      {
+       "pageid": 48825294,
+       "ns": 14,
+       "title": "Category:World Health Organization essential medicines (vaccines)"
+      },
+      {
+       "pageid": 27977033,
+       "ns": 14,
+       "title": "Category:Vaccine stubs"
+      }
+     ]
+    }
+   }
+  }
+ },
+ {
+  "request": {
+   "method": "GET",
+   "url": "https://en.wikipedia.org/w/api.php",
+   "params": {
+    "action": "query",
+    "cmlimit": "3",
+    "cmnamespace": "0",
+    "cmprop": "ids|title",
+    "cmtitle": "Category:Polio vaccines",
+    "cmtype": "page",
+    "list": "categorymembers"
+   }
+  },
+  "response": {
+   "status": 200,
+   "headers": {
+    "content-type": "application/json; charset=utf-8"
+   },
+   "body": {
+    "batchcomplete": true,
+    "continue": {
+     "cmcontinue": "page|2c322a403206042a402a44043c46384403063c463844042c322a4032040992543a4c464046363a4e50099401250b01dcc0dcc2dcc2dcc2dc15|34414616",
+     "continue": "-||"
+    },
+    "query": {
+     "categorymembers": [
+      {
+       "pageid": 192198,
+       "ns": 0,
+       "title": "Polio vaccine"
+      },
+      {
+       "pageid": 61262715,
+       "ns": 0,
+       "title": "Raul Andino"
+      },
+      {
+       "pageid": 68367201,
+       "ns": 0,
+       "title": "Announcement of polio vaccine success"
+      }
+     ]
+    }
+   }
+  }
+ },
+ {
+  "request": {
+   "method": "GET",
+   "url": "https://en.wikipedia.org/w/api.php",
+   "params": {
+    "action": "query",
+    "cmcontinue": "page|2c322a403206042a402a44043c46384403063c463844042c322a4032040992543a4c464046363a4e50099401250b01dcc0dcc2dcc2dcc2dc15|34414616",
+    "cmlimit": "3",
+    "cmnamespace": "0",
+    "cmprop": "ids|title",
+    "cmtitle": "Category:Polio vaccines",
+    "cmtype": "page",
+    "continue": "-||",
+    "list": "categorymembers"
+   }
+  },
+  "response": {
+   "status": 200,
+   "headers": {
+    "content-type": "application/json; charset=utf-8"
+   },
+   "body": {
+    "batchcomplete": true,
+    "continue": {
+     "cmcontinue": "page|2e3a2a04342a3e3204542a2e2e3a442a503a4644042e2a42482a3a3644043a4404482a3e3a4e502a4401250c01dcdcdca8dc0b|77725324",
+     "continue": "-||"
+    },
+    "query": {
+     "categorymembers": [
+      {
+       "pageid": 34414616,
+       "ns": 0,
+       "title": "John Beale (virologist)"
+      },
+      {
+       "pageid": 18900359,
+       "ns": 0,
+       "title": "David Bodian"
+      },
+      {
+       "pageid": 58134314,
+       "ns": 0,
+       "title": "Maurice Brodie"
+      }
+     ]
+    }
+   }
+  }
+ }
+]
