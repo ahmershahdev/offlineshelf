@@ -90,6 +90,9 @@ await ogFinal
   .clone()
   .png({ compressionLevel: 9, palette: true })
   .toFile(join(pub, 'og', 'og-default.png'))
-await ogFinal.clone().webp({ quality: 82 }).toFile(join(pub, 'og', 'og-default.webp'))
+await ogFinal
+  .clone()
+  .webp({ quality: 82 })
+  .toFile(join(pub, 'og', 'og-default.webp'))
 
 console.log('images written to public/')
