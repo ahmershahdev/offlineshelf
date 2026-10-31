@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Wrong article content
+    url: https://en.wikipedia.org/wiki/Help:Editing
+    about: Article text comes from Wikipedia. Please fix mistakes there.
+  - name: Security vulnerability
+    url: https://github.com/ahmershahdev/offlineshelf/security/advisories/new
+    about: Report security problems privately.
