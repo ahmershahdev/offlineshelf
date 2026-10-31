@@ -10,7 +10,7 @@ x-backend-env: &backend-env
 
 services:
   mariadb:
-    image: mariadb:11.4
+    image: mariadb:13.0
     restart: unless-stopped
     environment:
       MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:?}
