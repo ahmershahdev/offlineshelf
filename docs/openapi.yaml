@@ -86,6 +86,49 @@ paths:
       responses:
         '204': { description: Deleted }
         '404': { $ref: '#/components/responses/Problem' }
+  /lists/{listId}/build:
+    parameters:
+      - { name: listId, in: path, required: true, schema: { type: integer } }
+    post:
+      operationId: buildList
+      description: Queues a build. The new version starts as queued; poll it until ready or failed.
+      responses:
+        '202': { description: Build queued, content: { application/json: { schema: { $ref: '#/components/schemas/ListVersion' } } } }
+        '404': { $ref: '#/components/responses/Problem' }
+        '409': { $ref: '#/components/responses/Problem' }
+        '429': { $ref: '#/components/responses/Problem' }
+  /lists/{listId}/versions:
+    parameters:
+      - { name: listId, in: path, required: true, schema: { type: integer } }
+    get:
+      operationId: listVersions
+      parameters:
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
+        - { name: cursor, in: query, schema: { type: integer } }
+      responses:
+        '200': { description: Newest first, content: { application/json: { schema: { $ref: '#/components/schemas/VersionPage' } } } }
+        '404': { $ref: '#/components/responses/Problem' }
+  /lists/{listId}/versions/{versionId}:
+    parameters:
+      - { name: listId, in: path, required: true, schema: { type: integer } }
+      - { name: versionId, in: path, required: true, schema: { type: integer } }
+    get:
+      operationId: getVersion
+      responses:
+        '200': { description: The version, content: { application/json: { schema: { $ref: '#/components/schemas/ListVersion' } } } }
+        '404': { $ref: '#/components/responses/Problem' }
+  /lists/{listId}/versions/{versionId}/articles:
+    parameters:
+      - { name: listId, in: path, required: true, schema: { type: integer } }
+      - { name: versionId, in: path, required: true, schema: { type: integer } }
+    get:
+      operationId: listArticles
+      parameters:
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 1000, default: 100 } }
+        - { name: cursor, in: query, schema: { type: integer } }
+      responses:
+        '200': { description: In insertion order, content: { application/json: { schema: { $ref: '#/components/schemas/ArticlePage' } } } }
+        '404': { $ref: '#/components/responses/Problem' }
 components:
   responses:
     Problem:
@@ -193,6 +236,36 @@ components:
       required: [items, next_cursor]
       properties:
         items: { type: array, items: { $ref: '#/components/schemas/ShelfList' } }
+        next_cursor: { oneOf: [{ type: integer }, { type: 'null' }] }
+    ListVersion:
+      type: object
+      required: [id, status, started_at, finished_at, article_count, error, report]
+      properties:
+        id: { type: integer }
+        status: { $ref: '#/components/schemas/VersionStatus' }
+        started_at: { oneOf: [{ type: string, format: date-time }, { type: 'null' }] }
+        finished_at: { oneOf: [{ type: string, format: date-time }, { type: 'null' }] }
+        article_count: { type: integer }
+        error: { oneOf: [{ type: string }, { type: 'null' }] }
+        report: { oneOf: [{ type: object, additionalProperties: true }, { type: 'null' }] }
+    VersionPage:
+      type: object
+      required: [items, next_cursor]
+      properties:
+        items: { type: array, items: { $ref: '#/components/schemas/ListVersion' } }
+        next_cursor: { oneOf: [{ type: integer }, { type: 'null' }] }
+    Article:
+      type: object
+      required: [page_id, title, revision_id]
+      properties:
+        page_id: { type: integer }
+        title: { type: string }
+        revision_id: { oneOf: [{ type: integer }, { type: 'null' }] }
+    ArticlePage:
+      type: object
+      required: [items, next_cursor]
+      properties:
+        items: { type: array, items: { $ref: '#/components/schemas/Article' } }
         next_cursor: { oneOf: [{ type: integer }, { type: 'null' }] }
     Problem:
       type: object

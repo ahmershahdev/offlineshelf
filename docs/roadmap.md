@@ -21,19 +21,20 @@ in CI, and seed data.
 
 ## M2. Builders (target 2026-11-29)
 
-- [ ] Wikimedia client: one `User-Agent` with contact details, `maxlag`, retries with backoff,
+- [x] Wikimedia client: one `User-Agent` with contact details, `maxlag`, retries with backoff,
   continuation handled, responses recorded for tests
 - [ ] Pasted list: normalise titles, resolve redirects, report missing pages
 - [ ] Category: members in namespace 0, subcategories up to a depth limit, loop-safe
 - [ ] Wikidata: SPARQL query, items mapped to articles on the chosen wiki
 - [ ] Top by pageviews: top N for a month from the Wikimedia REST API
-- [ ] `POST /api/v1/lists`, `GET /api/v1/lists/<id>`, validation and one error format
-- [ ] Builder logic in plain Python with 100% branch coverage
+- [x] `POST /api/v1/lists`, `GET /api/v1/lists/<id>`, validation and one error format
+- [x] Build pipeline: `POST /lists/<id>/build`, versions, articles; builders plug in via `app/core/builders.py` ([core-contract.md](core-contract.md))
+- [ ] Builder logic in plain Python with 100% branch coverage (maintainer)
 
 ## M3. Jobs and schedules (target 2026-12-13)
 
-- [ ] Every build is an RQ job; list status `queued`, `building`, `ready`, `failed`
-- [ ] Retries with `Retry` for network errors only; a failed build keeps the last good version
+- [x] Every build is an RQ job; list status `queued`, `building`, `ready`, `failed`
+- [x] Retries with `Retry` for network errors only; a failed build keeps the last good version
 - [ ] Email when a build fails (one per list per day at most)
 - [ ] Monthly rebuilds; each build stored as a version with added and removed articles
 - [ ] Large lists (100k titles) written in batches without loading everything in memory

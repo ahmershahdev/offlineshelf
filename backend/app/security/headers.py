@@ -3,7 +3,7 @@ from flask import Flask, Response
 from app.config import Settings
 
 # The API only returns JSON, so nothing may load, run or frame. The site's own CSP (with nonces)
-# is set by nginx in deploy/nginx, since nginx serves the HTML.
+# is set by nginx (frontend/nginx), since nginx serves the HTML.
 API_CSP = "default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'"
 
 

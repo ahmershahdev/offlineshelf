@@ -156,8 +156,38 @@ class ListPage(BaseModel):
     next_cursor: int | None
 
 
+class VersionOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    status: VersionStatus
+    started_at: datetime | None
+    finished_at: datetime | None
+    article_count: int
+    error: str | None
+    report: dict[str, object] | None
+
+
+class VersionPage(BaseModel):
+    items: list[VersionOut]
+    next_cursor: int | None
+
+
+class ArticleOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    page_id: int
+    title: str
+    revision_id: int | None
+
+
+class ArticlePage(BaseModel):
+    items: list[ArticleOut]
+    next_cursor: int | None
+
+
 class Problem(BaseModel):
-    """RFC 9457 problem details. Every error the API returns has this shape."""
+    """RFC 9457 problem details."""
 
     type: str = "about:blank"
     title: str
