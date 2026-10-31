@@ -1,13 +1,21 @@
 # Project status
 
-Last updated: 2026-11-01. `main` requires `backend`, `frontend` and both CodeQL checks to pass. Update at the end of every work session.
+Last updated: 2026-11-01. Update at the end of every work session.
 
 ## Where we are
 
-M1 done. M2: the Wikimedia client, the build pipeline (build, versions, articles API) and the
-core contract (`docs/core-contract.md`) are merged; the four builders in `app/core` are the
-maintainer's to write. The site has 13 public pages, the Fraunces/Geist type system, a torch
-cursor with grab states, and your contact details (support@ahmershah.dev, ahmershah.dev).
+- **M1 Skeleton:** done (PR #1, #9).
+- **M2 Builders:** infrastructure done (PR #10): Wikimedia client (`app/wiki`), shared types
+  (`app/contract.py`), build job (`app/jobs/build.py`), build/versions/articles API, recorded
+  responses in `backend/tests/wiki/recordings`. **Open:** the four builders in
+  `app/core/builders.py`, written by the maintainer per [core-contract.md](core-contract.md).
+  Until then a build ends as `failed` with "The X builder is not implemented yet."
+- **Site:** 13 public pages, Fraunces/Geist type, torch cursor with grab states, draggable example
+  shelf, brand emblem icons, security.txt, contact details (support@ahmershah.dev,
+  ahmershah.dev) (PR #11). The `/app` page signs in, creates, builds and deletes lists.
+- **Repo:** only `main`, no open PRs. `main` requires `backend`, `frontend`, `codeql (python)`
+  and `codeql (javascript-typescript)`, squash merges, linear history.
+- Tests: 88 backend (MariaDB 11.4 + Redis), 19 frontend.
 
 ## Run it
 
@@ -30,9 +38,14 @@ proxies `/api`). `npm run dev:down` stops the containers. Needs Docker, uv and N
 
 ## Next session
 
-1. Maintainer: `app/core/builders.py` with the four builders, per `docs/core-contract.md`.
-2. M3: version diffs (needs a core diff function), monthly schedules, failure emails.
-3. Install SonarQube Cloud and CodeRabbit on the repository, then add them as required checks.
+1. Maintainer: write `backend/app/core/builders.py` (pasted titles first, then category,
+   Wikidata, pageviews) with 100% branch coverage, per `docs/core-contract.md`.
+2. Read the About page copy and confirm it says what you want about yourself.
+3. M3: monthly schedules (rq scheduler), failure emails (at most one per list per day), version
+   diff endpoint once core has a diff function.
+4. M5: show build status, history and articles in `/app`.
+5. Install SonarQube Cloud and CodeRabbit on the repository (needs the owner's GitHub
+   authorisation), then add them as required checks in `.github/rulesets/protect-main.json`.
 
 ## Known issues
 
