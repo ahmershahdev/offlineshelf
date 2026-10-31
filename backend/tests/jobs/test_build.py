@@ -38,8 +38,10 @@ def builder(monkeypatch):
             raise outcome
         return outcome
 
-    monkeypatch.setattr(build_module, "resolve_builder", lambda kind: fake)
-    monkeypatch.setattr(build_module, "make_source", lambda wiki, s: SimpleNamespace(wiki=wiki))
+    monkeypatch.setattr(build_module, "resolve_builder", lambda _kind: fake)
+    monkeypatch.setattr(
+        build_module, "make_source", lambda wiki, _settings: SimpleNamespace(wiki=wiki)
+    )
     return state
 
 
@@ -193,7 +195,9 @@ def test_missing_core_builder_fails_with_a_clear_message() -> None:
 
 
 def test_unimplemented_builder_fails_the_build(signed_in, redis, monkeypatch) -> None:
-    monkeypatch.setattr(build_module, "make_source", lambda wiki, s: SimpleNamespace(wiki=wiki))
+    monkeypatch.setattr(
+        build_module, "make_source", lambda wiki, _settings: SimpleNamespace(wiki=wiki)
+    )
     list_id = create_list(signed_in)
     signed_in.send("POST", f"/api/v1/lists/{list_id}/build")
     work(redis)
