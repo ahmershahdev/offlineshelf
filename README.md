@@ -8,8 +8,18 @@ combine lists, and export the result as a TSV file, a static HTML bundle or (lat
 format offline readers such as Kiwix open. Lists can rebuild themselves every month and tell you
 what changed.
 
-> Status: planning. Nothing is built yet. See [docs/roadmap.md](docs/roadmap.md) for the
-> milestones and [docs/status.md](docs/status.md) for where the work is.
+> Status: early development. The skeleton, accounts and the landing site work; list builders come
+> next. See [docs/roadmap.md](docs/roadmap.md) and [docs/status.md](docs/status.md).
+
+## Run it locally
+
+```
+cp .env.example .env        # set OFFLINESHELF_SECRET_KEY and the two MariaDB passwords
+docker compose up -d --build
+```
+
+Then open <http://localhost:8080>. For development with hot reload, run `npm run dev` from the
+repo root and open <http://localhost:5173>. Test commands are in [docs/status.md](docs/status.md).
 
 ## What it will do
 
@@ -30,7 +40,7 @@ what changed.
 |---|---|
 | API and jobs | Python 3.12, Flask (app factory, blueprints), Pydantic, SQLAlchemy 2, Alembic, RQ |
 | Data | MariaDB 11.4, Redis (queue and cache), MediaWiki Action API, Wikimedia REST API, Wikidata Query Service |
-| Web | React, TypeScript (strict), Vite, Tailwind CSS |
+| Web | React, TypeScript (strict), Vite, Tailwind CSS, Lenis, three.js; prerendered for SEO |
 | Quality | pytest with recorded API responses, Vitest, Ruff, mypy, ESLint, Prettier, GitHub Actions, CodeQL |
 | Run | Docker Compose |
 

@@ -1,0 +1,71 @@
+# OfflineShelf: full text
+
+Source: https://offlineshelf.ahmershah.dev
+Author: Syed Ahmer Shah (https://ahmershah.dev)
+License: code MIT; Wikipedia content in exports CC BY-SA 4.0
+Status: in development, launching February 2027
+
+## What it is
+
+OfflineShelf builds Wikipedia reading lists for places without internet. Picking a few thousand good articles out of millions is the hard part of offline Wikipedia: the lists have to be reproducible, combinable and kept up to date. OfflineShelf is a small, self-hostable tool for that step.
+
+## Builders
+
+1. Category: every article (namespace 0) in a category and its subcategories, down to a depth limit of 5. Loops in the category tree are detected.
+2. Wikidata: a SPARQL query against the Wikidata Query Service (up to 10,000 characters, 60 second timeout). Items are mapped to articles on the chosen wiki through sitelinks.
+3. Pasted titles: up to 20,000 titles. Redirects are resolved and missing pages are reported.
+4. Pageviews: the top N (up to 1,000) most-read articles of a month from the Wikimedia REST API.
+
+Lists can target any language edition of Wikipedia and the other Wikimedia content projects (Wiktionary, Wikibooks, Wikinews, Wikiquote, Wikisource, Wikiversity, Wikivoyage).
+
+## Combinations
+
+Union, intersection and difference of up to ten lists, for example "Physics minus Biographies". Cycles between lists are refused. A combination rebuilds when one of its source lists gets a new version.
+
+## Builds, versions and schedules
+
+Builds never run inside a web request. Each build is a background job with a status: queued, building, ready or failed. Network errors are retried with backoff. Each successful build is stored as a new version with the articles added and removed since the previous one. A failed build never replaces the last good version. Lists can rebuild monthly.
+
+## Exports
+
+- TSV: title, page ID and revision ID.
+- Static HTML bundle: Parsoid HTML of each article, local links rewritten, with an attribution page.
+- ZIM (stretch goal): a single file that Kiwix opens, for small lists.
+
+Downloads are streamed and expire after seven days.
+
+## Principles
+
+- Titles, not text: only titles and IDs are stored.
+- Attribution built in: every export carries the CC BY-SA 4.0 notice.
+- Polite to Wikimedia: one identified User-Agent with a contact address, maxlag on every request, backoff when servers are busy.
+- Yours to host: MIT licensed, one Docker Compose file.
+
+## Privacy
+
+Stored: your email address, an Argon2id hash of your password, and your list settings. One HttpOnly session cookie, 14 days. No analytics, advertising, tracking or third-party resources. Wikimedia APIs are called from the server, not the browser.
+
+## API
+
+JSON under /api/v1, errors as RFC 9457 problem details. Unsafe requests need the session cookie and the X-CSRF-Token header from GET /api/v1/auth/csrf.
+
+- GET /api/v1/health
+- GET /api/v1/auth/csrf
+- POST /api/v1/auth/register, /auth/login, /auth/logout, /auth/logout-everywhere
+- GET /api/v1/auth/me
+- GET, POST /api/v1/lists
+- GET, DELETE /api/v1/lists/{id}
+
+## FAQ
+
+What does OfflineShelf export? A TSV file of titles, page IDs and revision IDs, and a static HTML bundle of the articles with attribution. ZIM export for Kiwix is planned for small lists.
+
+Does OfflineShelf copy Wikipedia articles into its database? No. It stores titles and IDs only.
+
+Which wikis can I build lists from? Any language edition of Wikipedia, and the other Wikimedia content projects.
+
+What happens when a scheduled rebuild fails? The last good version stays current, the failure is recorded, and the next rebuild tries again.
+
+Is OfflineShelf free and open source? Yes, MIT licensed and self-hostable with Docker Compose.
+
+Wikipedia is a trademark of the Wikimedia Foundation. OfflineShelf is an independent project and is not endorsed by or affiliated with the Foundation.
