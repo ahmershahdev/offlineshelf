@@ -56,7 +56,7 @@ as Wikimedia's WP1 selection tool, without needing its database replicas.
 - [docs/roadmap.md](docs/roadmap.md): milestones M1 to M6 and what "done" means
 - [docs/architecture.md](docs/architecture.md): planned API, data model and decisions
 - [docs/status.md](docs/status.md): current state, updated every session
-- [CONTRIBUTING.md](CONTRIBUTING.md) and [SECURITY.md](SECURITY.md)
+- [CONTRIBUTING.md](CONTRIBUTING.md), [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) and [SECURITY.md](SECURITY.md)
 
 ## Related
 

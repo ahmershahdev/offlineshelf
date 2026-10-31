@@ -14,7 +14,7 @@ in CI, and seed data.
 - [x] Redis and one RQ worker in Compose; a test job that runs end to end
 - [x] pytest with coverage, Ruff, mypy (strict)
 - [x] GitHub Actions: `backend` job, CodeQL
-- [ ] Add `backend`, `frontend` and `codeql` as required checks in the ruleset
+- [x] Add `backend`, `frontend` and `codeql` as required checks in the ruleset
 - [x] Extra: accounts (Argon2id), CSRF, rate limits, security headers, list CRUD, OpenAPI contract
 - [x] Extra: prerendered landing site with SEO (meta, JSON-LD, sitemap, robots, llms.txt)
 - [x] Dependabot for Actions, Python, npm and Docker

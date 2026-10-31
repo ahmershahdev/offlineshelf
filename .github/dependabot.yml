@@ -7,6 +7,7 @@ updates:
     groups:
       actions:
         patterns: ["*"]
+
   - package-ecosystem: uv
     directory: /backend
     schedule:
@@ -14,6 +15,7 @@ updates:
     groups:
       python:
         patterns: ["*"]
+
   - package-ecosystem: npm
     directory: /frontend
     schedule:
@@ -21,11 +23,35 @@ updates:
     groups:
       npm:
         patterns: ["*"]
+    ignore:
+      # typescript-eslint and openapi-typescript only support TypeScript 5 (docs/architecture.md).
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
+      # @types/node follows the Node line in the Dockerfile and CI, not the latest release.
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
+
+  # The runtime lines below are pinned on purpose; moving them is a deliberate PR, not a bot bump.
   - package-ecosystem: docker
     directories: ["/backend", "/frontend"]
     schedule:
       interval: monthly
+    ignore:
+      - dependency-name: python
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      - dependency-name: node
+        update-types: ["version-update:semver-major"]
+      # Odd nginx minors are mainline; the project follows the stable line.
+      - dependency-name: nginxinc/nginx-unprivileged
+        update-types: ["version-update:semver-minor"]
+
   - package-ecosystem: docker-compose
     directory: /
     schedule:
       interval: monthly
+    ignore:
+      # MariaDB 11.4 is the LTS the project targets in dev, tests and production.
+      - dependency-name: mariadb
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      - dependency-name: redis
+        update-types: ["version-update:semver-major"]

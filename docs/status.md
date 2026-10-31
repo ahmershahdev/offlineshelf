@@ -1,10 +1,10 @@
 # Project status
 
-Last updated: 2026-11-01. Update at the end of every work session.
+Last updated: 2026-11-01. `main` requires `backend`, `frontend` and both CodeQL checks to pass. Update at the end of every work session.
 
 ## Where we are
 
-M1 skeleton is built on branch `feat/skeleton` (not merged yet), plus security, auth, list CRUD,
+M1 skeleton is merged (PR #1), plus security, auth, list CRUD,
 the prerendered landing site and the SEO pipeline. Everything runs with `docker compose up`.
 Backend: 49 tests pass against MariaDB 11.4 and Redis; ruff and mypy strict are clean. Frontend:
 typecheck, ESLint (strictTypeChecked) and Vitest pass; the production build prerenders 4 routes.
@@ -31,21 +31,21 @@ OFFLINESHELF_TEST_DATABASE_URL="mariadb+pymysql://offlineshelf:<MARIADB_PASSWORD
 
 Development with hot reload, from the repo root: `npm run dev`. It starts MariaDB and Redis in
 Docker, applies migrations, and runs the Flask API (port 5000) and Vite (http://localhost:5173,
-proxies `/api`). `npm run dev:down` stops the containers. Needs Docker, uv and Node 22.
+proxies `/api`). `npm run dev:down` stops the containers. Needs Docker, uv and Node 24.
 
 ## Next session
 
-1. Review and merge `feat/skeleton`, then make `backend`, `frontend` and `codeql` required checks
-   in `.github/rulesets/protect-main.json` and the repository settings.
-2. M2: the Wikimedia client in `app/wiki` and the builders in `app/core` (maintainer writes core).
-3. `POST /lists/<id>/build` that enqueues a build job and creates a `queued` version.
+1. M2: the Wikimedia client in `app/wiki` and the builders in `app/core` (maintainer writes core).
+2. `POST /lists/<id>/build` that enqueues a build job and creates a `queued` version.
 
 ## Known issues
 
 - `npm audit`: moderate advisory in `minimatch` via ESLint and openapi-typescript (dev tooling
   only, not shipped). The suggested fix downgrades typescript-eslint; wait for upstream.
-- Docker images pin minor versions (`mariadb:11.4`, `redis:7.4-alpine`,
-  `nginx-unprivileged:1.28-alpine`, `python:3.12-slim`, `node:22-alpine`); Dependabot watches them.
+- Docker images pin minor versions (`mariadb:11.4`, `redis:8.0-alpine`,
+  `nginx-unprivileged:1.30-alpine`, `python:3.12-slim`, `node:24-alpine`). Dependabot ignores
+  bumps that would leave those lines (Python 3.12, MariaDB 11.4 LTS, Node LTS, nginx stable,
+  TypeScript 5); those upgrades are made on purpose.
 - Account deletion is by email for now; an endpoint comes with the account settings page.
 
 ## Open questions
