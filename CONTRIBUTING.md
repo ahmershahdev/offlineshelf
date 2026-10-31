@@ -1,5 +1,7 @@
 # Contributing
 
+Everyone taking part follows the [code of conduct](CODE_OF_CONDUCT.md).
+
 OfflineShelf is in its planning stage. Issues and ideas are welcome; for code, please open an
 issue first so we can agree on the approach.
 
