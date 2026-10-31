@@ -1,4 +1,7 @@
+import { Link } from 'react-router'
+
 import { Combine } from '../components/Combine'
+import { DragShelf } from '../components/DragShelf'
 import { Hero } from '../components/Hero'
 import { Reveal, Split } from '../components/Reveal'
 import { FAQ } from '../seo/faq'
@@ -28,17 +31,6 @@ const BUILDERS = [
     text: 'The most-read articles of a month, straight from the Wikimedia pageviews API.',
     param: 'top: 1,000  month: 2026-09',
   },
-]
-
-const SHELVES = [
-  'Physics minus Biographies',
-  'Top 1,000 on Urdu Wikipedia',
-  'Vaccines, depth 3',
-  'Rivers of Pakistan',
-  'Nobel laureates in medicine',
-  'WHO essential medicines',
-  'Wikivoyage: South Asia',
-  'Most read in September',
 ]
 
 const VERSIONS = [
@@ -90,19 +82,17 @@ export function Home() {
     <>
       <Hero />
 
-      <section aria-label="Example lists" className="overflow-hidden border-y hairline py-6">
-        <div className="marquee">
-          {[...SHELVES, ...SHELVES].map((name, i) => (
-            <span
-              key={`${name}-${i}`}
-              aria-hidden={i >= SHELVES.length}
-              className="flex items-center gap-10 pr-10 font-serif text-3xl whitespace-nowrap text-paper/80 md:text-5xl"
-            >
-              {name}
-              <span className="size-2 rounded-full bg-signal" />
-            </span>
-          ))}
+      <section aria-labelledby="shelves-title" className="border-y hairline py-20 md:py-28">
+        <div className="gutter mb-12 flex flex-wrap items-end justify-between gap-6">
+          <div>
+            <p className="label mb-4">Example shelves</p>
+            <h2 id="shelves-title" className="text-title max-w-xl font-serif">
+              Grab the shelf. Every book is a list someone could build today.
+            </h2>
+          </div>
+          <p className="label hidden md:block">Drag sideways</p>
         </div>
+        <DragShelf />
       </section>
 
       <section id="builders" className="gutter py-32 md:py-48" aria-labelledby="builders-title">
@@ -263,6 +253,9 @@ export function Home() {
             <h2 id="faq-title" className="text-headline font-serif">
               Asked often.
             </h2>
+            <Link to="/faq" className="link-draw mt-8 inline-block text-paper/80 hover:text-paper">
+              All questions
+            </Link>
           </div>
           <div className="md:col-span-7 md:col-start-6">
             {FAQ.map((f) => (

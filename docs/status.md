@@ -4,15 +4,10 @@ Last updated: 2026-11-01. `main` requires `backend`, `frontend` and both CodeQL 
 
 ## Where we are
 
-M1 skeleton is merged (PR #1), plus security, auth, list CRUD,
-the prerendered landing site and the SEO pipeline. Everything runs with `docker compose up`.
-Backend: 49 tests pass against MariaDB 11.4 and Redis; ruff and mypy strict are clean. Frontend:
-typecheck, ESLint (strictTypeChecked) and Vitest pass; the production build prerenders 4 routes.
-Checked in Chrome: WebGL hero renders under the nonce CSP with no console errors; sign up and
-create list work through nginx.
-
-`backend/app/core` and `backend/app/wiki` are empty on purpose: the core list logic is the
-maintainer's to write (AGENTS.md).
+M1 done. M2: the Wikimedia client, the build pipeline (build, versions, articles API) and the
+core contract (`docs/core-contract.md`) are merged; the four builders in `app/core` are the
+maintainer's to write. The site has 13 public pages, the Fraunces/Geist type system, a torch
+cursor with grab states, and your contact details (support@ahmershah.dev, ahmershah.dev).
 
 ## Run it
 
@@ -35,8 +30,9 @@ proxies `/api`). `npm run dev:down` stops the containers. Needs Docker, uv and N
 
 ## Next session
 
-1. M2: the Wikimedia client in `app/wiki` and the builders in `app/core` (maintainer writes core).
-2. `POST /lists/<id>/build` that enqueues a build job and creates a `queued` version.
+1. Maintainer: `app/core/builders.py` with the four builders, per `docs/core-contract.md`.
+2. M3: version diffs (needs a core diff function), monthly schedules, failure emails.
+3. Install SonarQube Cloud and CodeRabbit on the repository, then add them as required checks.
 
 ## Known issues
 

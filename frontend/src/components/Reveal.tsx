@@ -24,7 +24,6 @@ type SplitProps = {
   className?: string
 }
 
-/** Headline whose words rise into place when scrolled into view. */
 export function Split({ as: Tag = 'h2', text, id, className }: SplitProps) {
   const ref = useReveal<HTMLElement>(0.35)
   const words = text.split(' ')

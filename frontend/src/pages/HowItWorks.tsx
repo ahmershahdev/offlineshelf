@@ -1,5 +1,6 @@
+import { Link } from 'react-router'
+
 import { Reveal, Split } from '../components/Reveal'
-import { SITE } from '../seo/site'
 
 const STEPS = [
   {
@@ -31,17 +32,6 @@ const LIMITS = [
   ['Top by pageviews', '1,000 articles'],
   ['Lists per account', '100'],
   ['Combination sources', '10 lists'],
-]
-
-const ENDPOINTS = [
-  ['GET', '/api/v1/health'],
-  ['GET', '/api/v1/auth/csrf'],
-  ['POST', '/api/v1/auth/register'],
-  ['POST', '/api/v1/auth/login'],
-  ['GET', '/api/v1/lists'],
-  ['POST', '/api/v1/lists'],
-  ['GET', '/api/v1/lists/{id}'],
-  ['DELETE', '/api/v1/lists/{id}'],
 ]
 
 export function HowItWorks() {
@@ -101,29 +91,16 @@ export function HowItWorks() {
           <h2 id="api" className="mb-4 font-serif text-5xl">
             API
           </h2>
-          <p className="text-paper/70">
-            JSON over HTTPS, with errors as RFC 9457 problem details. The full schema is in{' '}
-            <a
-              className="link-draw text-paper"
-              href={`${SITE.repo}/blob/main/docs/openapi.yaml`}
-              rel="noopener"
-            >
-              docs/openapi.yaml
-            </a>
-            .
-          </p>
         </div>
-        <ul className="border-t hairline font-mono text-sm md:col-span-7 md:col-start-6">
-          {ENDPOINTS.map(([method, path]) => (
-            <li
-              key={`${method}${path}`}
-              className="grid grid-cols-[5rem_1fr] border-b hairline py-4"
-            >
-              <span className="text-signal">{method}</span>
-              <span>{path}</span>
-            </li>
-          ))}
-        </ul>
+        <div className="md:col-span-7 md:col-start-6">
+          <p className="mb-6 text-lg text-paper/70">
+            The app is a client of a public JSON API. Endpoints, sessions and CSRF, errors and rate
+            limits are documented on the developers page.
+          </p>
+          <Link to="/developers" className="btn btn-ghost">
+            Read the API docs
+          </Link>
+        </div>
       </section>
     </article>
   )
