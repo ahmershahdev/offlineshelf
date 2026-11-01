@@ -1,5 +1,5 @@
 import { ArrowUpRight } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { Link, NavLink, useLocation } from 'react-router'
 
 import { getLenis } from '../lib/scroll'
@@ -86,19 +86,25 @@ export function Header() {
             type="button"
             aria-expanded={open}
             aria-controls="site-menu"
+            aria-label="Menu"
             onClick={() => {
               setOpen((v) => !v)
             }}
             className="group flex items-center gap-3 rounded-full bg-paper px-4 py-2 text-sm text-ink"
           >
-            <span>{open ? 'Close' : 'Menu'}</span>
-            <span className="relative block h-2.5 w-4" aria-hidden="true">
-              <span
-                className={`absolute left-0 block h-px w-4 bg-ink transition-transform duration-500 ${open ? 'top-1 rotate-45' : 'top-0'}`}
-              />
-              <span
-                className={`absolute left-0 block h-px w-4 bg-ink transition-transform duration-500 ${open ? 'top-1 -rotate-45' : 'top-2'}`}
-              />
+            <span className="relative block h-5 overflow-hidden" aria-hidden="true">
+              <span className="menu-label block" data-open={open}>
+                <span className="block h-5 leading-5">Menu</span>
+                <span className="block h-5 leading-5">Close</span>
+              </span>
+            </span>
+            <span
+              className="menu-icon relative block h-2.5 w-4"
+              data-open={open}
+              aria-hidden="true"
+            >
+              <span className="absolute top-0 left-0 block h-px w-4 bg-ink" />
+              <span className="absolute top-2 left-0 block h-px w-4 bg-ink" />
             </span>
           </button>
         </div>
@@ -110,34 +116,41 @@ export function Header() {
         role="dialog"
         aria-modal="true"
         aria-label="Site menu"
-        hidden={!open}
+        data-open={open}
+        inert={!open}
         onClick={(e) => {
           if (e.target instanceof Element && e.target.closest('a')) setOpen(false)
         }}
-        className="gutter fixed inset-0 z-40 overflow-y-auto bg-ink pt-28 pb-10"
+        className="menu-panel gutter fixed inset-0 z-40 overflow-y-auto bg-ink pt-28 pb-10"
       >
         <div className="grid min-h-full gap-12 lg:grid-cols-12">
           <nav aria-label="All pages" className="lg:col-span-8">
             <ol className="border-t hairline">
               {MENU.map((r, i) => (
-                <li key={r.path} className="border-b hairline">
+                <li
+                  key={r.path}
+                  className="menu-row border-b hairline"
+                  style={{ '--i': i } as CSSProperties}
+                >
                   <Link
                     to={r.path}
-                    className="group flex items-baseline gap-6 py-3 md:py-4"
+                    className="group flex items-baseline gap-6 overflow-hidden py-3 md:py-4"
                     aria-current={pathname === r.path ? 'page' : undefined}
                   >
-                    <span className="w-8 font-mono text-xs text-signal">
+                    <span className="menu-rise w-8 font-mono text-xs text-signal">
                       {String(i + 1).padStart(2, '0')}
                     </span>
-                    <span className="font-serif text-4xl leading-none transition-[transform,color] duration-500 group-hover:translate-x-3 group-hover:text-ember md:text-6xl">
-                      {r.nav}
+                    <span className="menu-rise">
+                      <span className="block font-serif text-4xl leading-none transition-[transform,color] duration-500 group-hover:translate-x-3 group-hover:text-ember group-aria-[current=page]:text-ember md:text-6xl">
+                        {r.nav}
+                      </span>
                     </span>
                   </Link>
                 </li>
               ))}
             </ol>
           </nav>
-          <div className="flex flex-col justify-between gap-10 lg:col-span-3 lg:col-start-10">
+          <div className="menu-fade flex flex-col justify-between gap-10 lg:col-span-3 lg:col-start-10">
             <div className="space-y-6">
               <p className="label">Write to us</p>
               <a href={`mailto:${SITE.email}`} className="link-draw block font-serif text-3xl">

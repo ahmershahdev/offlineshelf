@@ -96,7 +96,7 @@ export function Home() {
       </section>
 
       <section id="builders" className="gutter py-32 md:py-48" aria-labelledby="builders-title">
-        <div className="mb-20 grid gap-8 md:grid-cols-12">
+        <div className="mb-20 grid grid-cols-1 gap-8 md:grid-cols-12">
           <p className="label md:col-span-3">01 / Build</p>
           <div className="md:col-span-9">
             <Split
@@ -141,7 +141,7 @@ export function Home() {
       </section>
 
       <section className="gutter bg-ink-2 py-32 md:py-48" aria-labelledby="combine-title">
-        <div className="mb-20 grid gap-8 md:grid-cols-12">
+        <div className="mb-20 grid grid-cols-1 gap-8 md:grid-cols-12">
           <p className="label md:col-span-3">02 / Combine</p>
           <div className="md:col-span-9">
             <Split
@@ -158,7 +158,7 @@ export function Home() {
       </section>
 
       <section className="gutter py-32 md:py-48" aria-labelledby="rebuild-title">
-        <div className="grid gap-16 md:grid-cols-12">
+        <div className="grid grid-cols-1 gap-16 md:grid-cols-12">
           <div className="md:col-span-5">
             <p className="label mb-8">03 / Rebuild</p>
             <Split
@@ -199,7 +199,7 @@ export function Home() {
       </section>
 
       <section className="gutter border-t hairline py-32 md:py-48" aria-labelledby="export-title">
-        <div className="mb-16 grid gap-8 md:grid-cols-12">
+        <div className="mb-16 grid grid-cols-1 gap-8 md:grid-cols-12">
           <p className="label md:col-span-3">04 / Export</p>
           <div className="md:col-span-9">
             <Split
@@ -247,7 +247,7 @@ export function Home() {
       </section>
 
       <section className="gutter py-32 md:py-48" aria-labelledby="faq-title">
-        <div className="grid gap-12 md:grid-cols-12">
+        <div className="grid grid-cols-1 gap-12 md:grid-cols-12">
           <div className="md:col-span-4">
             <p className="label mb-8">Questions</p>
             <h2 id="faq-title" className="text-headline font-serif">

@@ -38,14 +38,14 @@ const SECTIONS = [
 export function Privacy() {
   return (
     <article className="gutter pt-40 pb-32">
-      <header className="mb-20 grid gap-8 md:grid-cols-12">
+      <header className="mb-20 grid grid-cols-1 gap-8 md:grid-cols-12">
         <p className="label md:col-span-3">Privacy</p>
         <div className="md:col-span-9">
           <Split as="h1" text="Small on purpose." className="text-headline font-serif" />
           <p className="mt-6 text-dim">Last updated 31 October 2026</p>
         </div>
       </header>
-      <div className="grid gap-8 md:grid-cols-12">
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-12">
         <div className="md:col-span-7 md:col-start-4">
           {SECTIONS.map((s) => (
             <section key={s.h} className="border-t hairline py-10">
