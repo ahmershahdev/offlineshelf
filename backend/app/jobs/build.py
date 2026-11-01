@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from app.config import Settings, get_settings
 from app.contract import Builder, Limits, Page, WikiSource
 from app.db import SessionLocal
+from app.jobs.notify import enqueue_failure_email
 from app.jobs.queue import BUILD_TIMEOUT_SECONDS, get_queue
 from app.models import BuilderKind, ListArticle, ListVersion, ShelfList, VersionStatus, utcnow
 from app.wiki.client import WikiApiError, WikiClient, WikiNetworkError
@@ -104,16 +105,16 @@ def run_build(version_id: int) -> None:
             if job is not None and job.retries_left:
                 _mark(session, version_id, VersionStatus.QUEUED, f"Retrying: {exc}")
                 raise
-            _mark(session, version_id, VersionStatus.FAILED, str(exc))
+            _fail(session, version_id, str(exc))
             return
         except (WikiApiError, BuilderNotImplementedError, TooManyArticlesError) as exc:
             session.rollback()
-            _mark(session, version_id, VersionStatus.FAILED, str(exc))
+            _fail(session, version_id, str(exc))
             return
         except Exception:
             session.rollback()
             log.exception("Build %s crashed", version_id)
-            _mark(session, version_id, VersionStatus.FAILED, "The build failed unexpectedly.")
+            _fail(session, version_id, "The build failed unexpectedly.")
             return
 
         version = session.get_one(ListVersion, version_id)
@@ -160,6 +161,11 @@ def _mark(session: Session, version_id: int, status: VersionStatus, error: str) 
     if status is VersionStatus.FAILED:
         version.finished_at = utcnow()
     session.commit()
+
+
+def _fail(session: Session, version_id: int, error: str) -> None:
+    _mark(session, version_id, VersionStatus.FAILED, error)
+    enqueue_failure_email(version_id)
 
 
 def _batched(items: Iterator[Page], size: int) -> Iterator[list[Page]]:
