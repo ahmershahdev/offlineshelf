@@ -1,6 +1,8 @@
 import { useEffect, useState, type SyntheticEvent } from 'react'
 
 import { ApiError, api, type ListCreate, type ShelfList, type User } from '../api/client'
+import { ListDetail } from '../components/ListDetail'
+import { POLL_MS, isActive } from '../lib/shelf'
 
 type Kind = ListCreate['params']['kind']
 
@@ -290,6 +292,17 @@ function NewList({ onCreated }: { onCreated: (l: ShelfList) => void }) {
 export function AppPage() {
   const [user, setUser] = useState<User | null | undefined>(undefined)
   const [lists, setLists] = useState<ShelfList[]>([])
+  const [open, setOpen] = useState<number | null>(null)
+  const [notice, setNotice] = useState<string | null>(null)
+  const building = lists.some((l) => isActive(l.latest_status))
+
+  function setStatus(id: number, status: ShelfList['latest_status']): void {
+    setLists((prev) =>
+      prev.map((x) =>
+        x.id === id && x.latest_status !== status ? { ...x, latest_status: status } : x,
+      ),
+    )
+  }
 
   useEffect(() => {
     api
@@ -317,6 +330,21 @@ export function AppPage() {
       live = false
     }
   }, [user])
+
+  useEffect(() => {
+    if (!user || !building) return
+    const timer = setInterval(() => {
+      api
+        .lists()
+        .then((page) => {
+          setLists(page.items)
+        })
+        .catch(() => undefined)
+    }, POLL_MS)
+    return () => {
+      clearInterval(timer)
+    }
+  }, [user, building])
 
   if (user === undefined) {
     return (
@@ -360,6 +388,11 @@ export function AppPage() {
           <p className="label mb-4">
             {lists.length} {lists.length === 1 ? 'list' : 'lists'}
           </p>
+          {notice ? (
+            <p role="alert" className="mb-4 text-sm text-signal">
+              {notice}
+            </p>
+          ) : null}
           {lists.length === 0 ? (
             <p className="border-t hairline pt-8 text-paper/60">
               No lists yet. Make the first one.
@@ -367,51 +400,71 @@ export function AppPage() {
           ) : (
             <ul className="border-t hairline">
               {lists.map((l) => (
-                <li
-                  key={l.id}
-                  className="grid grid-cols-[1fr_auto] items-center gap-4 border-b hairline py-5"
-                >
-                  <div>
-                    <p className="text-lg">{l.name}</p>
-                    <p className="font-mono text-xs text-dim">
-                      {l.wiki} / {KIND_LABEL[l.builder]} / {l.latest_status ?? 'not built yet'}
-                      {l.schedule === 'monthly' ? ' / monthly' : ''}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-5">
-                    <button
-                      type="button"
-                      className="label link-draw hover:text-paper"
-                      aria-label={`Build ${l.name}`}
-                      disabled={l.latest_status === 'queued' || l.latest_status === 'building'}
-                      onClick={() => {
-                        void api
-                          .buildList(l.id)
-                          .then((v) => {
-                            setLists((prev) =>
-                              prev.map((x) =>
-                                x.id === l.id ? { ...x, latest_status: v.status } : x,
-                              ),
-                            )
+                <li key={l.id} className="border-b hairline py-5">
+                  <div className="grid grid-cols-[1fr_auto] items-center gap-4">
+                    <div>
+                      <p className="text-lg">{l.name}</p>
+                      <p className="font-mono text-xs text-dim">
+                        {l.wiki} / {KIND_LABEL[l.builder]} /{' '}
+                        <span aria-live="polite">{l.latest_status ?? 'not built yet'}</span>
+                        {l.schedule === 'monthly' ? ' / monthly' : ''}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-5">
+                      <button
+                        type="button"
+                        className="label link-draw hover:text-paper"
+                        aria-expanded={open === l.id}
+                        aria-controls={`list-${l.id}`}
+                        onClick={() => {
+                          setOpen((prev) => (prev === l.id ? null : l.id))
+                        }}
+                      >
+                        {open === l.id ? 'Hide' : 'Details'}
+                      </button>
+                      <button
+                        type="button"
+                        className="label link-draw hover:text-paper"
+                        aria-label={`Build ${l.name}`}
+                        disabled={isActive(l.latest_status)}
+                        onClick={() => {
+                          setNotice(null)
+                          api
+                            .buildList(l.id)
+                            .then((v) => {
+                              setStatus(l.id, v.status)
+                            })
+                            .catch((err: unknown) => {
+                              setNotice(errorText(err))
+                            })
+                        }}
+                      >
+                        Build
+                      </button>
+                      <button
+                        type="button"
+                        className="label link-draw hover:text-signal"
+                        aria-label={`Delete ${l.name}`}
+                        onClick={() => {
+                          void api.deleteList(l.id).then(() => {
+                            setLists((prev) => prev.filter((x) => x.id !== l.id))
                           })
-                          .catch(() => undefined)
-                      }}
-                    >
-                      Build
-                    </button>
-                    <button
-                      type="button"
-                      className="label link-draw hover:text-signal"
-                      aria-label={`Delete ${l.name}`}
-                      onClick={() => {
-                        void api.deleteList(l.id).then(() => {
-                          setLists((prev) => prev.filter((x) => x.id !== l.id))
-                        })
-                      }}
-                    >
-                      Delete
-                    </button>
+                        }}
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </div>
+                  {open === l.id ? (
+                    <div id={`list-${l.id}`} className="mt-6">
+                      <ListDetail
+                        list={l}
+                        onStatus={(status) => {
+                          setStatus(l.id, status)
+                        }}
+                      />
+                    </div>
+                  ) : null}
                 </li>
               ))}
             </ul>
