@@ -70,9 +70,8 @@ export function About() {
         <div className="grid grid-cols-1 gap-10 md:grid-cols-[1fr_auto] md:items-end">
           <div className="prose-shelf">
             <p>
-              OfflineShelf is designed and built by <strong>{SITE.author.name}</strong>. The core
-              list logic is written by hand and reviewed line by line; the project is part of a
-              proposal to the Kiwix community.
+              OfflineShelf is designed and built by <strong>{SITE.author.name}</strong>, in the
+              open; the project is part of a proposal to the Kiwix community.
             </p>
             <p>
               More work, writing and contact details are on{' '}

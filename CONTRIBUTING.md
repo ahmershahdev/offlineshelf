@@ -18,8 +18,3 @@ settings.
 - Tests and linters must pass. List logic in `backend/app/core` needs 100% branch coverage.
 - Tests use recorded Wikimedia API responses, never live calls.
 - Read [AGENTS.md](AGENTS.md) for the code rules and [docs/](docs/) for the design.
-
-## AI use
-
-The maintainer uses an AI assistant for setup, docs and reviews. The core list logic is written by
-the maintainer, and he reviews, tests and can explain every line that is merged.

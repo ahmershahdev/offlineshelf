@@ -101,9 +101,6 @@ lists have to be reproducible, combinable and kept up to date. OfflineShelf is a
 self-hostable tool for that step, built on the same ideas (builders, combinations, queued builds)
 as Wikimedia's WP1 selection tool, without needing its database replicas.
 
-The list logic in `backend/app/core` was written with AI assistance at the maintainer's request;
-see [AGENTS.md](AGENTS.md).
-
 ## Documentation
 
 - [docs/roadmap.md](docs/roadmap.md): milestones M1 to M6 and what "done" means
