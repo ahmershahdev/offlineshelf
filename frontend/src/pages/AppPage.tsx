@@ -54,18 +54,18 @@ function AuthForm({ onUser }: { onUser: (u: User) => void }) {
 
   return (
     <div className="mx-auto w-full max-w-md">
-      <div role="tablist" aria-label="Account" className="mb-12 flex gap-6">
+      <h1 className="sr-only">{mode === 'login' ? 'Sign in' : 'Create an account'}</h1>
+      <div role="group" aria-label="Account" className="mb-12 flex gap-6">
         {(['login', 'register'] as const).map((m) => (
           <button
             key={m}
             type="button"
-            role="tab"
-            aria-selected={mode === m}
+            aria-pressed={mode === m}
             onClick={() => {
               setMode(m)
               setError(null)
             }}
-            className={`font-serif text-4xl transition-colors ${mode === m ? 'text-paper' : 'text-faint hover:text-dim'}`}
+            className={`font-serif text-4xl transition-colors ${mode === m ? 'text-paper' : 'text-dim hover:text-paper/80'}`}
           >
             {m === 'login' ? 'Sign in' : 'Create account'}
           </button>
@@ -320,6 +320,7 @@ export function AppPage() {
   const [lists, setLists] = useState<ShelfList[]>([])
   const [open, setOpen] = useState<number | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
+  const [confirming, setConfirming] = useState<number | null>(null)
   const building = lists.some((l) => isActive(l.latest_status))
 
   function setStatus(id: number, status: ShelfList['latest_status']): void {
@@ -411,9 +412,7 @@ export function AppPage() {
 
       <div className="grid grid-cols-1 gap-16 lg:grid-cols-12">
         <div className="lg:col-span-7">
-          <p className="label mb-4">
-            {lists.length} {lists.length === 1 ? 'list' : 'lists'}
-          </p>
+          <h2 className="label mb-4">Your lists: {lists.length}</h2>
           {notice ? (
             <p role="alert" className="mb-4 text-sm text-signal">
               {notice}
@@ -429,7 +428,7 @@ export function AppPage() {
                 <li key={l.id} className="border-b hairline py-5">
                   <div className="grid grid-cols-[1fr_auto] items-center gap-4">
                     <div>
-                      <p className="text-lg">{l.name}</p>
+                      <h3 className="text-lg">{l.name}</h3>
                       <p className="font-mono text-xs text-dim">
                         {l.wiki} / {KIND_LABEL[l.builder]} /{' '}
                         <span aria-live="polite">{l.latest_status ?? 'not built yet'}</span>
@@ -439,7 +438,7 @@ export function AppPage() {
                     <div className="flex items-center gap-5">
                       <button
                         type="button"
-                        className="label link-draw hover:text-paper"
+                        className="label link-draw py-2 hover:text-paper"
                         aria-expanded={open === l.id}
                         aria-controls={`list-${l.id}`}
                         onClick={() => {
@@ -450,7 +449,7 @@ export function AppPage() {
                       </button>
                       <button
                         type="button"
-                        className="label link-draw hover:text-paper"
+                        className="label link-draw py-2 hover:text-paper"
                         aria-label={`Build ${l.name}`}
                         disabled={isActive(l.latest_status)}
                         onClick={() => {
@@ -467,18 +466,53 @@ export function AppPage() {
                       >
                         Build
                       </button>
-                      <button
-                        type="button"
-                        className="label link-draw hover:text-signal"
-                        aria-label={`Delete ${l.name}`}
-                        onClick={() => {
-                          void api.deleteList(l.id).then(() => {
-                            setLists((prev) => prev.filter((x) => x.id !== l.id))
-                          })
-                        }}
-                      >
-                        Delete
-                      </button>
+                      {confirming === l.id ? (
+                        <span
+                          className="flex items-center gap-4"
+                          role="group"
+                          aria-label={`Delete ${l.name}?`}
+                        >
+                          <button
+                            type="button"
+                            autoFocus
+                            className="label link-draw py-2 text-signal"
+                            onClick={() => {
+                              setConfirming(null)
+                              api
+                                .deleteList(l.id)
+                                .then(() => {
+                                  setLists((prev) => prev.filter((x) => x.id !== l.id))
+                                })
+                                .catch((err: unknown) => {
+                                  setNotice(errorText(err))
+                                })
+                            }}
+                          >
+                            Yes, delete
+                          </button>
+                          <button
+                            type="button"
+                            className="label link-draw py-2 hover:text-paper"
+                            onClick={() => {
+                              setConfirming(null)
+                            }}
+                          >
+                            Keep
+                          </button>
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          className="label link-draw py-2 hover:text-signal"
+                          aria-label={`Delete ${l.name}`}
+                          onClick={() => {
+                            setNotice(null)
+                            setConfirming(l.id)
+                          }}
+                        >
+                          Delete
+                        </button>
+                      )}
                     </div>
                   </div>
                   {open === l.id ? (
@@ -497,7 +531,7 @@ export function AppPage() {
           )}
         </div>
         <div className="lg:col-span-5">
-          <p className="label mb-4">New list</p>
+          <h2 className="label mb-4">New list</h2>
           <NewList
             lists={lists}
             onCreated={(l) => {
