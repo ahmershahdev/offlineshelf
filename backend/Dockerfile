@@ -8,7 +8,7 @@ RUN --mount=type=cache,target=/root/.cache/uv uv sync --frozen --no-dev --no-ins
 
 FROM python:3.12-slim
 ENV PATH=/opt/venv/bin:$PATH PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
-RUN groupadd --system app && useradd --system --gid app --no-create-home app
+RUN groupadd --system app && useradd --system --gid app --no-create-home app     && mkdir -p /data/exports && chown app:app /data/exports
 COPY --from=build /opt/venv /opt/venv
 WORKDIR /srv
 COPY --chown=root:root alembic.ini gunicorn.conf.py ./

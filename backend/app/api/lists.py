@@ -8,7 +8,8 @@ from app.config import current_settings
 from app.db import SessionLocal
 from app.exports import tsv_header, tsv_rows
 from app.jobs.build import BuildInProgressError, enqueue_build
-from app.models import ListArticle, ListVersion, ShelfList, User, VersionStatus
+from app.jobs.export import remove_files
+from app.models import ListArticle, ListExport, ListVersion, ShelfList, User, VersionStatus
 from app.schemas import (
     ArticleOut,
     ArticlePage,
@@ -124,8 +125,16 @@ def show(list_id: int) -> Response:
 @limiter.limit(limit_from("rate_limit_write"))
 def delete(list_id: int) -> tuple[str, int]:
     shelf = _owned(list_id, require_user())
+    files = list(
+        SessionLocal.scalars(
+            select(ListExport.file_name)
+            .join(ListVersion, ListExport.version_id == ListVersion.id)
+            .where(ListVersion.list_id == shelf.id, ListExport.file_name.is_not(None))
+        )
+    )
     SessionLocal.delete(shelf)
     SessionLocal.commit()
+    remove_files(current_settings(), [f for f in files if f])
     return "", 204
 
 

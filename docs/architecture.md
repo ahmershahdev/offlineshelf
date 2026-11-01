@@ -26,9 +26,10 @@ app only calls the API. Builds never run inside a web request.
 | `backend/app/wiki/` | The only code that calls Wikimedia: `client.py` (User-Agent, maxlag, retries, continuation), `source.py` (implements `WikiSource`) |
 | `backend/app/api/` | Blueprints: `health`, `auth`, `lists`; `errors.py` (problem+json), `util.py` |
 | `backend/app/security/` | Password hashing, CSRF, session cookie, headers, rate limits, wiki allow list |
-| `backend/app/jobs/` | RQ queue; `build.py` queues and runs builds; `notify.py` sends failure emails; `schedule.py` queues monthly rebuilds |
+| `backend/app/jobs/` | RQ queue; `build.py` queues and runs builds; `notify.py` sends failure emails; `schedule.py` queues monthly rebuilds; `export.py` builds HTML bundles and deletes expired ones |
 | `backend/app/scheduler.py` | The `scheduler` process: RQ `CronScheduler` that enqueues the dispatcher every hour |
 | `backend/app/exports.py` | Export formats: TSV header with attribution and rows |
+| `backend/app/bundle.py` | HTML bundle: rewrites Parsoid HTML for offline reading, writes the zip with index and attribution pages |
 | `backend/app/mail.py` | Plain-text email over SMTP (standard library); off when `OFFLINESHELF_SMTP_HOST` is empty |
 | `backend/scripts/record_wiki.py` | Re-records the Wikimedia responses in `tests/wiki/recordings` (manual, never in CI) |
 | `backend/app/schemas.py` | Pydantic request and response models; all input limits live here |
@@ -60,6 +61,8 @@ shelf_list    id, owner_id, name, wiki, builder, params (JSON), schedule, row_ve
 list_version  id, list_id, status, started_at, finished_at, article_count, error, report (JSON),
               notified_at
 list_article  id, version_id, page_id, title (utf8mb4_bin), revision_id; unique (version_id, page_id)
+list_export   id, version_id, format, status, file_name, size_bytes, progress, missing (JSON),
+              error, created_at, finished_at, expires_at
 ```
 
 Planned for M4: `combination_src (combination_id, source_list_id, operation)`,
@@ -100,6 +103,25 @@ reading 5000 rows at a time by `list_article.id`, so memory stays flat for 100k-
 Before the column header (`title`, `page_id`, `revision_id`) come `#` lines with the list name,
 source wiki, build time and the CC BY-SA 4.0 notice; MediaWiki titles can never start with `#`.
 An empty `revision_id` means the builder did not report one.
+
+HTML bundles (`POST /lists/<id>/versions/<vid>/exports`, ready versions of up to
+`OFFLINESHELF_MAX_BUNDLE_ARTICLES`, default 1000) are an RQ job (`export-<id>`):
+
+1. For each article, `WikiClient.page_html` fetches Parsoid HTML of the stored revision from
+   `/w/rest.php/v1/revision/<id>/html` (or the page by title when no revision is known), one
+   request at a time.
+2. `app/bundle.py` drops `<base>` and scripts, points links to bundled articles at
+   `articles/<page_id>.html` (keeping `#fragments`), sends other links to the wiki, makes
+   protocol-relative and root-relative URLs absolute, adds a small reader stylesheet and an
+   attribution footer (revision link, CC BY-SA 4.0, page history).
+3. The zip also holds `index.html` (pages that no longer exist are listed apart) and
+   `ATTRIBUTION.html`. It is written to `<file>.part` and renamed when complete.
+4. Files live in `OFFLINESHELF_EXPORTS_DIR` (the `exports-data` volume shared by `api` and
+   `worker`) for `OFFLINESHELF_EXPORT_DAYS` (7). The scheduler runs `delete_expired_exports`
+   hourly; it also removes files older than that with no row (crashes, deleted lists). Deleting
+   a list deletes its files at once. Expired downloads answer 410.
+
+Images are linked, not bundled; each keeps its own licence on Commons.
 
 ## Security
 
@@ -175,6 +197,8 @@ Mono for code, all self-hosted.
 | Neutral `app/contract.py` | Core stays importable without Flask, SQLAlchemy or httpx, and is tested with fakes |
 | SMTP with `smtplib`, no mail library or provider SDK | Any provider speaks SMTP; one fewer dependency; self-hosters use their own server |
 | Hourly idempotent dispatcher, not a cron entry on the 1st | A cron run missed during downtime would wait a month; the hourly check catches up and needs no extra state |
+| Exports on local disk, not object storage | Self-hosters need nothing extra; bundles are capped at 1000 articles and expire in 7 days, so the disk stays small |
+| Bundle files named by page ID | Titles can hold characters that are unsafe or ambiguous in file names (`:` on Windows, case folding on macOS) |
 | TSV attribution in `#` lines, not a separate file | One file to hand around; `#` can never start a title, and most TSV readers can skip comment lines |
 | Naive UTC in the database, `Z` in the API | MariaDB `DATETIME` has no zone; the response schemas attach UTC so browsers show local time correctly |
 | Failure email timestamp on `list_version` | Writing to `shelf_list` would bump `row_version` and turn the owner's next edit into a false 409 |
@@ -182,5 +206,4 @@ Mono for code, all self-hosted.
 
 ## Open questions
 
-- Where exports live in production: local disk with a size cap, or object storage.
 - Brotli in production: needs an nginx build with the brotli module (`.br` files are already built).

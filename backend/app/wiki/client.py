@@ -4,6 +4,7 @@ import random
 import time
 from collections.abc import Callable, Iterator, Mapping
 from typing import Any
+from urllib.parse import quote
 
 import httpx
 
@@ -35,6 +36,10 @@ class WikiNetworkError(WikiError):
 
 class WikiApiError(WikiError):
     """The request itself was refused or impossible; retrying would not help."""
+
+
+class WikiNotFoundError(WikiApiError):
+    pass
 
 
 class WikiClient:
@@ -93,26 +98,30 @@ class WikiClient:
             timeout=timeout,
         )
 
+    def page_html(self, wiki: str, title: str, revision_id: int | None) -> str:
+        """Parsoid HTML of a revision (or the current page when no revision is known)."""
+        if not is_allowed_wiki(wiki):
+            raise WikiApiError(f"{wiki} is not an allowed Wikimedia wiki")
+        if revision_id is not None:
+            url = f"https://{wiki}/w/rest.php/v1/revision/{revision_id}/html"
+        else:
+            url = (
+                f"https://{wiki}/w/rest.php/v1/page/{quote(title.replace(' ', '_'), safe='')}/html"
+            )
+        attempt = 0
+        while True:
+            attempt += 1
+            response = self._response(attempt, "GET", url)
+            if response is not None:
+                return response.text
+
     def _send(self, method: str, url: str, *, action_api: bool = False, **kwargs: Any) -> Json:
         attempt = 0
         while True:
             attempt += 1
-            try:
-                response = self.http.request(method, url, **kwargs)
-            except httpx.TransportError as exc:
-                self._backoff(attempt, None, f"{type(exc).__name__} for {url}")
+            response = self._response(attempt, method, url, **kwargs)
+            if response is None:
                 continue
-
-            if response.status_code in RETRYABLE_STATUS:
-                if _is_sparql_timeout(response):
-                    raise WikiApiError("The SPARQL query timed out. Narrow it down and try again.")
-                self._backoff(attempt, response, f"HTTP {response.status_code} for {url}")
-                continue
-            if response.status_code == 404:
-                raise WikiApiError(f"Not found: {url}")
-            if response.is_error:
-                raise WikiApiError(f"HTTP {response.status_code} for {url}")
-
             try:
                 data: Json = response.json()
             except ValueError as exc:
@@ -126,6 +135,27 @@ class WikiClient:
                 info = data["errors"][0].get("text", code)
                 raise WikiApiError(f"MediaWiki error {code}: {info}")
             return data
+
+    def _response(
+        self, attempt: int, method: str, url: str, **kwargs: Any
+    ) -> httpx.Response | None:
+        """One attempt: the response, or None after backing off for a retryable failure."""
+        try:
+            response = self.http.request(method, url, **kwargs)
+        except httpx.TransportError as exc:
+            self._backoff(attempt, None, f"{type(exc).__name__} for {url}")
+            return None
+
+        if response.status_code in RETRYABLE_STATUS:
+            if _is_sparql_timeout(response):
+                raise WikiApiError("The SPARQL query timed out. Narrow it down and try again.")
+            self._backoff(attempt, response, f"HTTP {response.status_code} for {url}")
+            return None
+        if response.status_code == 404:
+            raise WikiNotFoundError(f"Not found: {url}")
+        if response.is_error:
+            raise WikiApiError(f"HTTP {response.status_code} for {url}")
+        return response
 
     def _backoff(self, attempt: int, response: httpx.Response | None, reason: str) -> None:
         if attempt > self.max_retries:

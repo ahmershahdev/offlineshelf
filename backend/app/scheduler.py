@@ -4,6 +4,7 @@ from redis import Redis
 from rq.cron import CronScheduler
 
 from app.config import get_settings
+from app.jobs.export import delete_expired_exports
 from app.jobs.schedule import DISPATCH_INTERVAL_SECONDS, dispatch_scheduled_builds
 
 
@@ -13,6 +14,9 @@ def make_scheduler(redis: Redis) -> CronScheduler:
     scheduler = CronScheduler(connection=redis)
     scheduler.register(
         dispatch_scheduled_builds, queue_name="default", interval=DISPATCH_INTERVAL_SECONDS
+    )
+    scheduler.register(
+        delete_expired_exports, queue_name="default", interval=DISPATCH_INTERVAL_SECONDS
     )
     return scheduler
 

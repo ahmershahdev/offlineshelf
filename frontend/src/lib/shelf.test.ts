@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { articleUrl, isActive, reportLines } from './shelf'
+import { articleUrl, formatBytes, isActive, reportLines } from './shelf'
 
 describe('shelf helpers', () => {
   it('treats queued and building as active', () => {
@@ -35,5 +35,13 @@ describe('shelf helpers', () => {
       'invalid: 0',
       'nested: {"a":1}',
     ])
+  })
+
+  it('formats sizes', () => {
+    expect(formatBytes(512)).toBe('512 B')
+    expect(formatBytes(2048)).toBe('2.0 KB')
+    expect(formatBytes(2_500_000)).toBe('2.4 MB')
+    expect(formatBytes(50 * 1024 ** 3)).toBe('50 GB')
+    expect(formatBytes(3 * 1024 ** 4)).toBe('3072 GB')
   })
 })

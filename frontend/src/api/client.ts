@@ -9,6 +9,8 @@ export type ListVersion = components['schemas']['ListVersion']
 export type VersionPage = components['schemas']['VersionPage']
 export type Article = components['schemas']['Article']
 export type ArticlePage = components['schemas']['ArticlePage']
+export type Export = components['schemas']['Export']
+export type ExportList = components['schemas']['ExportList']
 
 export class ApiError extends Error {
   constructor(
@@ -86,4 +88,8 @@ export const api = {
       'GET',
       `/lists/${id}/versions/${versionId}/articles?limit=100${cursor ? `&cursor=${cursor}` : ''}`,
     ),
+  exports: (id: number, versionId: number) =>
+    request<ExportList>('GET', `/lists/${id}/versions/${versionId}/exports`),
+  createExport: (id: number, versionId: number) =>
+    request<Export>('POST', `/lists/${id}/versions/${versionId}/exports`, { format: 'html' }),
 }
