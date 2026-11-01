@@ -44,6 +44,8 @@ jobs:
       - run: uv run ruff check .
       - run: uv run mypy app
       - run: uv run pytest --cov --cov-report=term-missing
+      # AGENTS.md: the list logic in app/core keeps 100% branch coverage.
+      - run: uv run coverage report --include='app/core/*' --fail-under=100
 
   frontend:
     runs-on: ubuntu-24.04

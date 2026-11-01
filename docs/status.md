@@ -7,9 +7,9 @@ Last updated: 2026-11-01. Update at the end of every work session.
 - **M1 Skeleton:** done (PR #1, #9).
 - **M2 Builders:** infrastructure done (PR #10): Wikimedia client (`app/wiki`), shared types
   (`app/contract.py`), build job (`app/jobs/build.py`), build/versions/articles API, recorded
-  responses in `backend/tests/wiki/recordings`. **Open:** the four builders in
-  `app/core/builders.py`, written by the maintainer per [core-contract.md](core-contract.md).
-  Until then a build ends as `failed` with "The X builder is not implemented yet."
+  responses in `backend/tests/wiki/recordings`. Builders done: `app/core/builders.py` (pasted,
+  category, Wikidata, pageviews), smoke-tested live against en.wikipedia.org. Core was written
+  with AI assistance at the maintainer's request (see AGENTS.md).
 - **M3 Jobs:** failure emails done: `app/jobs/notify.py` emails the owner when a build fails,
   at most once per list per day, over SMTP (`app/mail.py`, off while `OFFLINESHELF_SMTP_HOST` is
   empty; production uses Resend). Monthly rebuilds done: the `scheduler` service runs
@@ -22,15 +22,14 @@ Last updated: 2026-11-01. Update at the end of every work session.
   links rewritten, index and attribution pages, zipped on the `exports-data` volume, 7-day expiry
   with hourly cleanup, Make/Download HTML bundle in the Details panel.
 - **M4 Combinations:** infrastructure done: `combination` builder kind, `combination_source`
-  table, source checks, delete guard, rebuild on a source's new version, form in `/app`.
-  **Open:** `app/core/combine.py` (maintainer, see core-contract.md); until then combination
-  builds fail with "not implemented yet".
+  table, source checks, delete guard, rebuild on a source's new version, form in `/app`, and
+  `app/core/combine.py` (one merge pass over sorted sources).
 - **Site:** 13 public pages, Fraunces/Geist type, torch cursor with grab states, draggable example
   shelf, brand emblem icons, security.txt, contact details (support@ahmershah.dev,
   ahmershah.dev) (PR #11). The `/app` page signs in, creates, builds and deletes lists.
 - **Repo:** only `main`, no open PRs. `main` requires `backend`, `frontend`, `codeql (python)`
   and `codeql (javascript-typescript)`, squash merges, linear history.
-- Tests: 143 backend (MariaDB 11.4 + Redis), 32 frontend.
+- Tests: 185 backend (MariaDB 11.4 + Redis), 33 frontend.
 
 ## Run it
 

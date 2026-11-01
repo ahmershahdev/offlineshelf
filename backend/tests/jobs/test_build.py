@@ -6,12 +6,14 @@ from rq import SimpleWorker
 from sqlalchemy import func, select
 
 from app.contract import BuildResult, Page
+from app.core import builders as core_builders
 from app.db import SessionLocal
 from app.jobs import build as build_module
 from app.jobs.build import BuilderNotImplementedError, resolve_builder, run_build
 from app.jobs.queue import get_queue
 from app.models import BuilderKind, ListArticle, ListVersion, VersionStatus
 from app.wiki.client import WikiApiError, WikiNetworkError
+from tests.core.fakes import FakeWiki, article
 from tests.jobs.conftest import pages
 
 LIST = {
@@ -165,18 +167,38 @@ def test_builds_need_the_owner(app, signed_in, builder) -> None:
     assert signed_in.get(f"/api/v1/lists/{list_id}/versions/123456").status_code == 404
 
 
-def test_missing_core_builder_fails_with_a_clear_message() -> None:
+def test_missing_core_builder_fails_with_a_clear_message(monkeypatch) -> None:
+    monkeypatch.delitem(core_builders.REGISTRY, "category")
     with pytest.raises(BuilderNotImplementedError, match="category builder is not implemented"):
         resolve_builder(BuilderKind.CATEGORY)
 
 
 def test_unimplemented_builder_fails_the_build(signed_in, redis, monkeypatch) -> None:
-    monkeypatch.setattr(
-        build_module, "make_source", lambda wiki, _settings: SimpleNamespace(wiki=wiki)
-    )
+    monkeypatch.delitem(core_builders.REGISTRY, "category")
     list_id = create_list(signed_in)
     signed_in.send("POST", f"/api/v1/lists/{list_id}/build")
     work(redis)
     v = version(list_id, signed_in)
     assert v["status"] == "failed"
     assert v["error"] == "The category builder is not implemented yet."
+
+
+def test_the_real_pasted_builder_end_to_end(signed_in, redis, monkeypatch) -> None:
+    wiki = FakeWiki(
+        pages={"Physics": article(1, "Physics"), "United Kingdom": article(2, "United Kingdom")},
+        redirects={"UK": "United Kingdom"},
+    )
+    monkeypatch.setattr(build_module, "make_source", lambda _wiki, _settings: wiki)
+    body = {
+        "name": "Pasted",
+        "wiki": "en.wikipedia.org",
+        "params": {"kind": "pasted", "titles": ["physics", "UK", "Nope"]},
+    }
+    list_id = int(signed_in.send("POST", "/api/v1/lists", body).get_json()["id"])
+    signed_in.send("POST", f"/api/v1/lists/{list_id}/build")
+    work(redis)
+    v = version(list_id, signed_in)
+    assert v["status"] == "ready"
+    assert v["article_count"] == 2
+    assert v["report"]["missing"] == ["Nope"]
+    assert v["report"]["redirected"] == 1

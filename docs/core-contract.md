@@ -1,8 +1,8 @@
 # Core contract: what `app/core` must provide
 
-`backend/app/core` is written by the maintainer (AGENTS.md). Everything around it is built and
-tested: the Wikimedia client, the build job, the API and the database. This file is the
-interface between the two. Change it in the same PR as the code.
+`backend/app/core` holds the list logic; everything around it (the Wikimedia client, the build
+job, the API and the database) calls it through this interface. Both sides are implemented and
+tested. Change this file in the same PR as either side. AGENTS.md says how core was written.
 
 ## What the build job expects
 
@@ -46,8 +46,12 @@ already handled. Every method returns what MediaWiki said, without decisions.
 | `sparql_rows(query)` | `list[dict[str, str]]` | One dict per result row, variable name to value; entity values are full URIs like `http://www.wikidata.org/entity/Q42` |
 | `sitelinks(item_ids)` | `dict[str, str]` | Item ID (`Q42`) to article title on the list's wiki; items without an article are absent |
 | `top_pageviews(year, month)` | `list[TopArticle]` | Up to 1000, rank order, underscores already turned into spaces |
+| `main_page()` | `str` | The wiki's main page title, from siteinfo (shared with the Wikidata site ID lookup) |
 
-## The four builders
+`TitleBatch.special` lists titles that exist without a local page: `Special:` pages and files
+that live on Commons (MediaWiki marks those `missing` and `known`). They have no page ID.
+
+## The four builders (implemented in `app/core/builders.py`)
 
 ### Pasted titles: `{"titles": [str, ...]}`
 
@@ -58,11 +62,16 @@ already handled. Every method returns what MediaWiki said, without decisions.
    became which page.
 3. Keep only namespace 0 pages. Report missing, invalid and non-article titles separately.
 4. Several inputs can land on the same page (a title and its redirect). Keep one.
-5. Report suggestion: `{"input": n, "found": n, "redirected": n, "missing": [...], "invalid": [...], "not_articles": [...]}`.
+5. Report: `{"input", "found", "redirected", "duplicates", "missing", "invalid", "not_articles"}`.
+   Lists keep their first 100 entries; when there were more, `<name>_total` holds the count.
 
 ### Category: `{"category": str, "depth": int}`
 
-1. Breadth-first from the category: articles with `"page"`, subcategories with `"subcat"`.
+1. Breadth-first from the category: articles with `"page"`, subcategories with `"subcat"`. The
+   name is taken with or without the English `Category:` prefix. Subcategory titles come back
+   with the wiki's own prefix (`Kategorie:`), so the bare name is passed on and the source adds
+   the canonical `Category:`. Members come without revision IDs, so they are looked up with
+   `query_pages` afterwards and every article is pinned to a revision.
 2. `depth` 0 means only the category itself; stop descending at `depth`
    (also capped by `limits.max_category_depth`).
 3. Category trees contain loops (A is in B, B is in A). Track visited categories; never visit one
@@ -72,8 +81,8 @@ already handled. Every method returns what MediaWiki said, without decisions.
 
 ### Wikidata: `{"sparql": str}`
 
-1. Run `sparql_rows`. Take item IDs from entity URIs in the rows (decide which variable: the first
-   one, or one named `item`, and document it in the UI).
+1. Run `sparql_rows`. The item of a row is `?item` when the query selects it, otherwise the first
+   variable holding a Wikidata entity URI (`Q` items only).
 2. Map IDs to titles with `sitelinks`. Items without an article on this wiki go in the report.
 3. Look the titles up with `query_pages` to get page IDs and revision IDs.
 4. Report suggestion: `{"rows": n, "items": n, "with_article": n, "without_article": n}`.
@@ -106,8 +115,8 @@ combine: Combiner
 - `articles` can be a generator; more than `limits.max_articles` fails the build as for builders.
 - Report suggestion: `{"operation": "union", "inputs": [n, n], "result": n}`. The job adds
   `"source_versions": [version ids]` itself.
-- Until `combine` exists, combination builds fail with "The combination builder is not
-  implemented yet." A source without a ready version fails the build before core is called.
+- Implemented in `app/core/combine.py` as one `heapq.merge` pass. A source without a ready
+  version fails the build before core is called.
 - Cycles can't happen yet: lists can't be edited, so a new combination can only point at lists
   that already exist. When editing arrives, core gets a cycle check (below).
 

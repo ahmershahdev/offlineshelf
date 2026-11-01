@@ -34,9 +34,8 @@ export function Builders() {
         }
         aside={
           <p className="label leading-relaxed">
-            Status: the Wikimedia client, build queue, versions, schedules and combinations are
-            done. The builder logic itself is being written by hand and lands before launch; until
-            then a build ends with &ldquo;not implemented yet&rdquo;.
+            Status: all five builders work end to end, checked against the live Wikimedia APIs.
+            Public launch: February 2027.
           </p>
         }
       />
@@ -92,6 +91,15 @@ export function Builders() {
               so a loop is walked once and reported.
             </li>
             <li>
+              Type the category name with or without <code>Category:</code>; on other languages
+              leave out the local prefix (<code>Impfstoff</code>, not{' '}
+              <code>Kategorie:Impfstoff</code>).
+            </li>
+            <li>
+              Every article is pinned to the revision it had at build time, so exports made later
+              show the same text.
+            </li>
+            <li>
               Members come from the MediaWiki <code>categorymembers</code> API, 500 per request,
               with continuation until the category is exhausted.
             </li>
@@ -121,6 +129,10 @@ export function Builders() {
             <li>
               Items are matched to articles through Wikidata sitelinks for your wiki. Items without
               an article in that language are counted in the build report, so you can see the gaps.
+            </li>
+            <li>
+              Each result row becomes one item: the <code>?item</code> variable if your query
+              selects it, otherwise the first variable that holds a Wikidata item.
             </li>
             <li>Queries are capped at 10,000 characters.</li>
           </ul>

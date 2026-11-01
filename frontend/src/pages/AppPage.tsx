@@ -505,8 +505,8 @@ export function AppPage() {
             }}
           />
           <p className="mt-8 text-sm text-dim">
-            Builds run in a background queue. Until the builders land (milestone M2) a build ends as
-            failed with "not implemented yet"; your lists keep their settings.
+            Builds run in a background queue; most finish in seconds, deep category trees take
+            longer. Open Details to follow a build and see its report.
           </p>
         </div>
       </div>

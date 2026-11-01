@@ -7,6 +7,7 @@ from app.db import SessionLocal
 from app.jobs import notify
 from app.jobs.notify import send_failure_email
 from app.models import ListVersion, ShelfList, VersionStatus, utcnow
+from app.wiki.client import WikiApiError
 from tests.jobs.test_build import create_list, version, work
 
 
@@ -35,7 +36,8 @@ def notified_at(version_id: int):
     return v.notified_at
 
 
-def test_a_failed_build_emails_the_owner(signed_in, redis, outbox) -> None:
+def test_a_failed_build_emails_the_owner(signed_in, redis, outbox, builder) -> None:
+    builder.result = lambda: WikiApiError("MediaWiki error: the category does not exist")
     list_id = create_list(signed_in)
     signed_in.send("POST", f"/api/v1/lists/{list_id}/build")
     work(redis)
@@ -45,7 +47,7 @@ def test_a_failed_build_emails_the_owner(signed_in, redis, outbox) -> None:
     assert len(outbox) == 1
     assert outbox[0]["to"] == "reader@example.org"
     assert outbox[0]["subject"] == "Build failed: Vaccines"
-    assert "is not implemented yet" in outbox[0]["body"]
+    assert "the category does not exist" in outbox[0]["body"]
     assert "http://localhost/app" in outbox[0]["body"]
     assert notified_at(int(v["id"])) is not None
 

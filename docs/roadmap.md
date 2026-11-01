@@ -23,13 +23,13 @@ in CI, and seed data.
 
 - [x] Wikimedia client: one `User-Agent` with contact details, `maxlag`, retries with backoff,
   continuation handled, responses recorded for tests
-- [ ] Pasted list: normalise titles, resolve redirects, report missing pages
-- [ ] Category: members in namespace 0, subcategories up to a depth limit, loop-safe
-- [ ] Wikidata: SPARQL query, items mapped to articles on the chosen wiki
-- [ ] Top by pageviews: top N for a month from the Wikimedia REST API
+- [x] Pasted list: normalise titles, resolve redirects, report missing pages
+- [x] Category: members in namespace 0, subcategories up to a depth limit, loop-safe
+- [x] Wikidata: SPARQL query, items mapped to articles on the chosen wiki
+- [x] Top by pageviews: top N for a month from the Wikimedia REST API
 - [x] `POST /api/v1/lists`, `GET /api/v1/lists/<id>`, validation and one error format
 - [x] Build pipeline: `POST /lists/<id>/build`, versions, articles; builders plug in via `app/core/builders.py` ([core-contract.md](core-contract.md))
-- [ ] Builder logic in plain Python with 100% branch coverage (maintainer)
+- [x] Builder logic in plain Python with 100% branch coverage (CI gate)
 
 ## M3. Jobs and schedules (target 2026-12-13)
 
@@ -43,7 +43,7 @@ in CI, and seed data.
 ## M4. Combinations and exports (target 2026-12-27)
 
 - [x] Combinations of up to 10 lists: API, sources table, build job, form in `/app` ([core-contract.md](core-contract.md))
-- [ ] Union, intersection and difference in `app/core/combine.py` (maintainer)
+- [x] Union, intersection and difference in `app/core/combine.py`
 - [x] A combination rebuilds when one of its source lists gets a new version
 - [x] Export TSV (title, page ID, revision ID), streamed, with attribution lines
 - [x] Export a static HTML bundle (Parsoid HTML, local links rewritten, attribution page)
