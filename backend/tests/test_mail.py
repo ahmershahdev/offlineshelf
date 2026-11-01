@@ -81,6 +81,8 @@ def test_port_465_uses_implicit_tls_without_auth(monkeypatch) -> None:
 
 
 def test_the_removed_plaintext_setting_is_warned_about(smtp, caplog) -> None:
-    settings = get_settings().model_copy(update={"smtp_starttls": False})
+    settings = get_settings().model_copy(
+        update={"smtp_starttls": False, "smtp_host": "smtp.example.org", "smtp_port": 587}
+    )
     mail.send_email(settings, "a@example.org", "Hi", "Body")
     assert "no longer supported" in caplog.text
