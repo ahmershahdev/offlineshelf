@@ -213,7 +213,7 @@ class ArticlePage(BaseModel):
 class ExportCreate(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    format: Literal["html"] = "html"
+    format: Literal["html", "zim"] = "html"
 
 
 class ExportOut(BaseModel):

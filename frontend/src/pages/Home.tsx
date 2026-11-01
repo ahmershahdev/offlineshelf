@@ -44,17 +44,17 @@ const EXPORTS = [
   {
     format: 'TSV',
     text: 'Title, page ID and revision ID. Opens in any spreadsheet, feeds any script.',
-    tag: 'M4',
+    tag: 'Live',
   },
   {
     format: 'HTML bundle',
     text: 'The articles as static pages with local links rewritten and an attribution page.',
-    tag: 'M4',
+    tag: 'Live',
   },
   {
     format: 'ZIM',
-    text: 'One file that Kiwix opens on a phone, a laptop or a Raspberry Pi in a classroom.',
-    tag: 'Stretch',
+    text: 'One searchable file that Kiwix opens on a phone, a laptop or a Raspberry Pi in a classroom.',
+    tag: 'Live',
   },
 ]
 

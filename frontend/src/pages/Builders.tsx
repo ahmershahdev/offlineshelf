@@ -251,7 +251,7 @@ not articles: 4 (Portal:Physics, ...)`}</Code>
       <NextPage
         to="/exports"
         title="Exports"
-        text="Take a list offline: TSV, a static HTML bundle, and ZIM for Kiwix next."
+        text="Take a list offline: TSV, a static HTML bundle, or a ZIM file for Kiwix."
       />
     </article>
   )

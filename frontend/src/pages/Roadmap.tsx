@@ -82,7 +82,7 @@ const MILESTONES: {
     target: 'February 2027',
     state: 'next',
     items: [
-      ['ZIM export for small lists (stretch)', false],
+      ['ZIM export for Kiwix, up to 1,000 articles', true],
       ['Seed lists and screenshots', true],
       ['Public launch at offlineshelf.ahmershah.dev, v1.0.0', false],
     ],

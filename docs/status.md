@@ -25,6 +25,8 @@ Last updated: 2026-11-01. Update at the end of every work session.
   `app/core/combine.py` (one merge pass over sorted sources).
 - **M6:** seed command (`python -m app.seed <email>` adds three example lists and builds them),
   README with setup steps and screenshots (`docs/screenshots`).
+- **M6 ZIM:** `format: "zim"` exports write a ZIM file with libzim 3.9.0 (same pages as the HTML
+  bundle, full-text index, Kiwix metadata), offered in the Details panel. Checked live.
 - **Changes:** each ready version stores the articles added and removed since the previous ready
   one (`/versions/<v>/changes`), shown in the build history and the Details panel.
 - **Robustness:** the scheduler runs `recover_stalled` hourly: builds and exports whose RQ job
@@ -35,7 +37,7 @@ Last updated: 2026-11-01. Update at the end of every work session.
   ahmershah.dev) (PR #11). The `/app` page signs in, creates, builds and deletes lists.
 - **Repo:** only `main`, no open PRs. `main` requires `backend`, `frontend`, `codeql (python)`
   and `codeql (javascript-typescript)`, squash merges, linear history.
-- Tests: 192 backend (MariaDB 11.4 + Redis), 37 frontend.
+- Tests: 196 backend (MariaDB 11.4 + Redis), 38 frontend.
 
 ## Run it
 
@@ -59,8 +61,7 @@ proxies `/api`). `npm run dev:down` stops the containers. Needs Docker, uv and N
 ## Next session
 
 1. Read the About page copy and confirm it says what you want about yourself.
-2. M6: ZIM export for small lists (stretch, needs `python-libzim`), then deploy to
-   offlineshelf.ahmershah.dev and tag v1.0.0.
+2. M6: deploy to offlineshelf.ahmershah.dev and tag v1.0.0.
 3. Install SonarQube Cloud and CodeRabbit on the repository (needs the owner's GitHub
    authorisation), then add them as required checks in `.github/rulesets/protect-main.json`.
 

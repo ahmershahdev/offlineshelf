@@ -24,11 +24,7 @@ export function Exports() {
             no server and no install.
           </>
         }
-        aside={
-          <p className="label leading-relaxed">
-            Live: TSV and HTML bundle. Next: ZIM for Kiwix, for small lists first.
-          </p>
-        }
+        aside={<p className="label leading-relaxed">Live: TSV, HTML bundle and ZIM for Kiwix.</p>}
       />
 
       <Section index="01" title="Pick a format">
@@ -36,7 +32,7 @@ export function Exports() {
           {[
             ['TSV', 'Titles, page IDs and revision IDs', 'Spreadsheets, scripts, mwoffliner'],
             ['HTML bundle', 'Every article as an offline page', 'USB sticks, school servers, a Pi'],
-            ['ZIM (next)', 'One file for the Kiwix apps', 'Phones, tablets, Kiwix hotspots'],
+            ['ZIM', 'One searchable file for the Kiwix apps', 'Phones, tablets, Kiwix hotspots'],
           ].map(([name, what, where]) => (
             <div key={name} className="rounded-2xl border hairline bg-ink-2 p-5">
               <p className="font-serif text-2xl">{name}</p>
@@ -94,8 +90,8 @@ Smallpox vaccine\t1209427\t1246780455`}</Code>
         <BundlePreview />
         <Callout title="About images">
           Images are linked, not copied: they load when a device is online and show as missing when
-          it is not. Each image keeps its own licence on Wikimedia Commons. Bundling images is
-          planned with the ZIM export, where file size can be controlled.
+          it is not. Each image keeps its own licence on Wikimedia Commons. HTML bundles and ZIM
+          files carry text only, which keeps a 1,000-article export to a few megabytes.
         </Callout>
       </Section>
 
@@ -155,9 +151,12 @@ cd /srv/shelf && python3 -m http.server 8000
         <div className="prose-shelf">
           <h3>With Kiwix</h3>
           <p>
-            Until the ZIM export lands, feed the TSV titles to{' '}
-            <ExternalLink href="https://github.com/openzim/mwoffliner">mwoffliner</ExternalLink> to
-            produce a ZIM file that the Kiwix apps and the Kiwix hotspot open.
+            Choose <em>Make ZIM file for Kiwix</em> instead of the HTML bundle. You get one file
+            with the same pages, the list&rsquo;s index as its main page, full-text search, and the
+            metadata the Kiwix library shows (title, language, date, licence). Open it in Kiwix on
+            Android, iOS, Windows, macOS or Linux, or copy it to a Kiwix hotspot. For collections
+            bigger than 1,000 articles, feed the TSV titles to{' '}
+            <ExternalLink href="https://github.com/openzim/mwoffliner">mwoffliner</ExternalLink>.
           </p>
         </div>
       </Section>

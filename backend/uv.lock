@@ -385,6 +385,21 @@ wheels = [
 ]
 
 [[package]]
+name = "libzim"
+version = "3.9.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ae/98/207a1ad0ca10f4985a9e2c91a996b8bea40bbe1a3961a155c4a128459acd/libzim-3.9.0.tar.gz", hash = "sha256:4a0fdcce7f51fb49e65a3707baaaea63cd293dabb08d7d3b34ee0ef258534455", size = 58483, upload-time = "2026-03-24T12:15:47.67Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/50/28/083f45fb66bc84bfa88d04fb26dcdd952b272ed6631d5f19fced292ab2b9/libzim-3.9.0-cp312-cp312-macosx_13_0_arm64.whl", hash = "sha256:c9944d82ee39d666762c0c3ceb29714190a222463b71aeaf9e05a484024d3086", size = 3618406, upload-time = "2026-03-24T12:14:36.76Z" },
+    { url = "https://files.pythonhosted.org/packages/d8/db/9599bf2dcb9429a0f686e2c5800904962b02be70f27e504c92ff8c233c77/libzim-3.9.0-cp312-cp312-macosx_13_0_x86_64.whl", hash = "sha256:b2793f971260594e02efd12cf49ef1e16c34ca9e75368278f2271c443b89b0b6", size = 3839407, upload-time = "2026-03-24T12:14:38.455Z" },
+    { url = "https://files.pythonhosted.org/packages/4f/7d/3fff44302e75954cd9933d6135274bd0b84cc9f320ebad2c3a61a419f945/libzim-3.9.0-cp312-cp312-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:391a7b8ecf5a851aeb63397511a35c42bbe09a6a930421ef71e0389ebd54a204", size = 8209836, upload-time = "2026-03-24T12:14:40.536Z" },
+    { url = "https://files.pythonhosted.org/packages/af/56/adc4b08f17b79779cf95bc2d6dd2f96977eae807ba0626443b9f2b59a74f/libzim-3.9.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:7a5fd4ab46a62c7504249c5a77a727c11b0ed9a6b65c45e5ffcdae1ee8311124", size = 8414196, upload-time = "2026-03-24T12:14:43.544Z" },
+    { url = "https://files.pythonhosted.org/packages/c7/b5/21bc3019bd1aba9a0b73f5ea0b83914bb63c4e8edf32fd02d6d138267548/libzim-3.9.0-cp312-cp312-musllinux_1_2_aarch64.whl", hash = "sha256:0c8bb15e08ed62769025f594695b8d66362edcb7f1f87d92dc138342629e61e8", size = 9541922, upload-time = "2026-03-24T12:14:46.459Z" },
+    { url = "https://files.pythonhosted.org/packages/a8/57/215c8d09848275cfdcb0c29876bcaf74ea2797b19aeef9d03a9a2bdc626e/libzim-3.9.0-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:1cd008c643f2ae4118d5923423b761ca8dcb60a8756f5d6d785f006c338578dc", size = 9769176, upload-time = "2026-03-24T12:14:49.366Z" },
+    { url = "https://files.pythonhosted.org/packages/63/f6/d594cedbd9b12b48c85d8d1587cf5c241c5a9eafd64e985b9b9787e6ed90/libzim-3.9.0-cp312-cp312-win_amd64.whl", hash = "sha256:cb640c961d7220cd94525bf37a07a9d23d828448f149d7b6412b2d1052120532", size = 15964122, upload-time = "2026-03-24T12:14:53.05Z" },
+]
+
+[[package]]
 name = "limits"
 version = "5.8.0"
 source = { registry = "https://pypi.org/simple" }
@@ -476,6 +491,7 @@ dependencies = [
     { name = "flask-limiter" },
     { name = "gunicorn" },
     { name = "httpx" },
+    { name = "libzim" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "pymysql" },
@@ -501,6 +517,7 @@ requires-dist = [
     { name = "flask-limiter", specifier = "==4.1.1" },
     { name = "gunicorn", specifier = "==26.2.0" },
     { name = "httpx", specifier = "==0.28.1" },
+    { name = "libzim", specifier = "==3.9.0" },
     { name = "pydantic", specifier = "==2.14.2" },
     { name = "pydantic-settings", specifier = "==2.16.2" },
     { name = "pymysql", specifier = "==1.2.3" },

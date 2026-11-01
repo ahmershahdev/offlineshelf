@@ -277,7 +277,7 @@ export interface paths {
         };
         get: operations["listExports"];
         put?: never;
-        /** @description Queues a static HTML bundle of a ready version: one Parsoid HTML file per article with links between bundled articles rewritten, an index and an attribution page, zipped. If an export of this version is already queued, running or ready, that one is returned. Bundles expire after 7 days. */
+        /** @description Queues an export of a ready version: one Parsoid HTML page per article with links between exported articles rewritten, an index and an attribution page, as a zip (html) or a ZIM file for Kiwix (zim). If an export of this version is already queued, running or ready, that one is returned. Bundles expire after 7 days. */
         post: operations["createExport"];
         delete?: never;
         options?: never;
@@ -434,10 +434,11 @@ export interface components {
         };
         ExportCreate: {
             /**
+             * @description html: a zip of offline pages; zim: one ZIM file for the Kiwix apps
              * @default html
              * @enum {string}
              */
-            format: "html";
+            format: "html" | "zim";
         };
         Export: {
             id: number;
@@ -985,13 +986,14 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description The zip file */
+            /** @description The zip or ZIM file */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/zip": string;
+                    "application/x-zim": string;
                 };
             };
             404: components["responses"]["Problem"];

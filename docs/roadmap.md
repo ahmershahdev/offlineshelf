@@ -60,7 +60,7 @@ in CI, and seed data.
 
 ## M6. ZIM export, docs and launch (target 2027-02-14)
 
-- [ ] Stretch: ZIM export with `python-libzim` for small lists (articles, main page, metadata)
+- [x] Stretch: ZIM export with `python-libzim` for small lists (articles, main page, metadata, full-text index)
 - [x] Seed data: three example lists (a category, a Wikidata query, a combination): `python -m app.seed <email>`
 - [x] README setup steps and screenshots
 - [ ] Deploy at `offlineshelf.ahmershah.dev`; tag `v1.0.0`

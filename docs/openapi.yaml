@@ -171,8 +171,9 @@ paths:
     post:
       operationId: createExport
       description: >-
-        Queues a static HTML bundle of a ready version: one Parsoid HTML file per article with
-        links between bundled articles rewritten, an index and an attribution page, zipped. If an
+        Queues an export of a ready version: one Parsoid HTML page per article with links between
+        exported articles rewritten, an index and an attribution page, as a zip (html) or a ZIM
+        file for Kiwix (zim). If an
         export of this version is already queued, running or ready, that one is returned.
         Bundles expire after 7 days.
       requestBody:
@@ -190,7 +191,7 @@ paths:
     get:
       operationId: downloadExport
       responses:
-        '200': { description: The zip file, content: { application/zip: { schema: { type: string, format: binary } } } }
+        '200': { description: The zip or ZIM file, content: { application/zip: { schema: { type: string, format: binary } }, application/x-zim: { schema: { type: string, format: binary } } } }
         '404': { $ref: '#/components/responses/Problem' }
         '410': { $ref: '#/components/responses/Problem' }
 components:
@@ -339,7 +340,7 @@ components:
       type: object
       additionalProperties: false
       properties:
-        format: { type: string, enum: [html], default: html }
+        format: { type: string, enum: [html, zim], default: html, description: 'html: a zip of offline pages; zim: one ZIM file for the Kiwix apps' }
     Export:
       type: object
       required: [id, version_id, format, status, progress, total, size_bytes, missing, error, created_at, finished_at, expires_at]

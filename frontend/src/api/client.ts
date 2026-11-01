@@ -95,6 +95,6 @@ export const api = {
     ),
   exports: (id: number, versionId: number) =>
     request<ExportList>('GET', `/lists/${id}/versions/${versionId}/exports`),
-  createExport: (id: number, versionId: number) =>
-    request<Export>('POST', `/lists/${id}/versions/${versionId}/exports`, { format: 'html' }),
+  createExport: (id: number, versionId: number, format: 'html' | 'zim' = 'html') =>
+    request<Export>('POST', `/lists/${id}/versions/${versionId}/exports`, { format }),
 }

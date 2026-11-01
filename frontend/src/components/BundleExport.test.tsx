@@ -89,7 +89,7 @@ describe('BundleExport', () => {
     })
     render(<BundleExport list={LIST} version={VERSION} />)
     await flush()
-    expect(screen.getByText('The last bundle failed: HTTP 403')).toBeTruthy()
+    expect(screen.getByText('The last export failed: HTTP 403')).toBeTruthy()
     cleanup()
 
     vi.spyOn(api, 'exports').mockResolvedValue({
@@ -98,6 +98,22 @@ describe('BundleExport', () => {
     render(<BundleExport list={LIST} version={VERSION} />)
     await flush()
     expect(screen.getByRole('button', { name: 'Make HTML bundle' })).toBeTruthy()
+  })
+
+  it('handles ZIM files separately from HTML bundles', async () => {
+    vi.spyOn(api, 'exports').mockResolvedValue({
+      items: [exp('ready', { expires_at: '2026-11-08T10:00:00Z', size_bytes: 900 })],
+    })
+    const create = vi.spyOn(api, 'createExport').mockResolvedValue({
+      ...exp('queued'),
+      id: 12,
+      format: 'zim',
+    })
+    render(<BundleExport list={LIST} version={VERSION} format="zim" />)
+    await flush()
+    fireEvent.click(screen.getByRole('button', { name: 'Make ZIM file for Kiwix' }))
+    await flush()
+    expect(create).toHaveBeenCalledWith(7, 2, 'zim')
   })
 
   it('shows why a bundle could not start', async () => {

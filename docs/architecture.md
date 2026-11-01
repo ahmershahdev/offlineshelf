@@ -151,6 +151,13 @@ HTML bundles (`POST /lists/<id>/versions/<vid>/exports`, ready versions of up to
 
 Images are linked, not bundled; each keeps its own licence on Commons.
 
+ZIM exports (`format: "zim"`, `app/zim.py`) write the same pages through `write_pages` into a
+libzim `Creator` instead of a zip: same paths, so the rewritten links work unchanged; `index.html`
+is the main page; full-text indexing in the list's language; metadata Kiwix needs (Name, Title of
+at most 30 characters, Description of at most 80, ISO 639-3 Language, Creator, Publisher, Date,
+Source, License, a 48 px illustration from `app/assets`). libzim may leave a temporary index
+folder beside the file; the job and the expiry cleanup remove folders as well as files.
+
 ## Security
 
 | Threat | Defence | Where |
@@ -218,7 +225,7 @@ Mono for code, all self-hosted.
 | Recorded API responses in tests | No live Wikimedia calls in CI; real calls only in a manual smoke test |
 | One `User-Agent` with a contact address, `maxlag`, backoff | Wikimedia's API etiquette; being blocked would stop every build |
 | Versions instead of overwriting a list | A failed rebuild must never lose the last good list, and diffs need the previous version |
-| ZIM export is a stretch goal | The HTML bundle covers the need first; `python-libzim` adds a native dependency |
+| ZIM through `libzim` 3.9.0, capped like bundles | Official openZIM bindings with wheels for Linux and Windows; the same pages as the bundle, so links and attribution need no second implementation |
 | Email and password accounts (Argon2id) first | Works for self-hosters without registering an OAuth app; Wikimedia OAuth can be added beside it |
 | Prerendered SPA instead of a Node SSR server | Public pages are static; one fewer runtime to run and secure, and nginx can set the nonce |
 | PyMySQL driver | Pure Python, same on Windows, Linux and CI; speed is irrelevant next to Wikimedia API latency |

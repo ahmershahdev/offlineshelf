@@ -1,7 +1,9 @@
 import logging
+import shutil
 import time
 from datetime import timedelta
 from pathlib import Path
+from typing import Any
 
 from rq import get_current_job
 from sqlalchemy import or_, select
@@ -14,12 +16,14 @@ from app.jobs.build import NETWORK_RETRY
 from app.jobs.queue import get_queue
 from app.models import ExportStatus, ListArticle, ListExport, ListVersion, utcnow
 from app.wiki.client import WikiApiError, WikiClient, WikiNetworkError, WikiNotFoundError
+from app.zim import write_zim
 
 log = logging.getLogger(__name__)
 
 EXPORT_TIMEOUT_SECONDS = 2 * 3600
 PROGRESS_EVERY = 25
 LIVE = (ExportStatus.QUEUED, ExportStatus.BUILDING, ExportStatus.READY)
+EXTENSIONS = {"html": "zip", "zim": "zim"}
 
 
 def exports_dir(settings: Settings) -> Path:
@@ -86,8 +90,9 @@ def run_export(export_id: int) -> None:
         ]
         directory = exports_dir(settings)
         directory.mkdir(parents=True, exist_ok=True)
-        final = directory / f"export-{export_id}.zip"
-        part = directory / f"export-{export_id}.zip.part"
+        suffix = EXTENSIONS[export.format]
+        final = directory / f"export-{export_id}.{suffix}"
+        part = directory / f"export-{export_id}.{suffix}.part"
         wiki_client = client = make_client()
 
         def fetch(article: BundleArticle) -> str | None:
@@ -102,16 +107,19 @@ def run_export(export_id: int) -> None:
                 session.commit()
 
         try:
-            result = write_bundle(
-                part,
-                name=shelf.name,
-                wiki=shelf.wiki,
-                built=version.finished_at,
-                site_url=settings.site_url,
-                articles=articles,
-                fetch=fetch,
-                on_progress=progress,
-            )
+            pages: dict[str, Any] = {
+                "name": shelf.name,
+                "wiki": shelf.wiki,
+                "built": version.finished_at,
+                "site_url": settings.site_url,
+                "articles": articles,
+                "fetch": fetch,
+                "on_progress": progress,
+            }
+            if export.format == "zim":
+                result = write_zim(part, list_id=shelf.id, **pages)
+            else:
+                result = write_bundle(part, **pages)
             part.replace(final)
         except WikiNetworkError as exc:
             session.rollback()
@@ -145,7 +153,9 @@ def run_export(export_id: int) -> None:
         session.commit()
     finally:
         if part is not None:
-            part.unlink(missing_ok=True)
+            # libzim can leave a temporary full-text index folder beside the file it wrote.
+            for leftover in part.parent.glob(f"{part.name}*"):
+                _remove(leftover)
         if client is not None:
             client.close()
         session.close()
@@ -164,6 +174,13 @@ def _mark(
         # Failed rows expire too, so the cleanup job removes them.
         export.expires_at = now + timedelta(days=settings.export_days)
     session.commit()
+
+
+def _remove(path: Path) -> None:
+    if path.is_dir():
+        shutil.rmtree(path, ignore_errors=True)
+    else:
+        path.unlink(missing_ok=True)
 
 
 def remove_files(settings: Settings, names: list[str]) -> None:
@@ -187,7 +204,7 @@ def delete_expired_exports() -> int:
         if directory.is_dir():
             for path in directory.glob("export-*"):
                 if path.stat().st_mtime < cutoff:
-                    path.unlink(missing_ok=True)
+                    _remove(path)
         log.info("Deleted %d expired exports", len(expired))
         return len(expired)
     finally:

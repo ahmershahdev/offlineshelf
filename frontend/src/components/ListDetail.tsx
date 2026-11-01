@@ -314,8 +314,9 @@ export function ListDetail({
               ))}
             </ul>
           ) : null}
-          <div className="mb-4">
+          <div className="mb-4 space-y-1">
             <BundleExport key={shown.id} list={list} version={shown} />
+            <BundleExport key={`zim-${shown.id}`} list={list} version={shown} format="zim" />
           </div>
           {shown.previous_version_id !== null ? (
             <Changes key={`changes-${shown.id}`} list={list} version={shown} />
