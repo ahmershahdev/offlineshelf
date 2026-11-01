@@ -63,7 +63,10 @@ proxies `/api`). `npm run dev:down` stops the containers. Needs Docker, uv and N
 1. Read the About page copy and confirm it says what you want about yourself.
 2. M6: deploy to offlineshelf.ahmershah.dev and tag v1.0.0.
 3. Install SonarQube Cloud and CodeRabbit on the repository (needs the owner's GitHub
-   authorisation), then add them as required checks in `.github/rulesets/protect-main.json`.
+   authorisation; `.sonarcloud.properties` and `.coderabbit.yaml` are ready), then add them as
+   required checks in `.github/rulesets/protect-main.json`.
+4. Release images: `.github/workflows/images.yml` publishes `offlineshelf-api` and
+   `offlineshelf-web` to GHCR on every `v*` tag.
 
 ## Known issues
 

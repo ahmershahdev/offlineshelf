@@ -1,19 +1,19 @@
 # OfflineShelf
 
-> OfflineShelf builds Wikipedia reading lists for places without internet: schools, libraries and clinics. You build a list from a category, a Wikidata SPARQL query, pasted titles or the most-read articles, combine lists with set operations, rebuild them monthly and export them (TSV, static HTML, and later ZIM for Kiwix). Open source (MIT), self-hostable, launching February 2027 at https://offlineshelf.ahmershah.dev.
+> OfflineShelf builds Wikipedia reading lists for places without internet: schools, libraries and clinics. Build a list from a category, a Wikidata SPARQL query, pasted titles or the most-read articles; combine lists with union, intersection and difference; rebuild them every month and see what changed; export them as TSV, an offline HTML bundle or a ZIM file for Kiwix. Open source (MIT), self-hostable with Docker Compose, launching February 2027 at https://offlineshelf.ahmershah.dev.
 
-OfflineShelf stores article titles and IDs, never article text. Text is fetched from Wikimedia only while an export is written, and every export carries the CC BY-SA 4.0 attribution. It is an independent project, not affiliated with the Wikimedia Foundation.
+OfflineShelf stores article titles and IDs, never article text. Text is fetched from Wikimedia only while an HTML bundle or ZIM file is written, and every export carries the CC BY-SA 4.0 attribution. It is an independent project, not affiliated with the Wikimedia Foundation.
 
 ## Pages
 
 - [Home](https://offlineshelf.ahmershah.dev/): what OfflineShelf does, example lists, combinations, rebuilds, exports
-- [How it works](https://offlineshelf.ahmershah.dev/how-it-works): the build pipeline and limits
-- [Builders](https://offlineshelf.ahmershah.dev/builders): category, Wikidata SPARQL, pasted titles, top pageviews
-- [Exports](https://offlineshelf.ahmershah.dev/exports): TSV, static HTML bundle, ZIM for Kiwix, attribution
-- [Developers](https://offlineshelf.ahmershah.dev/developers): JSON API, sessions and CSRF, errors, rate limits
-- [Self-hosting](https://offlineshelf.ahmershah.dev/self-host): Docker Compose install, configuration, backups
-- [Roadmap](https://offlineshelf.ahmershah.dev/roadmap): milestones M1 to M6 and their status
-- [FAQ](https://offlineshelf.ahmershah.dev/faq): common questions
+- [How it works](https://offlineshelf.ahmershah.dev/how-it-works): the five-step pipeline, a walkthrough, versions, schedules, failures, limits
+- [Builders](https://offlineshelf.ahmershah.dev/builders): category, Wikidata SPARQL, pasted titles, top pageviews, combinations, reading a build report
+- [Exports](https://offlineshelf.ahmershah.dev/exports): TSV, HTML bundle, ZIM for Kiwix, taking a list offline, attribution
+- [Developers](https://offlineshelf.ahmershah.dev/developers): JSON API, quickstart, sessions and CSRF, errors, exports, rate limits
+- [Self-hosting](https://offlineshelf.ahmershah.dev/self-host): Docker Compose install, configuration, email, backups, troubleshooting
+- [Roadmap](https://offlineshelf.ahmershah.dev/roadmap): milestones M1 to M6 and their progress
+- [FAQ](https://offlineshelf.ahmershah.dev/faq): 25 common questions
 - [About](https://offlineshelf.ahmershah.dev/about): why it exists, principles, the maker
 - [Security](https://offlineshelf.ahmershah.dev/security): protections and how to report a vulnerability
 - [Contact](https://offlineshelf.ahmershah.dev/contact): support@ahmershah.dev
@@ -21,11 +21,11 @@ OfflineShelf stores article titles and IDs, never article text. Text is fetched 
 
 ## Developers
 
-- [Source code](https://github.com/ahmershahdev/offlineshelf): Python (Flask, SQLAlchemy, RQ), MariaDB, Redis, React
+- [Source code](https://github.com/ahmershahdev/offlineshelf): Python 3.12 (Flask, SQLAlchemy, RQ), MariaDB 11.4, Redis, React and TypeScript
 - [OpenAPI schema](https://github.com/ahmershahdev/offlineshelf/blob/main/docs/openapi.yaml): the JSON API under /api/v1
-- [Roadmap](https://github.com/ahmershahdev/offlineshelf/blob/main/docs/roadmap.md): milestones M1 to M6
+- [Architecture](https://github.com/ahmershahdev/offlineshelf/blob/main/docs/architecture.md): data model, sources, builds, exports and decisions
+- [Wiki](https://github.com/ahmershahdev/offlineshelf/wiki): guides for users, self-hosters and contributors
 
 ## Optional
 
 - [Full text for LLMs](https://offlineshelf.ahmershah.dev/llms-full.txt): every public page in one plain-text file
-- [Author](https://ahmershah.dev): Syed Ahmer Shah, creator and maintainer (support@ahmershah.dev)
