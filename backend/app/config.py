@@ -45,7 +45,6 @@ class Settings(BaseSettings):
     smtp_port: int = 587
     smtp_username: str = ""
     smtp_password: SecretStr = SecretStr("")
-    smtp_starttls: bool = True
     mail_from: str = "OfflineShelf <noreply@ahmershah.dev>"
 
     @field_validator("database_url")

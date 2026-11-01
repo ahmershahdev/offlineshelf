@@ -474,7 +474,9 @@ export function AppPage() {
                         >
                           <button
                             type="button"
-                            autoFocus
+                            ref={(el) => {
+                              el?.focus()
+                            }}
                             className="label link-draw py-2 text-signal"
                             onClick={() => {
                               setConfirming(null)

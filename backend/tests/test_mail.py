@@ -61,9 +61,17 @@ def test_sends_with_starttls_and_login(smtp) -> None:
     assert msg.get_content().strip() == "Body"
 
 
-def test_plain_smtp_without_auth(smtp) -> None:
-    settings = get_settings().model_copy(
-        update={"smtp_host": "localhost", "smtp_port": 25, "smtp_starttls": False}
-    )
+def test_port_465_uses_implicit_tls_without_auth(monkeypatch) -> None:
+    opened: list[dict[str, object]] = []
+
+    class FakeSMTPSSL(FakeSMTP):
+        def __init__(self, host: str, port: int, timeout: int, context: object) -> None:
+            super().__init__(host, port, timeout)
+            opened.append({"context": context})
+
+    monkeypatch.setattr(mail.smtplib, "SMTP_SSL", FakeSMTPSSL)
+    FakeSMTP.instances = []
+    settings = get_settings().model_copy(update={"smtp_host": "smtp.example.org", "smtp_port": 465})
     assert mail.send_email(settings, "a@example.org", "Hi", "Body")
-    assert smtp.instances[0].calls == ["quit"]
+    assert FakeSMTP.instances[0].calls == ["quit"]
+    assert opened[0]["context"] is not None

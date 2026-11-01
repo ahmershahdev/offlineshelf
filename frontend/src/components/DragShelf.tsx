@@ -132,7 +132,7 @@ export function DragShelf() {
       ref={track}
       data-cursor="grab"
       data-lenis-prevent-wheel=""
-      tabIndex={0}
+      tabIndex={0} // NOSONAR: a scrolling region needs focus so keyboard users can scroll it
       role="region"
       aria-label="Example lists, scroll sideways"
       className="no-scrollbar flex cursor-grab items-end gap-4 overflow-x-auto px-[var(--gutter)] pb-4 select-none active:cursor-grabbing"
