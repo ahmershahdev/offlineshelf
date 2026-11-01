@@ -185,6 +185,9 @@ Mono for code, all self-hosted.
 - three.js loads lazily after first paint and is skipped when WebGL is missing or Save-Data is
   on. With `prefers-reduced-motion`, Lenis, the cursor and animations are off and the hero renders
   one still frame. The cursor only appears with a fine pointer; touch keeps native scrolling.
+- Hover effects apply only with a real mouse or trackpad: Tailwind's `hover` variant is redefined
+  as `(hover: hover) and (pointer: fine)` (so `group-hover` follows), and every custom `:hover` rule
+  in `index.css` sits in the same media query. Keyboard focus keeps the same effects everywhere.
 - Brand assets come from `src/assets/source/brand` (the emblem); `scripts/images.mjs` builds the
   favicon, app icons (including a maskable one), header emblem and the share image.
 - `/.well-known/security.txt` (RFC 9116) is generated at build time with a fresh expiry.

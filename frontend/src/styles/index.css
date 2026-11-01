@@ -5,6 +5,17 @@
 @import '@fontsource-variable/geist-mono';
 @import 'lenis/dist/lenis.css';
 
+/* Hover only where there is a real mouse or trackpad. Touch browsers keep :hover after a tap,
+   which leaves effects stuck on; plain (hover: hover) also misfires on some Android phones.
+   group-hover and peer-hover are built from this variant, so they follow it. */
+@custom-variant hover {
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      @slot;
+    }
+  }
+}
+
 @theme {
   --color-ink: #0b0b0a;
   --color-ink-2: #121210;
@@ -135,9 +146,13 @@
     background-repeat: no-repeat;
     transition: background-size 0.6s var(--ease-out-expo);
   }
-  .link-draw:hover,
   .link-draw:focus-visible {
     background-size: 100% 1px;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .link-draw:hover {
+      background-size: 100% 1px;
+    }
   }
 
   .btn {
@@ -163,9 +178,13 @@
     transform: translateY(101%);
     transition: transform 0.6s var(--ease-out-expo);
   }
-  .btn:hover::before,
   .btn:focus-visible::before {
     transform: translateY(0);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .btn:hover::before {
+      transform: translateY(0);
+    }
   }
   .btn-solid {
     background: var(--color-paper);
@@ -181,9 +200,13 @@
   .btn-ghost::before {
     background: var(--color-paper);
   }
-  .btn-ghost:hover,
   .btn-ghost:focus-visible {
     color: var(--color-ink);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .btn-ghost:hover {
+      color: var(--color-ink);
+    }
   }
 
   .field {
@@ -232,8 +255,10 @@
     text-underline-offset: 0.2em;
     text-decoration-thickness: 1px;
   }
-  .prose-shelf a:hover {
-    color: var(--color-signal);
+  @media (hover: hover) and (pointer: fine) {
+    .prose-shelf a:hover {
+      color: var(--color-signal);
+    }
   }
   .prose-shelf ul,
   .prose-shelf ol {
@@ -377,8 +402,10 @@ html[data-motion='on'] .split[data-in='true'] > span > span {
   width: max-content;
   animation: marquee 38s linear infinite;
 }
-.marquee:hover {
-  animation-play-state: paused;
+@media (hover: hover) and (pointer: fine) {
+  .marquee:hover {
+    animation-play-state: paused;
+  }
 }
 @keyframes marquee {
   to {
