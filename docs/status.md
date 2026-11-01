@@ -26,7 +26,7 @@ Last updated: 2026-11-01. Update at the end of every work session.
   ahmershah.dev) (PR #11). The `/app` page signs in, creates, builds and deletes lists.
 - **Repo:** only `main`, no open PRs. `main` requires `backend`, `frontend`, `codeql (python)`
   and `codeql (javascript-typescript)`, squash merges, linear history.
-- Tests: 128 backend (MariaDB 11.4 + Redis), 30 frontend.
+- Tests: 129 backend (MariaDB 11.4 + Redis), 30 frontend.
 
 ## Run it
 
