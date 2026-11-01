@@ -123,10 +123,31 @@ def rebuild_dependents(session: Session, list_id: int) -> None:
         .distinct()
     ).all()
     for shelf in combinations:
+        # A combination waits until every source has built once. Queuing it earlier would only
+        # fail it, and email its owner, while the other sources are still on their first build.
+        if not _sources_ready(session, shelf.id):
+            continue
         try:
             enqueue_build(session, shelf)
         except BuildInProgressError:
             log.info("Combination %s is already building; not queued again", shelf.id)
+
+
+def _sources_ready(session: Session, combination_id: int) -> bool:
+    ready = (
+        select(ListVersion.id)
+        .where(
+            ListVersion.list_id == CombinationSource.source_list_id,
+            ListVersion.status == VersionStatus.READY,
+        )
+        .exists()
+    )
+    unready = session.scalar(
+        select(CombinationSource.source_list_id)
+        .where(CombinationSource.combination_id == combination_id, ~ready)
+        .limit(1)
+    )
+    return unready is None
 
 
 def make_source(wiki: str, settings: Settings) -> WikiSource:
