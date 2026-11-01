@@ -70,6 +70,18 @@ services:
     security_opt: ["no-new-privileges:true"]
     cap_drop: [ALL]
 
+  scheduler:
+    build: ./backend
+    restart: unless-stopped
+    environment: *backend-env
+    command: ["python", "-m", "app.scheduler"]
+    depends_on:
+      worker: {condition: service_started}
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
+
   web:
     build: ./frontend
     restart: unless-stopped

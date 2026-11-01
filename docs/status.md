@@ -12,13 +12,14 @@ Last updated: 2026-11-01. Update at the end of every work session.
   Until then a build ends as `failed` with "The X builder is not implemented yet."
 - **M3 Jobs:** failure emails done: `app/jobs/notify.py` emails the owner when a build fails,
   at most once per list per day, over SMTP (`app/mail.py`, off while `OFFLINESHELF_SMTP_HOST` is
-  empty). Production needs SMTP credentials in `.env`.
+  empty; production uses Resend). Monthly rebuilds done: the `scheduler` service runs
+  `app/jobs/schedule.py` hourly and queues lists not built this month.
 - **Site:** 13 public pages, Fraunces/Geist type, torch cursor with grab states, draggable example
   shelf, brand emblem icons, security.txt, contact details (support@ahmershah.dev,
   ahmershah.dev) (PR #11). The `/app` page signs in, creates, builds and deletes lists.
 - **Repo:** only `main`, no open PRs. `main` requires `backend`, `frontend`, `codeql (python)`
   and `codeql (javascript-typescript)`, squash merges, linear history.
-- Tests: 98 backend (MariaDB 11.4 + Redis), 19 frontend.
+- Tests: 105 backend (MariaDB 11.4 + Redis), 19 frontend.
 
 ## Run it
 
@@ -44,8 +45,8 @@ proxies `/api`). `npm run dev:down` stops the containers. Needs Docker, uv and N
 1. Maintainer: write `backend/app/core/builders.py` (pasted titles first, then category,
    Wikidata, pageviews) with 100% branch coverage, per `docs/core-contract.md`.
 2. Read the About page copy and confirm it says what you want about yourself.
-3. M3: monthly schedules, version diff endpoint once core has a diff function.
-   Choose an SMTP provider for production and set the `OFFLINESHELF_SMTP_*` variables.
+3. M3: version diff (added and removed articles) once core has a diff function; large lists
+   (100k titles) written in batches.
 4. M5: show build status, history and articles in `/app`.
 5. Install SonarQube Cloud and CodeRabbit on the repository (needs the owner's GitHub
    authorisation), then add them as required checks in `.github/rulesets/protect-main.json`.
