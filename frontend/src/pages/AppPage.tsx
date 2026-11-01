@@ -1,16 +1,22 @@
 import { useEffect, useState, type SyntheticEvent } from 'react'
 
-import { ApiError, api, type ListCreate, type ShelfList, type User } from '../api/client'
+import { ApiError, api, type ShelfList, type User } from '../api/client'
 import { ListDetail } from '../components/ListDetail'
+import { paramsFrom, type Kind, type Operation } from '../lib/params'
 import { POLL_MS, isActive } from '../lib/shelf'
-
-type Kind = ListCreate['params']['kind']
 
 const KIND_LABEL: Record<Kind, string> = {
   category: 'Category',
   wikidata: 'Wikidata query',
   pasted: 'Pasted titles',
   pageviews: 'Top by pageviews',
+  combination: 'Combination of lists',
+}
+
+const OPERATION_LABEL: Record<Operation, string> = {
+  union: 'Union: in any of them',
+  intersection: 'Intersection: in all of them',
+  difference: 'Difference: in the first, not in the others',
 }
 
 function field(form: FormData, name: string): string {
@@ -108,27 +114,7 @@ function AuthForm({ onUser }: { onUser: (u: User) => void }) {
   )
 }
 
-function paramsFrom(kind: Kind, form: FormData): ListCreate['params'] {
-  const s = (k: string): string => field(form, k)
-  switch (kind) {
-    case 'category':
-      return { kind, category: s('category'), depth: Number(s('depth') || 0) }
-    case 'wikidata':
-      return { kind, sparql: s('sparql') }
-    case 'pasted':
-      return {
-        kind,
-        titles: s('titles')
-          .split('\n')
-          .map((t) => t.trim())
-          .filter(Boolean),
-      }
-    case 'pageviews':
-      return { kind, year: Number(s('year')), month: Number(s('month')), limit: Number(s('limit')) }
-  }
-}
-
-function NewList({ onCreated }: { onCreated: (l: ShelfList) => void }) {
+function NewList({ lists, onCreated }: { lists: ShelfList[]; onCreated: (l: ShelfList) => void }) {
   const [kind, setKind] = useState<Kind>('category')
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
@@ -232,6 +218,46 @@ function NewList({ onCreated }: { onCreated: (l: ShelfList) => void }) {
           <span className="label">Titles, one per line</span>
           <textarea name="titles" required rows={6} className="field font-mono text-sm" />
         </label>
+      ) : null}
+      {kind === 'combination' ? (
+        <>
+          <label className="block md:col-span-2">
+            <span className="label">Operation</span>
+            <select name="operation" defaultValue="union" className="field bg-ink">
+              {(Object.keys(OPERATION_LABEL) as Operation[]).map((op) => (
+                <option key={op} value={op}>
+                  {OPERATION_LABEL[op]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <fieldset className="md:col-span-2">
+            <legend className="label mb-2">Lists to combine (2 to 10, same wiki)</legend>
+            {lists.length < 2 ? (
+              <p className="text-sm text-dim">Make at least two lists first.</p>
+            ) : (
+              <div className="grid gap-2 sm:grid-cols-2">
+                {[...lists].reverse().map((l) => (
+                  <label key={l.id} className="flex items-center gap-3 text-sm">
+                    <input
+                      type="checkbox"
+                      name="sources"
+                      value={l.id}
+                      className="size-4 accent-[var(--color-signal)]"
+                    />
+                    <span>
+                      {l.name} <span className="font-mono text-xs text-dim">{l.wiki}</span>
+                    </span>
+                  </label>
+                ))}
+              </div>
+            )}
+            <p className="mt-2 text-xs text-dim">
+              For a difference, the oldest checked list comes first. It rebuilds whenever one of
+              these lists gets a new version.
+            </p>
+          </fieldset>
+        </>
       ) : null}
       {kind === 'pageviews' ? (
         <div className="grid grid-cols-3 gap-6 md:col-span-2">
@@ -473,6 +499,7 @@ export function AppPage() {
         <div className="lg:col-span-5">
           <p className="label mb-4">New list</p>
           <NewList
+            lists={lists}
             onCreated={(l) => {
               setLists((prev) => [l, ...prev])
             }}

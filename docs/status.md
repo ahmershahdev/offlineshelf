@@ -21,12 +21,16 @@ Last updated: 2026-11-01. Update at the end of every work session.
   with a Download TSV link in the Details panel. HTML bundle done: Parsoid HTML per article,
   links rewritten, index and attribution pages, zipped on the `exports-data` volume, 7-day expiry
   with hourly cleanup, Make/Download HTML bundle in the Details panel.
+- **M4 Combinations:** infrastructure done: `combination` builder kind, `combination_source`
+  table, source checks, delete guard, rebuild on a source's new version, form in `/app`.
+  **Open:** `app/core/combine.py` (maintainer, see core-contract.md); until then combination
+  builds fail with "not implemented yet".
 - **Site:** 13 public pages, Fraunces/Geist type, torch cursor with grab states, draggable example
   shelf, brand emblem icons, security.txt, contact details (support@ahmershah.dev,
   ahmershah.dev) (PR #11). The `/app` page signs in, creates, builds and deletes lists.
 - **Repo:** only `main`, no open PRs. `main` requires `backend`, `frontend`, `codeql (python)`
   and `codeql (javascript-typescript)`, squash merges, linear history.
-- Tests: 129 backend (MariaDB 11.4 + Redis), 30 frontend.
+- Tests: 142 backend (MariaDB 11.4 + Redis), 32 frontend.
 
 ## Run it
 
@@ -50,7 +54,8 @@ proxies `/api`). `npm run dev:down` stops the containers. Needs Docker, uv and N
 ## Next session
 
 1. Maintainer: write `backend/app/core/builders.py` (pasted titles first, then category,
-   Wikidata, pageviews) with 100% branch coverage, per `docs/core-contract.md`.
+   Wikidata, pageviews) and `backend/app/core/combine.py`, with 100% branch coverage, per
+   `docs/core-contract.md`.
 2. Read the About page copy and confirm it says what you want about yourself.
 3. M3: version diff (added and removed articles) once core has a diff function; large lists
    (100k titles) written in batches.

@@ -86,8 +86,33 @@ already handled. Every method returns what MediaWiki said, without decisions.
 2. Take the first `limit` that remain, in rank order.
 3. Report suggestion: `{"skipped": [...], "month": "2026-08"}`.
 
+## Combinations: `app/core/combine.py`
+
+```python
+from app.contract import Combiner
+
+combine: Combiner
+```
+
+`Combiner` is `(operation, sources: Sequence[Iterator[Page]], limits: Limits) -> BuildResult`.
+
+- `operation` is `"union"`, `"intersection"` or `"difference"` (the first source minus all the
+  others). There are 2 to 10 sources, in the order the user chose.
+- Each source yields the pages of one list's latest ready version, **sorted by `page_id`
+  ascending, without duplicates**, read lazily from the database. Merging them in one pass keeps
+  memory flat however large the lists are; don't turn them into lists or sets.
+- A page in several sources can have different titles or revision IDs (the sources were built at
+  different times). Pick one rule and document it; taking the first source's copy is simplest.
+- `articles` can be a generator; more than `limits.max_articles` fails the build as for builders.
+- Report suggestion: `{"operation": "union", "inputs": [n, n], "result": n}`. The job adds
+  `"source_versions": [version ids]` itself.
+- Until `combine` exists, combination builds fail with "The combination builder is not
+  implemented yet." A source without a ready version fails the build before core is called.
+- Cycles can't happen yet: lists can't be edited, so a new combination can only point at lists
+  that already exist. When editing arrives, core gets a cycle check (below).
+
 ## Later milestones
 
 - M3: version diff (articles added and removed between two versions), given two sorted
   iterators of page IDs.
-- M4: union, intersection and difference of up to 10 lists, and cycle detection between lists.
+- With list editing: cycle detection between combinations.

@@ -9,10 +9,19 @@ from app.db import SessionLocal
 from app.exports import tsv_header, tsv_rows
 from app.jobs.build import BuildInProgressError, enqueue_build
 from app.jobs.export import remove_files
-from app.models import ListArticle, ListExport, ListVersion, ShelfList, User, VersionStatus
+from app.models import (
+    CombinationSource,
+    ListArticle,
+    ListExport,
+    ListVersion,
+    ShelfList,
+    User,
+    VersionStatus,
+)
 from app.schemas import (
     ArticleOut,
     ArticlePage,
+    CombinationParams,
     ListCreate,
     ListOut,
     ListPage,
@@ -86,6 +95,17 @@ def index() -> Response:
     return jsonify(page.model_dump(mode="json"))
 
 
+def _check_sources(user: User, wiki: str, sources: list[int]) -> None:
+    found = SessionLocal.scalars(
+        select(ShelfList.id).where(
+            ShelfList.id.in_(sources), ShelfList.owner_id == user.id, ShelfList.wiki == wiki
+        )
+    ).all()
+    if len(found) != len(sources):
+        SessionLocal.rollback()
+        abort(422, description="Combine only your own lists, all on the same wiki as this one.")
+
+
 @bp.post("")
 @limiter.limit(limit_from("rate_limit_write"))
 def create() -> tuple[Response, int]:
@@ -110,6 +130,13 @@ def create() -> tuple[Response, int]:
         schedule=data.schedule,
     )
     SessionLocal.add(shelf)
+    if isinstance(data.params, CombinationParams):
+        _check_sources(user, data.wiki, data.params.sources)
+        SessionLocal.flush()
+        SessionLocal.add_all(
+            CombinationSource(combination_id=shelf.id, position=i, source_list_id=source)
+            for i, source in enumerate(data.params.sources)
+        )
     SessionLocal.commit()
     response = jsonify(_out(shelf))
     response.headers["Location"] = f"/api/v1/lists/{shelf.id}"
@@ -125,6 +152,14 @@ def show(list_id: int) -> Response:
 @limiter.limit(limit_from("rate_limit_write"))
 def delete(list_id: int) -> tuple[str, int]:
     shelf = _owned(list_id, require_user())
+    used_by = SessionLocal.scalar(
+        select(ShelfList.name)
+        .join(CombinationSource, CombinationSource.combination_id == ShelfList.id)
+        .where(CombinationSource.source_list_id == shelf.id)
+        .limit(1)
+    )
+    if used_by is not None:
+        abort(409, description=f'The combination "{used_by}" uses this list. Delete it first.')
     files = list(
         SessionLocal.scalars(
             select(ListExport.file_name)

@@ -67,3 +67,9 @@ class BuildResult:
 
 
 Builder = Callable[[WikiSource, Mapping[str, object], Limits], BuildResult]
+
+
+Operation = Literal["union", "intersection", "difference"]
+
+# Each source yields its pages sorted by page_id, ascending, without duplicates.
+Combiner = Callable[[Operation, Sequence[Iterator[Page]], Limits], BuildResult]

@@ -29,7 +29,14 @@ from app import create_app
 from app.config import get_settings
 from app.db import SessionLocal
 
-TABLES = ("list_export", "list_article", "list_version", "shelf_list", "user")
+TABLES = (
+    "combination_source",
+    "list_export",
+    "list_article",
+    "list_version",
+    "shelf_list",
+    "user",
+)
 
 
 @pytest.fixture(scope="session")

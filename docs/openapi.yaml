@@ -86,6 +86,7 @@ paths:
       responses:
         '204': { description: Deleted }
         '404': { $ref: '#/components/responses/Problem' }
+        '409': { $ref: '#/components/responses/Problem' }
   /lists/{listId}/build:
     parameters:
       - { name: listId, in: path, required: true, schema: { type: integer } }
@@ -212,7 +213,7 @@ components:
       type: object
       required: [user, csrf]
       properties: { user: { $ref: '#/components/schemas/User' }, csrf: { type: string } }
-    BuilderKind: { type: string, enum: [category, wikidata, pasted, pageviews] }
+    BuilderKind: { type: string, enum: [category, wikidata, pasted, pageviews, combination] }
     Schedule: { type: string, enum: [none, monthly] }
     VersionStatus: { type: string, enum: [queued, building, ready, failed] }
     CategoryParams:
@@ -246,6 +247,18 @@ components:
         year: { type: integer, minimum: 2016 }
         month: { type: integer, minimum: 1, maximum: 12 }
         limit: { type: integer, minimum: 1, maximum: 1000 }
+    CombinationParams:
+      type: object
+      additionalProperties: false
+      description: >-
+        Union, intersection or difference (the first list minus the others) of the latest ready
+        versions of 2 to 10 of your lists on the same wiki. Rebuilds when a source list gets a
+        new version.
+      required: [kind, operation, sources]
+      properties:
+        kind: { const: combination }
+        operation: { type: string, enum: [union, intersection, difference] }
+        sources: { type: array, items: { type: integer }, minItems: 2, maxItems: 10, uniqueItems: true }
     ListCreate:
       type: object
       additionalProperties: false
@@ -259,6 +272,7 @@ components:
             - $ref: '#/components/schemas/WikidataParams'
             - $ref: '#/components/schemas/PastedParams'
             - $ref: '#/components/schemas/PageviewsParams'
+            - $ref: '#/components/schemas/CombinationParams'
           discriminator:
             propertyName: kind
             mapping:
@@ -266,6 +280,7 @@ components:
               wikidata: '#/components/schemas/WikidataParams'
               pasted: '#/components/schemas/PastedParams'
               pageviews: '#/components/schemas/PageviewsParams'
+              combination: '#/components/schemas/CombinationParams'
         schedule: { $ref: '#/components/schemas/Schedule' }
     ShelfList:
       type: object

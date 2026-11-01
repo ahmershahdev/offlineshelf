@@ -32,6 +32,7 @@ class BuilderKind(enum.StrEnum):
     WIKIDATA = "wikidata"
     PASTED = "pasted"
     PAGEVIEWS = "pageviews"
+    COMBINATION = "combination"
 
 
 class Schedule(enum.StrEnum):
@@ -77,7 +78,12 @@ class ShelfList(Base):
     name: Mapped[str] = mapped_column(String(120))
     wiki: Mapped[str] = mapped_column(String(64))
     builder: Mapped[BuilderKind] = mapped_column(
-        Enum(BuilderKind, values_callable=lambda e: [m.value for m in e], native_enum=False)
+        Enum(
+            BuilderKind,
+            values_callable=lambda e: [m.value for m in e],
+            native_enum=False,
+            length=16,
+        )
     )
     params: Mapped[dict[str, Any]] = mapped_column(JSON)
     schedule: Mapped[Schedule] = mapped_column(
@@ -94,6 +100,19 @@ class ShelfList(Base):
     )
 
     __mapper_args__ = {"version_id_col": row_version}  # noqa: RUF012
+
+
+class CombinationSource(Base):
+    __tablename__ = "combination_source"
+
+    combination_id: Mapped[int] = mapped_column(
+        ForeignKey("shelf_list.id", ondelete="CASCADE"), primary_key=True
+    )
+    position: Mapped[int] = mapped_column(Integer, primary_key=True)
+    # RESTRICT: a list that a combination reads from can't be deleted out from under it.
+    source_list_id: Mapped[int] = mapped_column(
+        ForeignKey("shelf_list.id", ondelete="RESTRICT"), index=True
+    )
 
 
 class ListVersion(Base):

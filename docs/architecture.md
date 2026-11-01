@@ -58,6 +58,7 @@ Built (migrations `512c42b8a106`, `7f9fad1c53cf`):
 ```
 user          id, email (unique), password_hash, session_epoch, created_at
 shelf_list    id, owner_id, name, wiki, builder, params (JSON), schedule, row_version, created_at
+combination_source  combination_id, position, source_list_id (RESTRICT on delete)
 list_version  id, list_id, status, started_at, finished_at, article_count, error, report (JSON),
               notified_at
 list_article  id, version_id, page_id, title (utf8mb4_bin), revision_id; unique (version_id, page_id)
@@ -65,8 +66,6 @@ list_export   id, version_id, format, status, file_name, size_bytes, progress, m
               error, created_at, finished_at, expires_at
 ```
 
-Planned for M4: `combination_src (combination_id, source_list_id, operation)`,
-`export (id, version_id, format, path, created_at, expires_at)`.
 
 ## API
 
@@ -87,6 +86,18 @@ Built: see `docs/openapi.yaml` (health, auth, lists, build, versions, articles).
    the list row and skips the email if any version of the list has a `notified_at` in the last
    24 hours, so the owner gets at most one email per list per day. `notified_at` is set only
    after SMTP accepts the message; an SMTP error raises and RQ retries after 1, 5 and 15 minutes.
+
+### Combinations
+
+A list with `builder = combination` has `{"operation", "sources"}` in `params` and one
+`combination_source` row per source (order kept, for difference). Sources must be the owner's
+lists on the same wiki (422 otherwise); a list used by a combination can't be deleted (409).
+The build job reads each source's latest ready version as an iterator sorted by `page_id`
+(keyset batches of 5000, so nothing sits in memory whole) and hands them to
+`app/core/combine.py`; a source with no ready version fails the build. When any version becomes
+`ready`, the job queues a build for every combination that uses that list, so chains of
+combinations update in turn. A combination already queued or building is not queued again.
+Lists can't be edited yet, so a cycle can't form.
 
 ### Monthly rebuilds
 
@@ -197,6 +208,7 @@ Mono for code, all self-hosted.
 | Neutral `app/contract.py` | Core stays importable without Flask, SQLAlchemy or httpx, and is tested with fakes |
 | SMTP with `smtplib`, no mail library or provider SDK | Any provider speaks SMTP; one fewer dependency; self-hosters use their own server |
 | Hourly idempotent dispatcher, not a cron entry on the 1st | A cron run missed during downtime would wait a month; the hourly check catches up and needs no extra state |
+| Combinations as a builder kind with a sources table | One list model, one build pipeline and one versions API for every list; the table makes "who uses this list" one indexed query and lets the database refuse deleting a source |
 | Exports on local disk, not object storage | Self-hosters need nothing extra; bundles are capped at 1000 articles and expire in 7 days, so the disk stays small |
 | Bundle files named by page ID | Titles can hold characters that are unsafe or ambiguous in file names (`:` on Windows, case folding on macOS) |
 | TSV attribution in `#` lines, not a separate file | One file to hand around; `#` can never start a title, and most TSV readers can skip comment lines |
