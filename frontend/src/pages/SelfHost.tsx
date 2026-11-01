@@ -89,7 +89,10 @@ docker compose up -d --build`}</Code>
         <Facts
           items={[
             ['OFFLINESHELF_SMTP_HOST', 'For example smtp.resend.com. Empty turns email off'],
-            ['OFFLINESHELF_SMTP_PORT', '587 (STARTTLS, default) or 465 (TLS); always encrypted'],
+            [
+              'OFFLINESHELF_SMTP_PORT',
+              '587 (STARTTLS, default), 465 or 2465 (TLS); always encrypted',
+            ],
             ['OFFLINESHELF_SMTP_USERNAME', 'For Resend: resend'],
             ['OFFLINESHELF_SMTP_PASSWORD', 'An API key or password; keep it in .env only'],
             ['OFFLINESHELF_MAIL_FROM', 'A sender on a domain verified with your provider'],

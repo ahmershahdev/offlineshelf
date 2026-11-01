@@ -54,6 +54,14 @@
           {
             "context": "codeql (javascript-typescript)",
             "integration_id": 15368
+          },
+          {
+            "context": "SonarCloud Code Analysis",
+            "integration_id": 12526
+          },
+          {
+            "context": "CodeRabbit",
+            "integration_id": 347564
           }
         ]
       }

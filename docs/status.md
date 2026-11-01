@@ -78,6 +78,9 @@ proxies `/api`). `npm run dev:down` stops the containers. Needs Docker, uv and N
   bumps that would leave those lines (Python 3.12, MariaDB 11.4 LTS, Node LTS, nginx stable,
   TypeScript 5); those upgrades are made on purpose.
 - Failure emails have no opt-out yet; add one with the account settings page.
+- Upgrade note: `OFFLINESHELF_SMTP_STARTTLS=false` is no longer supported; mail is always sent
+  over TLS (STARTTLS on 587, implicit TLS on 465 and 2465). Installs that still set it log a
+  warning.
 - Account deletion is by email for now; an endpoint comes with the account settings page.
 
 ## Open questions

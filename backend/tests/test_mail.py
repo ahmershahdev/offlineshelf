@@ -71,7 +71,16 @@ def test_port_465_uses_implicit_tls_without_auth(monkeypatch) -> None:
 
     monkeypatch.setattr(mail.smtplib, "SMTP_SSL", FakeSMTPSSL)
     FakeSMTP.instances = []
-    settings = get_settings().model_copy(update={"smtp_host": "smtp.example.org", "smtp_port": 465})
-    assert mail.send_email(settings, "a@example.org", "Hi", "Body")
-    assert FakeSMTP.instances[0].calls == ["quit"]
-    assert opened[0]["context"] is not None
+    for port in (465, 2465):
+        settings = get_settings().model_copy(
+            update={"smtp_host": "smtp.example.org", "smtp_port": port}
+        )
+        assert mail.send_email(settings, "a@example.org", "Hi", "Body")
+        assert FakeSMTP.instances[-1].calls == ["quit"]
+    assert all(o["context"] is not None for o in opened)
+
+
+def test_the_removed_plaintext_setting_is_warned_about(smtp, caplog) -> None:
+    settings = get_settings().model_copy(update={"smtp_starttls": False})
+    mail.send_email(settings, "a@example.org", "Hi", "Body")
+    assert "no longer supported" in caplog.text
