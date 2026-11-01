@@ -48,7 +48,7 @@ def _strings(params: Mapping[str, object], key: str) -> list[str]:
 
 def _case_sensitive(source: WikiSource) -> bool:
     # Wiktionary keeps the case of the first letter: "apple" and "Apple" are different entries.
-    return ".wiktionary.org" in source.wiki
+    return source.wiki.endswith(".wiktionary.org")
 
 
 def _articles_for_titles(
