@@ -5,17 +5,20 @@
 It makes about ten polite requests with the project User-Agent.
 """
 
+import contextlib
 import json
 from typing import Any
 
 import httpx
 
-from app.wiki.client import WikiClient
+from app.wiki.client import WikiApiError, WikiClient
 from app.wiki.source import HttpWikiSource
 from tests.wiki.recorded import RECORDINGS, request_key
 
 KEEP_HEADERS = {"content-type", "retry-after"}
 TOP_ARTICLES_KEPT = 8
+# A fixed revision keeps the recording stable when the article is edited.
+PAGE_HTML_REVISION = 1375425456
 
 
 def record(name: str, run: Any) -> None:
@@ -23,19 +26,18 @@ def record(name: str, run: Any) -> None:
 
     def on_response(response: httpx.Response) -> None:
         response.read()
-        body = response.json()
-        if "items" in body:
-            body["items"][0]["articles"] = body["items"][0]["articles"][:TOP_ARTICLES_KEPT]
-        exchanges.append(
-            {
-                "request": request_key(response.request),
-                "response": {
-                    "status": response.status_code,
-                    "headers": {k: v for k, v in response.headers.items() if k in KEEP_HEADERS},
-                    "body": body,
-                },
-            }
-        )
+        recorded: dict[str, Any] = {
+            "status": response.status_code,
+            "headers": {k: v for k, v in response.headers.items() if k in KEEP_HEADERS},
+        }
+        if "html" in response.headers.get("content-type", ""):
+            recorded["text"] = response.text
+        else:
+            body = response.json()
+            if "items" in body:
+                body["items"][0]["articles"] = body["items"][0]["articles"][:TOP_ARTICLES_KEPT]
+            recorded["body"] = body
+        exchanges.append({"request": request_key(response.request), "response": recorded})
 
     http = httpx.Client(timeout=60, event_hooks={"response": [on_response]})
     run(WikiClient(http))
@@ -85,6 +87,13 @@ def main() -> None:
         ),
     )
     record("top_pageviews", lambda c: HttpWikiSource(c, en).top_pageviews(2026, 8))
+
+    def page_html(c: WikiClient) -> None:
+        c.page_html(en, "Kiwix", PAGE_HTML_REVISION)
+        with contextlib.suppress(WikiApiError):
+            c.page_html(en, "OfflineShelf no such page 7731", None)
+
+    record("page_html", page_html)
 
 
 if __name__ == "__main__":

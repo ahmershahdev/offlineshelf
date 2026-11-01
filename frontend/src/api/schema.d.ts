@@ -245,6 +245,45 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/lists/{listId}/versions/{versionId}/exports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                listId: number;
+                versionId: number;
+            };
+            cookie?: never;
+        };
+        get: operations["listExports"];
+        put?: never;
+        /** @description Queues a static HTML bundle of a ready version: one Parsoid HTML file per article with links between bundled articles rewritten, an index and an attribution page, zipped. If an export of this version is already queued, running or ready, that one is returned. Bundles expire after 7 days. */
+        post: operations["createExport"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/lists/{listId}/exports/{exportId}/download": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                listId: number;
+                exportId: number;
+            };
+            cookie?: never;
+        };
+        get: operations["downloadExport"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -355,6 +394,37 @@ export interface components {
         VersionPage: {
             items: components["schemas"]["ListVersion"][];
             next_cursor: number | null;
+        };
+        ExportCreate: {
+            /**
+             * @default html
+             * @enum {string}
+             */
+            format: "html";
+        };
+        Export: {
+            id: number;
+            version_id: number;
+            format: string;
+            /** @enum {string} */
+            status: "queued" | "building" | "ready" | "failed";
+            /** @description Articles fetched so far */
+            progress: number;
+            /** @description Articles in the version */
+            total: number;
+            size_bytes: number | null;
+            /** @description Titles whose pages no longer exist */
+            missing: string[] | null;
+            error: string | null;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            finished_at: string | null;
+            /** Format: date-time */
+            expires_at: string | null;
+        };
+        ExportList: {
+            items: components["schemas"]["Export"][];
         };
         Article: {
             page_id: number;
@@ -780,6 +850,85 @@ export interface operations {
             };
             404: components["responses"]["Problem"];
             409: components["responses"]["Problem"];
+        };
+    };
+    listExports: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                listId: number;
+                versionId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The ten most recent exports */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExportList"];
+                };
+            };
+            404: components["responses"]["Problem"];
+        };
+    };
+    createExport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                listId: number;
+                versionId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExportCreate"];
+            };
+        };
+        responses: {
+            /** @description Queued (or the existing export) */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Export"];
+                };
+            };
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+        };
+    };
+    downloadExport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                listId: number;
+                exportId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The zip file */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/zip": string;
+                };
+            };
+            404: components["responses"]["Problem"];
+            410: components["responses"]["Problem"];
         };
     };
 }

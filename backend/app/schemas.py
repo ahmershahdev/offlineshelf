@@ -12,7 +12,7 @@ from pydantic import (
 )
 
 from app.config import current_settings
-from app.models import BuilderKind, Schedule, VersionStatus
+from app.models import BuilderKind, ExportStatus, Schedule, VersionStatus
 from app.security.wiki_hosts import is_allowed_wiki
 
 # The database stores naive UTC; without an offset in the JSON, browsers read it as local time.
@@ -188,6 +188,29 @@ class ArticleOut(BaseModel):
 class ArticlePage(BaseModel):
     items: list[ArticleOut]
     next_cursor: int | None
+
+
+class ExportCreate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    format: Literal["html"] = "html"
+
+
+class ExportOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    version_id: int
+    format: str
+    status: ExportStatus
+    progress: int
+    total: int
+    size_bytes: int | None
+    missing: list[str] | None
+    error: str | None
+    created_at: UtcDateTime
+    finished_at: UtcDateTime | None
+    expires_at: UtcDateTime | None
 
 
 class Problem(BaseModel):

@@ -39,6 +39,8 @@ class Replay(httpx.MockTransport):
         for exchange in self.exchanges:
             if exchange["request"] == key:
                 r = exchange["response"]
+                if "text" in r:
+                    return httpx.Response(r["status"], headers=r["headers"], text=r["text"])
                 return httpx.Response(r["status"], headers=r["headers"], json=r["body"])
         raise AssertionError(f"No recording for {key}")
 

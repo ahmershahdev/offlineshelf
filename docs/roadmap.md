@@ -45,8 +45,8 @@ in CI, and seed data.
 - [ ] Union, intersection and difference of up to 10 lists; no cycles between lists
 - [ ] A combination rebuilds when one of its source lists gets a new version
 - [x] Export TSV (title, page ID, revision ID), streamed, with attribution lines
-- [ ] Export a static HTML bundle (Parsoid HTML, local links rewritten, attribution page)
-- [ ] Downloads are streamed and expire after 7 days
+- [x] Export a static HTML bundle (Parsoid HTML, local links rewritten, attribution page)
+- [x] Downloads are streamed and expire after 7 days
 
 ## M5. Web app (target 2027-01-17)
 

@@ -1,4 +1,8 @@
 import pytest
+from sqlalchemy import func, select
+
+from app.db import SessionLocal
+from app.models import ShelfList, User
 
 CATEGORY_LIST = {
     "name": "Physics",
@@ -115,3 +119,11 @@ def test_oversized_body_rejected(signed_in) -> None:
         "POST", "/api/v1/lists", data="x" * 1_100_000, content_type="application/json"
     )
     assert resp.status_code == 413
+
+
+def test_deleting_a_user_deletes_their_lists(signed_in) -> None:
+    signed_in.send("POST", "/api/v1/lists", CATEGORY_LIST)
+    user = SessionLocal.scalars(select(User)).one()
+    SessionLocal.delete(user)
+    SessionLocal.commit()
+    assert SessionLocal.scalar(select(func.count()).select_from(ShelfList)) == 0

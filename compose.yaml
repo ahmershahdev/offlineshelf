@@ -50,6 +50,7 @@ services:
     restart: unless-stopped
     environment: *backend-env
     command: ["sh", "-c", "alembic upgrade head && exec gunicorn -c gunicorn.conf.py app.wsgi:app"]
+    volumes: [exports-data:/data/exports]
     depends_on:
       mariadb: {condition: service_healthy}
       redis: {condition: service_healthy}
@@ -63,6 +64,7 @@ services:
     restart: unless-stopped
     environment: *backend-env
     command: ["python", "-m", "app.worker"]
+    volumes: [exports-data:/data/exports]
     depends_on:
       api: {condition: service_started}
     read_only: true
@@ -95,3 +97,4 @@ services:
 volumes:
   mariadb-data:
   redis-data:
+  exports-data:

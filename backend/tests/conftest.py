@@ -1,4 +1,5 @@
 import os
+import tempfile
 from collections.abc import Iterator
 
 import pytest
@@ -19,6 +20,7 @@ os.environ["OFFLINESHELF_DATABASE_URL"] = os.environ.get(
     "OFFLINESHELF_TEST_DATABASE_URL",
     "mariadb+pymysql://offlineshelf:offlineshelf@127.0.0.1:3306/offlineshelf_test",
 )
+os.environ["OFFLINESHELF_EXPORTS_DIR"] = tempfile.mkdtemp(prefix="offlineshelf-exports-")
 os.environ["OFFLINESHELF_REDIS_URL"] = os.environ.get(
     "OFFLINESHELF_TEST_REDIS_URL", "redis://127.0.0.1:6379/15"
 )
@@ -27,7 +29,7 @@ from app import create_app
 from app.config import get_settings
 from app.db import SessionLocal
 
-TABLES = ("list_article", "list_version", "shelf_list", "user")
+TABLES = ("list_export", "list_article", "list_version", "shelf_list", "user")
 
 
 @pytest.fixture(scope="session")

@@ -42,6 +42,7 @@ async function flush(): Promise<void> {
 
 beforeEach(() => {
   vi.useFakeTimers()
+  vi.spyOn(api, 'exports').mockResolvedValue({ items: [] })
 })
 
 afterEach(() => {

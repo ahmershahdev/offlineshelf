@@ -143,6 +143,40 @@ paths:
         '200': { description: TSV file, content: { text/tab-separated-values: { schema: { type: string } } } }
         '404': { $ref: '#/components/responses/Problem' }
         '409': { $ref: '#/components/responses/Problem' }
+  /lists/{listId}/versions/{versionId}/exports:
+    parameters:
+      - { name: listId, in: path, required: true, schema: { type: integer } }
+      - { name: versionId, in: path, required: true, schema: { type: integer } }
+    get:
+      operationId: listExports
+      responses:
+        '200': { description: The ten most recent exports, newest first, content: { application/json: { schema: { $ref: '#/components/schemas/ExportList' } } } }
+        '404': { $ref: '#/components/responses/Problem' }
+    post:
+      operationId: createExport
+      description: >-
+        Queues a static HTML bundle of a ready version: one Parsoid HTML file per article with
+        links between bundled articles rewritten, an index and an attribution page, zipped. If an
+        export of this version is already queued, running or ready, that one is returned.
+        Bundles expire after 7 days.
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/ExportCreate' } } }
+      responses:
+        '202': { description: Queued (or the existing export), content: { application/json: { schema: { $ref: '#/components/schemas/Export' } } } }
+        '404': { $ref: '#/components/responses/Problem' }
+        '409': { $ref: '#/components/responses/Problem' }
+        '422': { $ref: '#/components/responses/Problem' }
+  /lists/{listId}/exports/{exportId}/download:
+    parameters:
+      - { name: listId, in: path, required: true, schema: { type: integer } }
+      - { name: exportId, in: path, required: true, schema: { type: integer } }
+    get:
+      operationId: downloadExport
+      responses:
+        '200': { description: The zip file, content: { application/zip: { schema: { type: string, format: binary } } } }
+        '404': { $ref: '#/components/responses/Problem' }
+        '410': { $ref: '#/components/responses/Problem' }
 components:
   responses:
     Problem:
@@ -268,6 +302,32 @@ components:
       properties:
         items: { type: array, items: { $ref: '#/components/schemas/ListVersion' } }
         next_cursor: { oneOf: [{ type: integer }, { type: 'null' }] }
+    ExportCreate:
+      type: object
+      additionalProperties: false
+      properties:
+        format: { type: string, enum: [html], default: html }
+    Export:
+      type: object
+      required: [id, version_id, format, status, progress, total, size_bytes, missing, error, created_at, finished_at, expires_at]
+      properties:
+        id: { type: integer }
+        version_id: { type: integer }
+        format: { type: string }
+        status: { type: string, enum: [queued, building, ready, failed] }
+        progress: { type: integer, description: Articles fetched so far }
+        total: { type: integer, description: Articles in the version }
+        size_bytes: { type: [integer, 'null'] }
+        missing: { type: [array, 'null'], items: { type: string }, description: Titles whose pages no longer exist }
+        error: { type: [string, 'null'] }
+        created_at: { type: string, format: date-time }
+        finished_at: { type: [string, 'null'], format: date-time }
+        expires_at: { type: [string, 'null'], format: date-time }
+    ExportList:
+      type: object
+      required: [items]
+      properties:
+        items: { type: array, items: { $ref: '#/components/schemas/Export' } }
     Article:
       type: object
       required: [page_id, title, revision_id]

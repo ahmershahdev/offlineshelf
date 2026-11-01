@@ -36,6 +36,10 @@ class Settings(BaseSettings):
     max_top_articles: int = 1000
     sparql_timeout_seconds: int = 60
 
+    exports_dir: str = "/data/exports"
+    max_bundle_articles: int = 1000
+    export_days: int = 7
+
     # An empty host turns email off; failures are then only visible in the app.
     smtp_host: str = ""
     smtp_port: int = 587

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 
 import { api, type Article, type ListVersion, type ShelfList } from '../api/client'
 import { POLL_MS, articleUrl, isActive, reportLines } from '../lib/shelf'
+import { BundleExport } from './BundleExport'
 
 type Status = ListVersion['status']
 
@@ -197,6 +198,9 @@ export function ListDetail({
               ))}
             </ul>
           ) : null}
+          <div className="mb-4">
+            <BundleExport key={shown.id} list={list} version={shown} />
+          </div>
           <Articles key={shown.id} list={list} version={shown} />
         </div>
       ) : null}

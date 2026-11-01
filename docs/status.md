@@ -18,13 +18,15 @@ Last updated: 2026-11-01. Update at the end of every work session.
   articles of a ready version with paging and links to the wiki, live status while building.
   API timestamps now carry `Z` (UTC).
 - **M4 Exports:** TSV export done (`/versions/<vid>/export.tsv`, streamed, attribution lines),
-  with a Download TSV link in the Details panel.
+  with a Download TSV link in the Details panel. HTML bundle done: Parsoid HTML per article,
+  links rewritten, index and attribution pages, zipped on the `exports-data` volume, 7-day expiry
+  with hourly cleanup, Make/Download HTML bundle in the Details panel.
 - **Site:** 13 public pages, Fraunces/Geist type, torch cursor with grab states, draggable example
   shelf, brand emblem icons, security.txt, contact details (support@ahmershah.dev,
   ahmershah.dev) (PR #11). The `/app` page signs in, creates, builds and deletes lists.
 - **Repo:** only `main`, no open PRs. `main` requires `backend`, `frontend`, `codeql (python)`
   and `codeql (javascript-typescript)`, squash merges, linear history.
-- Tests: 111 backend (MariaDB 11.4 + Redis), 26 frontend.
+- Tests: 128 backend (MariaDB 11.4 + Redis), 30 frontend.
 
 ## Run it
 

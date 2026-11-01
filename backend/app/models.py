@@ -46,6 +46,13 @@ class VersionStatus(enum.StrEnum):
     FAILED = "failed"
 
 
+class ExportStatus(enum.StrEnum):
+    QUEUED = "queued"
+    BUILDING = "building"
+    READY = "ready"
+    FAILED = "failed"
+
+
 class User(Base):
     __tablename__ = "user"
 
@@ -56,7 +63,9 @@ class User(Base):
     session_epoch: Mapped[int] = mapped_column(Integer, default=0)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
 
-    lists: Mapped[list["ShelfList"]] = relationship(back_populates="owner")
+    lists: Mapped[list["ShelfList"]] = relationship(
+        back_populates="owner", cascade="all, delete-orphan", passive_deletes=True
+    )
 
 
 class ShelfList(Base):
@@ -116,3 +125,26 @@ class ListArticle(Base):
     page_id: Mapped[int] = mapped_column(BigInteger)
     title: Mapped[str] = mapped_column(String(255, collation=TITLE_COLLATION))
     revision_id: Mapped[int | None] = mapped_column(BigInteger)
+
+
+class ListExport(Base):
+    __tablename__ = "list_export"
+    __table_args__ = (Index("ix_list_export_version_id_id", "version_id", "id"),)
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    version_id: Mapped[int] = mapped_column(ForeignKey("list_version.id", ondelete="CASCADE"))
+    format: Mapped[str] = mapped_column(String(16))
+    status: Mapped[ExportStatus] = mapped_column(
+        Enum(ExportStatus, values_callable=lambda e: [m.value for m in e], native_enum=False),
+        default=ExportStatus.QUEUED,
+    )
+    file_name: Mapped[str | None] = mapped_column(String(255))
+    size_bytes: Mapped[int | None] = mapped_column(BigInteger)
+    progress: Mapped[int] = mapped_column(Integer, default=0)
+    missing: Mapped[list[str] | None] = mapped_column(JSON)
+    error: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime)
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime, index=True)
+
+    version: Mapped[ListVersion] = relationship()

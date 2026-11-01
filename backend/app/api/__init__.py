@@ -1,6 +1,7 @@
 from flask import Blueprint, Flask
 
 from app.api.auth import bp as auth_bp
+from app.api.exports import bp as exports_bp
 from app.api.health import bp as health_bp
 from app.api.lists import bp as lists_bp
 
@@ -10,4 +11,5 @@ def register_blueprints(app: Flask) -> None:
     api.register_blueprint(health_bp)
     api.register_blueprint(auth_bp)
     api.register_blueprint(lists_bp)
+    api.register_blueprint(exports_bp)
     app.register_blueprint(api)
