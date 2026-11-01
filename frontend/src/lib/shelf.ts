@@ -25,6 +25,7 @@ export function reportLines(report: ListVersion['report']): string[] {
     const name = key.replaceAll('_', ' ')
     if (!Array.isArray(value)) return `${name}: ${text(value)}`
     if (value.length === 0) return `${name}: 0`
+    if (value.every((v) => typeof v === 'number')) return `${name}: ${value.join(', ')}`
     const shown = value.slice(0, 5).map(text).join(', ')
     return `${name}: ${value.length} (${shown}${value.length > 5 ? ', ...' : ''})`
   })

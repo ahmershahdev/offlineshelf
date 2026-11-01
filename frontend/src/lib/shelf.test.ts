@@ -26,6 +26,7 @@ describe('shelf helpers', () => {
         month: '2026-08',
         missing: ['A', 'B', 'C', 'D', 'E', 'F'],
         invalid: [],
+        inputs: [270, 205],
         nested: { a: 1 },
       }),
     ).toEqual([
@@ -33,6 +34,7 @@ describe('shelf helpers', () => {
       'month: 2026-08',
       'missing: 6 (A, B, C, D, E, ...)',
       'invalid: 0',
+      'inputs: 270, 205',
       'nested: {"a":1}',
     ])
   })

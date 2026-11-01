@@ -24,12 +24,17 @@ Last updated: 2026-11-01. Update at the end of every work session.
 - **M4 Combinations:** infrastructure done: `combination` builder kind, `combination_source`
   table, source checks, delete guard, rebuild on a source's new version, form in `/app`, and
   `app/core/combine.py` (one merge pass over sorted sources).
+- **M6:** seed command (`python -m app.seed <email>` adds three example lists and builds them),
+  README with setup steps and screenshots (`docs/screenshots`).
+- **Robustness:** the scheduler runs `recover_stalled` hourly: builds and exports whose RQ job
+  died with its worker are marked failed instead of blocking the list. Combinations are queued
+  automatically only once every source has a ready version.
 - **Site:** 13 public pages, Fraunces/Geist type, torch cursor with grab states, draggable example
   shelf, brand emblem icons, security.txt, contact details (support@ahmershah.dev,
   ahmershah.dev) (PR #11). The `/app` page signs in, creates, builds and deletes lists.
 - **Repo:** only `main`, no open PRs. `main` requires `backend`, `frontend`, `codeql (python)`
   and `codeql (javascript-typescript)`, squash merges, linear history.
-- Tests: 185 backend (MariaDB 11.4 + Redis), 33 frontend.
+- Tests: 189 backend (MariaDB 11.4 + Redis), 33 frontend.
 
 ## Run it
 

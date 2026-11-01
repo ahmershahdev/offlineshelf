@@ -164,8 +164,16 @@ def test_a_new_source_version_rebuilds_its_combinations(
     assert combiner.calls[0]["operation"] == "difference"
 
 
+def test_a_combination_waits_until_every_source_has_built(signed_in, builder) -> None:
+    a, b = make_list(signed_in, "A"), make_list(signed_in, "B")
+    combo = combine(signed_in, "union", [a, b]).get_json()["id"]
+    build_now(a)
+    assert SessionLocal.scalars(select(ListVersion).where(ListVersion.list_id == combo)).all() == []
+
+
 def test_a_combination_already_building_is_not_queued_twice(signed_in, builder) -> None:
     a, b = make_list(signed_in, "A"), make_list(signed_in, "B")
+    ready(b, [1])
     combo = combine(signed_in, "union", [a, b]).get_json()["id"]
     SessionLocal.add(ListVersion(list_id=combo, status=VersionStatus.BUILDING))
     SessionLocal.commit()

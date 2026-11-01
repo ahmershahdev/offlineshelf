@@ -7,6 +7,7 @@ from app.jobs import build as build_module
 from app.jobs import schedule
 from app.jobs.export import delete_expired_exports
 from app.jobs.queue import get_queue
+from app.jobs.recover import recover_stalled
 from app.jobs.schedule import dispatch_scheduled_builds, month_start
 from app.models import ListVersion, VersionStatus, utcnow
 from app.scheduler import make_scheduler
@@ -90,6 +91,10 @@ def test_a_list_deleted_meanwhile_is_skipped(signed_in, redis, monkeypatch) -> N
 
 def test_scheduler_runs_the_dispatcher_and_cleanup_hourly(redis) -> None:
     jobs = make_scheduler(redis).get_jobs()
-    assert [j.func for j in jobs] == [schedule.dispatch_scheduled_builds, delete_expired_exports]
+    assert [j.func for j in jobs] == [
+        schedule.dispatch_scheduled_builds,
+        delete_expired_exports,
+        recover_stalled,
+    ]
     assert {j.interval for j in jobs} == {3600}
     assert {j.queue_name for j in jobs} == {"default"}

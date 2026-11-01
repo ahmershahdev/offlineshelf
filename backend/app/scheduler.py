@@ -5,6 +5,7 @@ from rq.cron import CronScheduler
 
 from app.config import get_settings
 from app.jobs.export import delete_expired_exports
+from app.jobs.recover import recover_stalled
 from app.jobs.schedule import DISPATCH_INTERVAL_SECONDS, dispatch_scheduled_builds
 
 
@@ -18,6 +19,7 @@ def make_scheduler(redis: Redis) -> CronScheduler:
     scheduler.register(
         delete_expired_exports, queue_name="default", interval=DISPATCH_INTERVAL_SECONDS
     )
+    scheduler.register(recover_stalled, queue_name="default", interval=DISPATCH_INTERVAL_SECONDS)
     return scheduler
 
 

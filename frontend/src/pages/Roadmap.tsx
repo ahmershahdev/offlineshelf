@@ -83,7 +83,7 @@ const MILESTONES: {
     state: 'next',
     items: [
       ['ZIM export for small lists (stretch)', false],
-      ['Seed lists and screenshots', false],
+      ['Seed lists and screenshots', true],
       ['Public launch at offlineshelf.ahmershah.dev, v1.0.0', false],
     ],
   },

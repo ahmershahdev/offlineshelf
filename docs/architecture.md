@@ -97,7 +97,16 @@ The build job reads each source's latest ready version as an iterator sorted by 
 `app/core/combine.py`; a source with no ready version fails the build. When any version becomes
 `ready`, the job queues a build for every combination that uses that list, so chains of
 combinations update in turn. A combination already queued or building is not queued again.
-Lists can't be edited yet, so a cycle can't form.
+Lists can't be edited yet, so a cycle can't form. A combination is queued automatically only once
+every source has a ready version; until then a manual build fails with the source's name.
+
+### Stalled jobs
+
+A worker killed mid-job (restart, deploy, out of memory, the job timeout) never runs the code that
+marks its row failed. The scheduler runs `recover_stalled` every hour (and once at start): any
+version or export still queued or building whose RQ job is gone, finished, failed, stopped or
+canceled is marked failed with a readable reason, so the list can be built again. Jobs waiting for
+a retry are left alone.
 
 ### Monthly rebuilds
 
