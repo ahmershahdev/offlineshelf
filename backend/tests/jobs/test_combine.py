@@ -4,6 +4,7 @@ import pytest
 from sqlalchemy import select
 
 from app.contract import BuildResult, Page
+from app.core import combine as core_combine
 from app.db import SessionLocal
 from app.jobs import build as build_module
 from app.jobs.build import BuilderNotImplementedError, resolve_combiner, run_build
@@ -114,7 +115,8 @@ def test_a_source_without_a_ready_version_fails_the_build(signed_in, combiner) -
     assert combiner.calls == []
 
 
-def test_without_the_core_combiner_the_build_fails_clearly(signed_in) -> None:
+def test_without_the_core_combiner_the_build_fails_clearly(signed_in, monkeypatch) -> None:
+    monkeypatch.delattr(core_combine, "combine")
     with pytest.raises(BuilderNotImplementedError):
         resolve_combiner()
     a, b = make_list(signed_in, "A"), make_list(signed_in, "B")
@@ -124,6 +126,27 @@ def test_without_the_core_combiner_the_build_fails_clearly(signed_in) -> None:
     v = SessionLocal.get_one(ListVersion, version_id)
     SessionLocal.refresh(v)
     assert v.error == "The combination builder is not implemented yet."
+
+
+def test_the_real_combiner_end_to_end(signed_in) -> None:
+    a, b = make_list(signed_in, "A"), make_list(signed_in, "B")
+    va = ready(a, [5, 1, 3, 7])
+    vb = ready(b, [3, 4, 7])
+    version_id = build_now(combine(signed_in, "difference", [a, b]).get_json()["id"])
+    v = SessionLocal.get_one(ListVersion, version_id)
+    SessionLocal.refresh(v)
+    assert v.status is VersionStatus.READY
+    assert v.article_count == 2
+    assert v.report == {
+        "operation": "difference",
+        "inputs": [4, 3],
+        "result": 2,
+        "source_versions": [va, vb],
+    }
+    kept = SessionLocal.scalars(
+        select(ListArticle.page_id).where(ListArticle.version_id == version_id)
+    ).all()
+    assert sorted(kept) == [1, 5]
 
 
 def test_a_new_source_version_rebuilds_its_combinations(

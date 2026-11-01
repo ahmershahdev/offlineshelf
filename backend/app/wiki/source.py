@@ -80,24 +80,40 @@ class HttpWikiSource:
             for a in items[0].get("articles", [])
         ]
 
+    def main_page(self) -> str:
+        title = self._siteinfo.get("mainpage")
+        if not isinstance(title, str):
+            raise WikiApiError(f"{self.wiki} did not report its main page")
+        return title
+
     @cached_property
     def site_id(self) -> str:
         # Wikidata sitelinks are keyed by database name, which can't be derived from the host:
         # be-tarask.wikipedia.org is "be_x_oldwiki". siteinfo says what it is.
-        data = self.client.action(self.wiki, {"action": "query", "meta": "siteinfo"})
-        wiki_id = data.get("query", {}).get("general", {}).get("wikiid")
+        wiki_id = self._siteinfo.get("wikiid")
         if not isinstance(wiki_id, str):
             raise WikiApiError(f"{self.wiki} did not report its wiki ID")
         return wiki_id
+
+    @cached_property
+    def _siteinfo(self) -> dict[str, Any]:
+        data = self.client.action(self.wiki, {"action": "query", "meta": "siteinfo"})
+        general: dict[str, Any] = data.get("query", {}).get("general", {})
+        return general
 
 
 def _title_batch(query: dict[str, Any]) -> TitleBatch:
     pages: list[Page] = []
     missing: list[str] = []
     invalid: list[str] = []
+    special: list[str] = []
     for p in query.get("pages", []):
         if p.get("invalid"):
             invalid.append(p["title"])
+        elif p.get("special") or p.get("known"):
+            # "known" marks titles that exist without a local page, such as a Commons file seen
+            # from Wikipedia. Like Special: pages, they are real but not articles.
+            special.append(p["title"])
         elif p.get("missing"):
             missing.append(p["title"])
         else:
@@ -115,4 +131,5 @@ def _title_batch(query: dict[str, Any]) -> TitleBatch:
         pages=pages,
         missing=missing,
         invalid=invalid,
+        special=special,
     )

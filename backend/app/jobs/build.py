@@ -110,7 +110,8 @@ def _combine(session: Session, shelf: ShelfList, limits: Limits) -> BuildResult:
     result = combiner(
         shelf.params["operation"], [_source_pages(session, v) for v in versions], limits
     )
-    result.report = {**result.report, "source_versions": versions}
+    # The combiner fills its report while its articles are read, so add to that same dict.
+    result.report["source_versions"] = versions
     return result
 
 

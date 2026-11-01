@@ -96,3 +96,34 @@ def test_top_pageviews_uses_project_name_without_org() -> None:
 
 def test_top_pageviews_with_no_items() -> None:
     assert source(Script(httpx.Response(200, json={}))).top_pageviews(2026, 8) == []
+
+
+def test_special_pages_have_no_page_id_and_are_reported_apart() -> None:
+    body = {
+        "query": {
+            "pages": [
+                {"ns": -1, "title": "Special:Search", "special": True},
+                {"ns": 6, "title": "File:WhatsApp.svg", "missing": True, "known": True},
+                {"pageid": 1, "ns": 0, "title": "Physics", "lastrevid": 9},
+            ]
+        }
+    }
+    [batch] = source(Script(httpx.Response(200, json=body))).query_pages(["Special:Search"])
+    assert batch.special == ["Special:Search", "File:WhatsApp.svg"]
+    assert batch.missing == []
+    assert [p.title for p in batch.pages] == ["Physics"]
+
+
+def test_main_page_comes_from_siteinfo_shared_with_site_id() -> None:
+    general = {"query": {"general": {"mainpage": "Main Page", "wikiid": "enwiki"}}}
+    transport = Script(httpx.Response(200, json=general))
+    wiki = source(transport)
+    assert wiki.main_page() == "Main Page"
+    assert wiki.site_id == "enwiki"
+    assert len(transport.requests) == 1
+
+
+def test_main_page_must_be_reported() -> None:
+    transport = Script(httpx.Response(200, json={"query": {"general": {}}}))
+    with pytest.raises(WikiApiError, match="main page"):
+        source(transport).main_page()

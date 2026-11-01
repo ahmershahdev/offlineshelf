@@ -21,7 +21,7 @@ app only calls the API. Builds never run inside a web request.
 
 | Path | Holds |
 |---|---|
-| `backend/app/core/` | Pure list logic, written by the maintainer (see AGENTS.md and [core-contract.md](core-contract.md)) |
+| `backend/app/core/` | Pure list logic: `builders.py` (the four builders), `combine.py`, `lookup.py`, `titles.py`; 100% branch coverage ([core-contract.md](core-contract.md); see AGENTS.md on how it was written) |
 | `backend/app/contract.py` | Standard-library types shared by core and the job: `Page`, `TitleBatch`, `WikiSource`, `Builder` |
 | `backend/app/wiki/` | The only code that calls Wikimedia: `client.py` (User-Agent, maxlag, retries, continuation), `source.py` (implements `WikiSource`) |
 | `backend/app/api/` | Blueprints: `health`, `auth`, `lists`; `errors.py` (problem+json), `util.py` |

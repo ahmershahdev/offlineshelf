@@ -26,6 +26,8 @@ class TitleBatch:
     pages: Sequence[Page]
     missing: Sequence[str]
     invalid: Sequence[str]
+    # Titles that exist without a local page (Special: pages, Commons files), so no page ID.
+    special: Sequence[str] = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -52,6 +54,8 @@ class WikiSource(Protocol):
     def sitelinks(self, item_ids: Sequence[str]) -> dict[str, str]: ...
 
     def top_pageviews(self, year: int, month: int) -> list[TopArticle]: ...
+
+    def main_page(self) -> str: ...
 
 
 @dataclass(frozen=True, slots=True)

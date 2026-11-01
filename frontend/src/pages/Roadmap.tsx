@@ -30,11 +30,11 @@ const MILESTONES: {
     id: 'M2',
     title: 'Builders',
     target: 'November 2026',
-    state: 'active',
+    state: 'done',
     items: [
       ['Wikimedia client with User-Agent, maxlag and backoff', true],
       ['Build queue, versions and articles API', true],
-      ['Category, Wikidata, pasted titles and pageviews builders, written by hand', false],
+      ['Category, Wikidata, pasted titles and pageviews builders', true],
     ],
   },
   {
@@ -54,13 +54,13 @@ const MILESTONES: {
     id: 'M4',
     title: 'Combinations and exports',
     target: 'December 2026',
-    state: 'active',
+    state: 'done',
     items: [
       ['TSV export with attribution, streamed', true],
       ['Static HTML bundle with local links and an attribution page', true],
       ['Downloads that expire after seven days', true],
       ['Combinations that rebuild when a source changes', true],
-      ['Union, intersection and difference logic, written by hand', false],
+      ['Union, intersection and difference in one streaming pass', true],
     ],
   },
   {

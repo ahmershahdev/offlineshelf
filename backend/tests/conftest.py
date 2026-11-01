@@ -53,6 +53,19 @@ def app() -> Iterator[Flask]:
 
 
 @pytest.fixture(autouse=True)
+def _no_live_wikimedia(monkeypatch: pytest.MonkeyPatch) -> None:
+    """AGENTS.md: no live API calls in tests. Builds and exports reach Wikimedia only through
+    these two factories; a test that needs them passes a fake or a recording instead."""
+    from app.jobs import build, export
+
+    def refuse(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("A test tried to call the live Wikimedia APIs")
+
+    monkeypatch.setattr(build, "make_source", refuse)
+    monkeypatch.setattr(export, "make_client", refuse)
+
+
+@pytest.fixture(autouse=True)
 def _clean(app: Flask) -> Iterator[None]:
     yield
     SessionLocal.remove()

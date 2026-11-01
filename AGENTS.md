@@ -46,8 +46,11 @@ docs/                roadmap, architecture, status
 - Secrets only from environment variables. Never commit `.env`, dumps or keys.
 - API changes update the OpenAPI schema and the frontend types in the same PR.
 - No new dependency without a reason in the PR. Pin exact versions.
-- The maintainer writes the core list logic himself and must be able to explain every line (this
-  project is shown in a Kiwix proposal; Kiwix bans AI-generated code in contributions).
+- `app/core` (builders, title normalising, combinations) was written with AI assistance at the
+  maintainer's request on 2026-11-01. The maintainer reviews it and must be able to explain every
+  line. Kiwix bans AI-generated code in contributions: say so wherever this project is presented
+  to Kiwix, and never submit this code upstream as hand-written.
+- `app/core` keeps 100% branch coverage; CI fails below it.
 - No emojis in code, UI text or docs.
 
 ## Comments
