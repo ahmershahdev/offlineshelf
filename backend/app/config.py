@@ -45,7 +45,8 @@ class Settings(BaseSettings):
     smtp_port: int = 587
     smtp_username: str = ""
     smtp_password: SecretStr = SecretStr("")
-    smtp_starttls: bool = True
+    # Removed (mail is always encrypted); read only so installs that still set it get a warning.
+    smtp_starttls: bool | None = None
     mail_from: str = "OfflineShelf <noreply@ahmershah.dev>"
 
     @field_validator("database_url")

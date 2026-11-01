@@ -71,7 +71,7 @@ export function Hero() {
       <div className="sticky top-0 h-[100svh] overflow-hidden">
         <canvas
           ref={canvas}
-          aria-hidden="true"
+          aria-hidden="true" // NOSONAR: a canvas is not focusable; it is decoration"
           className="absolute inset-0 size-full opacity-0 transition-opacity duration-[2000ms] data-[ready=true]:opacity-100"
         />
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,var(--color-ink)_85%)]" />

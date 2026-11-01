@@ -64,3 +64,12 @@ in CI, and seed data.
 - [x] Seed data: three example lists (a category, a Wikidata query, a combination): `python -m app.seed <email>`
 - [x] README setup steps and screenshots
 - [ ] Deploy at `offlineshelf.ahmershah.dev`; tag `v1.0.0`
+
+## Before launch: test at scale (planned, not started)
+
+- [ ] End-to-end tests with Playwright: sign up, every builder, combinations, exports, delete
+- [ ] Smoke tests against a fresh Docker Compose stack on every release tag
+- [ ] Stress test: 15 to 20 simulated users in Docker building, combining and exporting at once,
+  watching queue depth, build times, memory and Wikimedia request rates
+- [ ] 100% line and branch coverage for the whole backend and frontend (today: `app/core` 100%,
+  backend about 97%)

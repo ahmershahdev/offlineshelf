@@ -17,7 +17,7 @@ from app.security.session import init_session_cookie
 
 def create_app(settings: Settings | None = None) -> Flask:
     settings = settings or get_settings()
-    app = Flask(__name__)
+    app = Flask(__name__)  # NOSONAR: CSRF is enforced by app/security/csrf.py, not Flask-WTF
     app.config["MAX_CONTENT_LENGTH"] = settings.max_request_bytes
     app.json.sort_keys = False  # type: ignore[attr-defined]
 

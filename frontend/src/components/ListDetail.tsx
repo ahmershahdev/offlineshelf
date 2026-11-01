@@ -59,8 +59,7 @@ function Articles({ list, version }: { list: ShelfList; version: ListVersion }) 
       <ol
         className="max-h-96 overflow-y-auto font-mono text-sm"
         aria-label="Articles"
-        // A scrolling region needs focus so keyboard users can scroll it.
-        tabIndex={0}
+        tabIndex={0} // NOSONAR: a scrolling region needs focus so keyboard users can scroll it
       >
         {items.map((a) => (
           <li key={a.page_id} className="border-b hairline py-1.5">
@@ -146,7 +145,7 @@ function Changes({ list, version }: { list: ShelfList; version: ListVersion }) {
         <ul
           className="mt-2 max-h-60 overflow-y-auto font-mono text-sm"
           aria-label={`Articles ${kind}`}
-          tabIndex={0}
+          tabIndex={0} // NOSONAR: a scrolling region needs focus so keyboard users can scroll it
         >
           {items.map((a) => (
             <li key={a.page_id} className="border-b hairline py-1.5">

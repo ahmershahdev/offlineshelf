@@ -1,4 +1,4 @@
-import { useEffect, useState, type SyntheticEvent } from 'react'
+import { useCallback, useEffect, useState, type SyntheticEvent } from 'react'
 
 import { ApiError, api, type ShelfList, type User } from '../api/client'
 import { ListDetail } from '../components/ListDetail'
@@ -321,6 +321,10 @@ export function AppPage() {
   const [open, setOpen] = useState<number | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
   const [confirming, setConfirming] = useState<number | null>(null)
+  // Stable, so re-renders from polling don't pull focus back while the confirmation is open.
+  const focusOnMount = useCallback((el: HTMLButtonElement | null) => {
+    el?.focus()
+  }, [])
   const building = lists.some((l) => isActive(l.latest_status))
 
   function setStatus(id: number, status: ShelfList['latest_status']): void {
@@ -474,7 +478,7 @@ export function AppPage() {
                         >
                           <button
                             type="button"
-                            autoFocus
+                            ref={focusOnMount}
                             className="label link-draw py-2 text-signal"
                             onClick={() => {
                               setConfirming(null)

@@ -61,9 +61,28 @@ def test_sends_with_starttls_and_login(smtp) -> None:
     assert msg.get_content().strip() == "Body"
 
 
-def test_plain_smtp_without_auth(smtp) -> None:
+def test_port_465_uses_implicit_tls_without_auth(monkeypatch) -> None:
+    opened: list[dict[str, object]] = []
+
+    class FakeSMTPSSL(FakeSMTP):
+        def __init__(self, host: str, port: int, timeout: int, context: object) -> None:
+            super().__init__(host, port, timeout)
+            opened.append({"context": context})
+
+    monkeypatch.setattr(mail.smtplib, "SMTP_SSL", FakeSMTPSSL)
+    FakeSMTP.instances = []
+    for port in (465, 2465):
+        settings = get_settings().model_copy(
+            update={"smtp_host": "smtp.example.org", "smtp_port": port}
+        )
+        assert mail.send_email(settings, "a@example.org", "Hi", "Body")
+        assert FakeSMTP.instances[-1].calls == ["quit"]
+    assert all(o["context"] is not None for o in opened)
+
+
+def test_the_removed_plaintext_setting_is_warned_about(smtp, caplog) -> None:
     settings = get_settings().model_copy(
-        update={"smtp_host": "localhost", "smtp_port": 25, "smtp_starttls": False}
+        update={"smtp_starttls": False, "smtp_host": "smtp.example.org", "smtp_port": 587}
     )
-    assert mail.send_email(settings, "a@example.org", "Hi", "Body")
-    assert smtp.instances[0].calls == ["quit"]
+    mail.send_email(settings, "a@example.org", "Hi", "Body")
+    assert "no longer supported" in caplog.text

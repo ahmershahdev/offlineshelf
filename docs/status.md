@@ -27,6 +27,8 @@ Last updated: 2026-11-01. Update at the end of every work session.
   README with setup steps and screenshots (`docs/screenshots`).
 - **M6 ZIM:** `format: "zim"` exports write a ZIM file with libzim 3.9.0 (same pages as the HTML
   bundle, full-text index, Kiwix metadata), offered in the Details panel. Checked live.
+- **Quality gates:** SonarQube Cloud (automatic analysis) and CodeRabbit are installed and are
+  required checks on `main` alongside backend, frontend and CodeQL.
 - **Changes:** each ready version stores the articles added and removed since the previous ready
   one (`/versions/<v>/changes`), shown in the build history and the Details panel.
 - **Robustness:** the scheduler runs `recover_stalled` hourly: builds and exports whose RQ job
@@ -62,9 +64,8 @@ proxies `/api`). `npm run dev:down` stops the containers. Needs Docker, uv and N
 
 1. Read the About page copy and confirm it says what you want about yourself.
 2. M6: deploy to offlineshelf.ahmershah.dev and tag v1.0.0.
-3. Install SonarQube Cloud and CodeRabbit on the repository (needs the owner's GitHub
-   authorisation; `.sonarcloud.properties` and `.coderabbit.yaml` are ready), then add them as
-   required checks in `.github/rulesets/protect-main.json`.
+3. Before launch, at the very end: Playwright end-to-end tests, smoke and stress tests with 15 to
+   20 simulated users in Docker, and 100% coverage everywhere (see the roadmap).
 4. Release images: `.github/workflows/images.yml` publishes `offlineshelf-api` and
    `offlineshelf-web` to GHCR on every `v*` tag.
 
@@ -77,6 +78,9 @@ proxies `/api`). `npm run dev:down` stops the containers. Needs Docker, uv and N
   bumps that would leave those lines (Python 3.12, MariaDB 11.4 LTS, Node LTS, nginx stable,
   TypeScript 5); those upgrades are made on purpose.
 - Failure emails have no opt-out yet; add one with the account settings page.
+- Upgrade note: `OFFLINESHELF_SMTP_STARTTLS=false` is no longer supported; mail is always sent
+  over TLS (STARTTLS on 587, implicit TLS on 465 and 2465). Installs that still set it log a
+  warning.
 - Account deletion is by email for now; an endpoint comes with the account settings page.
 
 ## Open questions

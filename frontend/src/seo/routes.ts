@@ -267,6 +267,7 @@ export const NOT_FOUND: RouteMeta = {
 }
 
 export function routeFor(pathname: string): RouteMeta {
-  const clean = pathname !== '/' ? pathname.replace(/\/+$/, '') : '/'
+  let clean = pathname
+  while (clean.length > 1 && clean.endsWith('/')) clean = clean.slice(0, -1)
   return ROUTES.find((r) => r.path === clean) ?? NOT_FOUND
 }
