@@ -26,7 +26,8 @@ app only calls the API. Builds never run inside a web request.
 | `backend/app/wiki/` | The only code that calls Wikimedia: `client.py` (User-Agent, maxlag, retries, continuation), `source.py` (implements `WikiSource`) |
 | `backend/app/api/` | Blueprints: `health`, `auth`, `lists`; `errors.py` (problem+json), `util.py` |
 | `backend/app/security/` | Password hashing, CSRF, session cookie, headers, rate limits, wiki allow list |
-| `backend/app/jobs/` | RQ queue; `build.py` queues and runs builds; `notify.py` sends failure emails |
+| `backend/app/jobs/` | RQ queue; `build.py` queues and runs builds; `notify.py` sends failure emails; `schedule.py` queues monthly rebuilds |
+| `backend/app/scheduler.py` | The `scheduler` process: RQ `CronScheduler` that enqueues the dispatcher every hour |
 | `backend/app/mail.py` | Plain-text email over SMTP (standard library); off when `OFFLINESHELF_SMTP_HOST` is empty |
 | `backend/scripts/record_wiki.py` | Re-records the Wikimedia responses in `tests/wiki/recordings` (manual, never in CI) |
 | `backend/app/schemas.py` | Pydantic request and response models; all input limits live here |
@@ -82,6 +83,14 @@ Built: see `docs/openapi.yaml` (health, auth, lists, build, versions, articles).
    the list row and skips the email if any version of the list has a `notified_at` in the last
    24 hours, so the owner gets at most one email per list per day. `notified_at` is set only
    after SMTP accepts the message; an SMTP error raises and RQ retries after 1, 5 and 15 minutes.
+
+### Monthly rebuilds
+
+The `scheduler` service enqueues `dispatch_scheduled_builds` every hour. It queues a build (step 1
+above) for each list with `schedule = monthly` that has no version queued, building or started
+since the 1st of the current month (UTC). A new monthly list is built within the hour. A failed
+build counts for the month: the owner is emailed and can rebuild by hand. Running the dispatcher
+twice, or after downtime, never builds a list twice in a month or skips one.
 
 ## Security
 
@@ -156,6 +165,7 @@ Mono for code, all self-hosted.
 | httpx for Wikimedia | Timeouts and connection pooling built in; `MockTransport` replays recordings without a mocking library |
 | Neutral `app/contract.py` | Core stays importable without Flask, SQLAlchemy or httpx, and is tested with fakes |
 | SMTP with `smtplib`, no mail library or provider SDK | Any provider speaks SMTP; one fewer dependency; self-hosters use their own server |
+| Hourly idempotent dispatcher, not a cron entry on the 1st | A cron run missed during downtime would wait a month; the hourly check catches up and needs no extra state |
 | Failure email timestamp on `list_version` | Writing to `shelf_list` would bump `row_version` and turn the owner's next edit into a false 409 |
 | Pageviews project without `.org` | The REST API answers 404 for `en.wikipedia.org`; it wants `en.wikipedia` |
 

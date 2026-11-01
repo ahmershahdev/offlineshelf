@@ -36,7 +36,8 @@ in CI, and seed data.
 - [x] Every build is an RQ job; list status `queued`, `building`, `ready`, `failed`
 - [x] Retries with `Retry` for network errors only; a failed build keeps the last good version
 - [x] Email when a build fails (one per list per day at most)
-- [ ] Monthly rebuilds; each build stored as a version with added and removed articles
+- [x] Monthly rebuilds (hourly dispatcher, `scheduler` service)
+- [ ] Each version stores its added and removed articles (needs the diff function in core)
 - [ ] Large lists (100k titles) written in batches without loading everything in memory
 
 ## M4. Combinations and exports (target 2026-12-27)
