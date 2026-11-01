@@ -73,7 +73,7 @@ const MILESTONES: {
       ['Live build status, history and articles', true],
       ['Download buttons for TSV and bundles', true],
       ['Diffs between versions', false],
-      ['Accessibility pass on phones and screen readers', false],
+      ['Accessibility pass: headings, keyboard, contrast, touch targets', true],
     ],
   },
   {

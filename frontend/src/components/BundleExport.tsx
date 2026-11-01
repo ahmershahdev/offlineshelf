@@ -58,7 +58,7 @@ export function BundleExport({ list, version }: { list: ShelfList; version: List
           <a
             href={`/api/v1/lists/${list.id}/exports/${latest.id}/download`}
             download
-            className="label link-draw hover:text-paper"
+            className="label link-draw py-2 hover:text-paper"
           >
             Download HTML bundle
           </a>
@@ -76,7 +76,7 @@ export function BundleExport({ list, version }: { list: ShelfList; version: List
         <>
           <button
             type="button"
-            className="label link-draw hover:text-paper"
+            className="label link-draw py-2 hover:text-paper"
             disabled={busy}
             onClick={start}
           >

@@ -56,7 +56,12 @@ function Articles({ list, version }: { list: ShelfList; version: ListVersion }) 
 
   return (
     <div>
-      <ol className="max-h-96 overflow-y-auto font-mono text-sm" aria-label="Articles">
+      <ol
+        className="max-h-96 overflow-y-auto font-mono text-sm"
+        aria-label="Articles"
+        // A scrolling region needs focus so keyboard users can scroll it.
+        tabIndex={0}
+      >
         {items.map((a) => (
           <li key={a.page_id} className="border-b hairline py-1.5">
             <a
@@ -73,7 +78,7 @@ function Articles({ list, version }: { list: ShelfList; version: ListVersion }) 
       <p className="mt-3 flex items-center gap-5 text-xs text-dim">
         Showing {items.length.toLocaleString()} of {version.article_count.toLocaleString()}
         {cursor !== null ? (
-          <button type="button" className="label link-draw" disabled={busy} onClick={more}>
+          <button type="button" className="label link-draw py-2" disabled={busy} onClick={more}>
             {busy ? 'Loading' : 'Show more'}
           </button>
         ) : null}
@@ -186,7 +191,7 @@ export function ListDetail({
             <a
               href={`/api/v1/lists/${list.id}/versions/${shown.id}/export.tsv`}
               download
-              className="label link-draw hover:text-paper"
+              className="label link-draw py-2 hover:text-paper"
             >
               Download TSV
             </a>

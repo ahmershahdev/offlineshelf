@@ -55,7 +55,7 @@ in CI, and seed data.
 - [x] Build progress (polls while a build runs), version history, articles per version
 - [ ] Diffs between versions, download buttons
 - [ ] Generated API types from the OpenAPI schema, checked in CI
-- [ ] Accessible forms (labels, keyboard, contrast), works on a phone
+- [x] Accessible forms (labels, keyboard, contrast), works on a phone
 - [ ] `frontend` CI job added as a required check
 
 ## M6. ZIM export, docs and launch (target 2027-02-14)
