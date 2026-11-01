@@ -28,6 +28,7 @@ app only calls the API. Builds never run inside a web request.
 | `backend/app/security/` | Password hashing, CSRF, session cookie, headers, rate limits, wiki allow list |
 | `backend/app/jobs/` | RQ queue; `build.py` queues and runs builds; `notify.py` sends failure emails; `schedule.py` queues monthly rebuilds |
 | `backend/app/scheduler.py` | The `scheduler` process: RQ `CronScheduler` that enqueues the dispatcher every hour |
+| `backend/app/exports.py` | Export formats: TSV header with attribution and rows |
 | `backend/app/mail.py` | Plain-text email over SMTP (standard library); off when `OFFLINESHELF_SMTP_HOST` is empty |
 | `backend/scripts/record_wiki.py` | Re-records the Wikimedia responses in `tests/wiki/recordings` (manual, never in CI) |
 | `backend/app/schemas.py` | Pydantic request and response models; all input limits live here |
@@ -91,6 +92,14 @@ above) for each list with `schedule = monthly` that has no version queued, build
 since the 1st of the current month (UTC). A new monthly list is built within the hour. A failed
 build counts for the month: the owner is emailed and can rebuild by hand. Running the dispatcher
 twice, or after downtime, never builds a list twice in a month or skips one.
+
+## Exports
+
+`GET /lists/<id>/versions/<vid>/export.tsv` streams a ready version (409 otherwise) as UTF-8 TSV,
+reading 5000 rows at a time by `list_article.id`, so memory stays flat for 100k-article lists.
+Before the column header (`title`, `page_id`, `revision_id`) come `#` lines with the list name,
+source wiki, build time and the CC BY-SA 4.0 notice; MediaWiki titles can never start with `#`.
+An empty `revision_id` means the builder did not report one.
 
 ## Security
 
@@ -166,6 +175,7 @@ Mono for code, all self-hosted.
 | Neutral `app/contract.py` | Core stays importable without Flask, SQLAlchemy or httpx, and is tested with fakes |
 | SMTP with `smtplib`, no mail library or provider SDK | Any provider speaks SMTP; one fewer dependency; self-hosters use their own server |
 | Hourly idempotent dispatcher, not a cron entry on the 1st | A cron run missed during downtime would wait a month; the hourly check catches up and needs no extra state |
+| TSV attribution in `#` lines, not a separate file | One file to hand around; `#` can never start a title, and most TSV readers can skip comment lines |
 | Naive UTC in the database, `Z` in the API | MariaDB `DATETIME` has no zone; the response schemas attach UTC so browsers show local time correctly |
 | Failure email timestamp on `list_version` | Writing to `shelf_list` would bump `row_version` and turn the owner's next edit into a false 409 |
 | Pageviews project without `.org` | The REST API answers 404 for `en.wikipedia.org`; it wants `en.wikipedia` |

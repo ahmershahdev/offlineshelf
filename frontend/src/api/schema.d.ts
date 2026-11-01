@@ -225,6 +225,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/lists/{listId}/versions/{versionId}/export.tsv": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                listId: number;
+                versionId: number;
+            };
+            cookie?: never;
+        };
+        /** @description Streams the articles of a ready version as tab-separated values with the columns title, page_id and revision_id. Lines starting with "#" before the column header carry the source wiki, build time and CC BY-SA 4.0 attribution. */
+        get: operations["exportTsv"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -735,6 +755,31 @@ export interface operations {
                 };
             };
             404: components["responses"]["Problem"];
+        };
+    };
+    exportTsv: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                listId: number;
+                versionId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description TSV file */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/tab-separated-values": string;
+                };
+            };
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
         };
     };
 }

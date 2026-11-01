@@ -1,9 +1,12 @@
-from flask import Blueprint, Response, abort, jsonify, request
+from collections.abc import Iterator
+
+from flask import Blueprint, Response, abort, jsonify, request, stream_with_context
 from sqlalchemy import func, select
 
 from app.api.util import json_body, require_user
 from app.config import current_settings
 from app.db import SessionLocal
+from app.exports import tsv_header, tsv_rows
 from app.jobs.build import BuildInProgressError, enqueue_build
 from app.models import ListArticle, ListVersion, ShelfList, User, VersionStatus
 from app.schemas import (
@@ -19,6 +22,7 @@ from app.security.ratelimit import limit_from, limiter
 
 bp = Blueprint("lists", __name__, url_prefix="/lists")
 PAGE_SIZE_MAX = 100
+EXPORT_BATCH = 5000
 
 
 def _latest_statuses(list_ids: list[int]) -> dict[int, VersionStatus]:
@@ -182,3 +186,39 @@ def articles(list_id: int, version_id: int) -> Response:
         next_cursor=rows[limit - 1].id if len(rows) > limit else None,
     )
     return jsonify(page.model_dump(mode="json"))
+
+
+@bp.get("/<int:list_id>/versions/<int:version_id>/export.tsv")
+def export_tsv(list_id: int, version_id: int) -> Response:
+    found = _owned_version(list_id, version_id)
+    if found.status is not VersionStatus.READY:
+        abort(409, description="Only a ready version can be exported.")
+    shelf = found.shelf_list
+    header = tsv_header(shelf.name, shelf.wiki, found.finished_at, current_settings().site_url)
+
+    def body() -> Iterator[str]:
+        yield header
+        after = 0
+        while True:
+            batch = SessionLocal.execute(
+                select(
+                    ListArticle.id, ListArticle.title, ListArticle.page_id, ListArticle.revision_id
+                )
+                .where(ListArticle.version_id == found.id, ListArticle.id > after)
+                .order_by(ListArticle.id)
+                .limit(EXPORT_BATCH)
+            ).all()
+            if not batch:
+                return
+            after = batch[-1].id
+            yield from tsv_rows((r.title, r.page_id, r.revision_id) for r in batch)
+
+    return Response(
+        stream_with_context(body()),
+        mimetype="text/tab-separated-values",
+        headers={
+            "Content-Disposition": (
+                f'attachment; filename="offlineshelf-{shelf.id}-v{found.id}.tsv"'
+            )
+        },
+    )

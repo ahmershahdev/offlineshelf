@@ -74,6 +74,9 @@ describe('ListDetail', () => {
     const link = screen.getByRole('link', { name: 'Polio vaccine' })
     expect(link.getAttribute('href')).toBe('https://en.wikipedia.org/wiki/Polio_vaccine')
     expect(articles).toHaveBeenCalledWith(7, 2)
+    expect(screen.getByRole('link', { name: 'Download TSV' }).getAttribute('href')).toBe(
+      '/api/v1/lists/7/versions/2/export.tsv',
+    )
 
     fireEvent.click(screen.getByRole('button', { name: 'Show more' }))
     await flush()
