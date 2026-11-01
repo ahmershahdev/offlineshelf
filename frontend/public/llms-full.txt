@@ -3,71 +3,73 @@
 Source: https://offlineshelf.ahmershah.dev
 Author: Syed Ahmer Shah (https://ahmershah.dev)
 Contact: support@ahmershah.dev
+Code: https://github.com/ahmershahdev/offlineshelf
 License: code MIT; Wikipedia content in exports CC BY-SA 4.0
-Status: in development, launching February 2027
+Status: every builder, combinations, schedules and all three exports work; public launch February 2027
 
 ## What it is
 
-OfflineShelf builds Wikipedia reading lists for places without internet. Picking a few thousand good articles out of millions is the hard part of offline Wikipedia: the lists have to be reproducible, combinable and kept up to date. OfflineShelf is a small, self-hostable tool for that step.
+OfflineShelf builds Wikipedia reading lists for places without internet. Picking a few thousand good articles out of millions is the hard part of offline Wikipedia: the lists have to be reproducible, combinable and kept up to date. You describe a list once; it is built in the background, kept as versions, rebuilt on a schedule and exported when you need it.
 
 ## Builders
 
-1. Category: every article (namespace 0) in a category and its subcategories, down to a depth limit of 5. Loops in the category tree are detected.
-2. Wikidata: a SPARQL query against the Wikidata Query Service (up to 10,000 characters, 60 second timeout). Items are mapped to articles on the chosen wiki through sitelinks.
-3. Pasted titles: up to 20,000 titles. Redirects are resolved and missing pages are reported.
-4. Pageviews: the top N (up to 1,000) most-read articles of a month from the Wikimedia REST API.
+1. Category: every article (namespace 0) in a category and its subcategories, breadth-first, down to a depth of 0 to 5. Loops in the category tree are walked once and counted. Each article is pinned to the revision it had at build time.
+2. Wikidata: a SPARQL query against the Wikidata Query Service (up to 10,000 characters, 60 second timeout). The item of a row is ?item if selected, otherwise the first variable holding a Wikidata item. Items are mapped to articles through sitelinks; items without an article are reported.
+3. Pasted titles: up to 20,000 titles, normalised the way MediaWiki does (underscores, spacing, first letter except on Wiktionary). Redirects are followed; missing, invalid and non-article titles are reported.
+4. Pageviews: the top N (up to 1,000) most-read articles of a month from the Wikimedia REST API. The main page, Special: pages, project pages and files are dropped and reported.
+5. Combination: union, intersection or difference (the first list minus the others) of 2 to 10 of your lists on the same wiki, read from each list's latest ready version in one streaming pass.
 
-Lists can target any language edition of Wikipedia and the other Wikimedia content projects (Wiktionary, Wikibooks, Wikinews, Wikiquote, Wikisource, Wikiversity, Wikivoyage).
-
-## Combinations
-
-Union, intersection and difference of up to ten lists, for example "Physics minus Biographies". Cycles between lists are refused. A combination rebuilds when one of its source lists gets a new version.
+Lists can target any language edition of eight Wikimedia projects: Wikipedia, Wiktionary, Wikibooks, Wikinews, Wikiquote, Wikisource, Wikiversity and Wikivoyage.
 
 ## Builds, versions and schedules
 
-Builds never run inside a web request. Each build is a background job with a status: queued, building, ready or failed. Network errors are retried with backoff. Each successful build is stored as a new version with the articles added and removed since the previous one. A failed build never replaces the last good version. Lists can rebuild monthly.
+Builds never run inside a web request. Each build is a background job: queued, building, then ready or failed. Network errors are retried with backoff, then the whole build after 1, 5 and 15 minutes. Each successful build is a new version with its article count, a short report, and the number of articles added and removed since the previous ready version. A failed build never replaces the last good version. Lists marked monthly rebuild once per calendar month (UTC); an hourly check catches up after downtime. A combination rebuilds by itself when one of its sources gets a new version, once every source has built. The owner gets one email a day at most when a build fails.
 
 ## Exports
 
-- TSV: title, page ID and revision ID.
-- Static HTML bundle: Parsoid HTML of each article, local links rewritten, with an attribution page.
-- ZIM (stretch goal): a single file that Kiwix opens, for small lists.
+- TSV: title, page ID and revision ID, streamed; header lines starting with # carry the source, build time and licence.
+- HTML bundle: a zip with one Parsoid HTML page per article at its pinned revision, links between exported articles rewritten to local files, other links to Wikipedia, an index and an attribution page. Opens from a USB stick with no server.
+- ZIM: the same pages in one file for the Kiwix apps and the Kiwix hotspot, with the index as main page, full-text search and Kiwix library metadata.
 
-Downloads are streamed and expire after seven days.
+HTML bundles and ZIM files hold up to 1,000 articles and expire after seven days. Images are linked, not copied.
 
 ## Principles
 
 - Titles, not text: only titles and IDs are stored.
-- Attribution built in: every export carries the CC BY-SA 4.0 notice.
-- Polite to Wikimedia: one identified User-Agent with a contact address, maxlag on every request, backoff when servers are busy.
+- Attribution built in: every export carries the CC BY-SA 4.0 notice and links to each article's history.
+- Polite to Wikimedia: one identified User-Agent with a contact address, maxlag on every request, backoff when servers are busy, one request at a time per worker.
 - Yours to host: MIT licensed, one Docker Compose file.
 
 ## Privacy
 
-Stored: your email address, an Argon2id hash of your password, and your list settings. One HttpOnly session cookie, 14 days. No analytics, advertising, tracking or third-party resources. Wikimedia APIs are called from the server, not the browser.
+Stored: your email address, an Argon2id hash of your password, your list settings, and the titles and IDs of built versions. One HttpOnly session cookie, 14 days. No analytics, advertising, tracking or third-party resources. Failure emails go through an email provider (Resend on the hosted instance). HTML bundles and ZIM files are kept for 7 days and deleted with their list. Wikimedia APIs are called from the server, never from your browser.
 
 ## API
 
-JSON under /api/v1, errors as RFC 9457 problem details. Unsafe requests need the session cookie and the X-CSRF-Token header from GET /api/v1/auth/csrf.
+JSON under /api/v1, errors as RFC 9457 problem details, timestamps in UTC with a Z suffix. Unsafe requests need the session cookie and the X-CSRF-Token header from GET /api/v1/auth/csrf. Lists are cursor-paginated.
 
 - GET /api/v1/health
 - GET /api/v1/auth/csrf
 - POST /api/v1/auth/register, /auth/login, /auth/logout, /auth/logout-everywhere
 - GET /api/v1/auth/me
 - GET, POST /api/v1/lists
-- GET, DELETE /api/v1/lists/{id}
+- GET, DELETE /api/v1/lists/{id} (409 while a combination uses the list)
 - POST /api/v1/lists/{id}/build (202, version queued; 409 if a build is active)
 - GET /api/v1/lists/{id}/versions, /versions/{v}, /versions/{v}/articles
+- GET /api/v1/lists/{id}/versions/{v}/changes?kind=added|removed
+- GET /api/v1/lists/{id}/versions/{v}/export.tsv
+- GET, POST /api/v1/lists/{id}/versions/{v}/exports (format html or zim)
+- GET /api/v1/lists/{id}/exports/{e}/download (410 once expired)
 
-Builds move queued, building, then ready or failed. Network errors with Wikimedia are retried after 1, 5 and 15 minutes. Rate limits: 300 requests a minute per IP; sign-in 10 a minute per IP and per email; builds 20 an hour.
+Rate limits: 300 requests a minute per IP; sign-in 10 a minute per IP and per email; list writes 30 a minute; builds and exports 20 an hour.
 
 ## Self-hosting
 
-Docker Compose runs nginx, the Flask API, an RQ worker, MariaDB 11.4 and Redis. Requirements: Docker 24+, about 2 GB RAM, outbound HTTPS to Wikimedia. Install: clone the repository, copy .env.example to .env, set OFFLINESHELF_SECRET_KEY and the MariaDB passwords, run docker compose up -d --build. Settings use the OFFLINESHELF_ environment prefix.
+Docker Compose runs nginx, the Flask API, an RQ worker, a scheduler, MariaDB 11.4 and Redis, plus a volume for exports. Requirements: Docker 24+, about 2 GB RAM, outbound HTTPS to Wikimedia. Install: clone the repository, copy .env.example to .env, set the secret key and database passwords, run docker compose up -d --build, open http://localhost:8080. Example lists: docker compose exec api python -m app.seed you@example.org. Failure emails need OFFLINESHELF_SMTP_* settings (any SMTP provider).
 
 ## Security
 
-Argon2id password hashing, per-session CSRF tokens plus same-origin checks, HttpOnly SameSite cookies (Secure and __Host- prefixed in production), a per-request CSP nonce with strict-dynamic, rate limits at the edge and in the app, owner-scoped queries, a Wikimedia host allow list, non-root read-only containers. Report vulnerabilities privately via GitHub security advisories or support@ahmershah.dev. security.txt: /.well-known/security.txt
+Argon2id password hashing, per-session CSRF tokens plus same-origin checks, HttpOnly SameSite cookies (Secure and __Host- prefixed in production), a per-request CSP nonce, rate limits in nginx and the API, a wiki hostname allow list, owner checks on every query, non-root read-only containers, CodeQL and tests on every pull request. Report vulnerabilities privately through GitHub security advisories or support@ahmershah.dev.
 
 ## Contact
 
@@ -75,13 +77,17 @@ Email support@ahmershah.dev. Bugs and features: GitHub issues. The maker: https:
 
 ## FAQ
 
-What does OfflineShelf export? A TSV file of titles, page IDs and revision IDs, and a static HTML bundle of the articles with attribution. ZIM export for Kiwix is planned for small lists.
+What does OfflineShelf export? A TSV file of titles, page IDs and revision IDs, an HTML bundle of the articles with attribution, and a ZIM file that the Kiwix apps open, with full-text search.
+
+Can I use an export with Kiwix? Yes. Make a ZIM file from any ready version of up to 1,000 articles. For bigger collections, the TSV works with mwoffliner.
 
 Does OfflineShelf copy Wikipedia articles into its database? No. It stores titles and IDs only.
 
-Which wikis can I build lists from? Any language edition of Wikipedia, and the other Wikimedia content projects.
+Which wikis can I build lists from? Any language edition of Wikipedia and of seven other Wikimedia projects.
 
-What happens when a scheduled rebuild fails? The last good version stays current, the failure is recorded, and the next rebuild tries again.
+What happens when a scheduled rebuild fails? The last good version stays current, the owner gets one email a day at most, and the next rebuild tries again.
+
+Does it work without internet? Building a list needs internet. Reading an exported HTML bundle or ZIM file does not.
 
 Is OfflineShelf free and open source? Yes, MIT licensed and self-hostable with Docker Compose.
 
