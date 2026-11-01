@@ -29,6 +29,13 @@ const SECTIONS: { title: string; body: string[] }[] = [
     ],
   },
   {
+    title: 'Exports and emails',
+    body: [
+      'Download links for HTML bundles work for 7 days, then the file is deleted; you can make a new one from the same version. Bundles hold up to 1,000 articles.',
+      'If a build of your list fails, you may get an email about it, at most once per list per day. These are service notices, not marketing.',
+    ],
+  },
+  {
     title: 'Liability',
     body: [
       'To the extent the law allows, OfflineShelf and its maintainer are not liable for losses arising from using the service, including inaccurate or incomplete article content, which comes from Wikipedia.',

@@ -1,5 +1,6 @@
 import { Callout, ExternalLink, NextPage, PageHeader, Section } from '../components/Page'
 import { SITE } from '../seo/site'
+import { DefenceLayers } from '../components/Visuals'
 
 const MEASURES: [string, string][] = [
   [
@@ -79,11 +80,12 @@ export function Security() {
       </Section>
 
       <Section index="02" title="What is in place">
+        <DefenceLayers />
         <dl className="border-t hairline">
           {MEASURES.map(([title, text]) => (
             <div
               key={title}
-              className="grid gap-3 border-b hairline py-6 md:grid-cols-[13rem_1fr] md:gap-10"
+              className="grid grid-cols-1 gap-3 border-b hairline py-6 md:grid-cols-[13rem_1fr] md:gap-10"
             >
               <dt className="font-serif text-2xl">{title}</dt>
               <dd className="text-paper/70">{text}</dd>

@@ -9,6 +9,20 @@ const SECTIONS = [
     ],
   },
   {
+    h: 'Emails',
+    p: [
+      'OfflineShelf sends one kind of email: a notice to your account address when a build of one of your lists fails, at most once per list per day. It contains the list name, the wiki and the reason.',
+      'Emails are delivered through Resend, an email provider that acts as a processor and receives only your address and the message. There are no newsletters, no tracking pixels and no link tracking.',
+    ],
+  },
+  {
+    h: 'Exports',
+    p: [
+      'An HTML bundle is a zip file stored on the OfflineShelf server so you can download it. Only you can download your bundles. They are deleted after 7 days, and at once when you delete the list.',
+      'TSV files are generated when you ask for them and are not stored.',
+    ],
+  },
+  {
     h: 'Cookies',
     p: [
       'One cookie, set when you sign in, that keeps you signed in. It is HttpOnly (scripts cannot read it), sent only to this site, and expires after 14 days. There are no analytics, advertising or third-party cookies.',
@@ -30,7 +44,7 @@ const SECTIONS = [
   {
     h: 'Deleting your data',
     p: [
-      'Deleting a list removes it and all its versions. To delete your account, email support@ahmershah.dev from the address you signed up with.',
+      'Deleting a list removes it, all its versions and any bundles made from it. To delete your account, email support@ahmershah.dev from the address you signed up with; your lists go with it.',
     ],
   },
 ]
@@ -42,7 +56,7 @@ export function Privacy() {
         <p className="label md:col-span-3">Privacy</p>
         <div className="md:col-span-9">
           <Split as="h1" text="Small on purpose." className="text-headline font-serif" />
-          <p className="mt-6 text-dim">Last updated 31 October 2026</p>
+          <p className="mt-6 text-dim">Last updated 1 November 2026</p>
         </div>
       </header>
       <div className="grid grid-cols-1 gap-8 md:grid-cols-12">

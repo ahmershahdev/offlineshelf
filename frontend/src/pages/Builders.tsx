@@ -1,11 +1,30 @@
+import { Link } from 'react-router'
+
 import { Callout, Code, Facts, NextPage, PageHeader, Section } from '../components/Page'
+import { SetOperations } from '../components/Visuals'
+
+const CHOOSE: [string, string, string][] = [
+  ['A topic Wikipedia already groups', 'Category', 'Fast to set up; check the depth'],
+  [
+    'Things with a property: rivers, laureates, drugs',
+    'Wikidata',
+    'Precise; needs a little SPARQL',
+  ],
+  [
+    'A syllabus or reading list you have',
+    'Pasted titles',
+    'Exactly what you paste, redirects followed',
+  ],
+  ['What people actually read', 'Pageviews', 'A month of the most-read articles'],
+  ['Two lists, joined or subtracted', 'Combination', 'Union, intersection or difference'],
+]
 
 export function Builders() {
   return (
     <article>
       <PageHeader
         eyebrow="Builders"
-        title="Four ways to ask Wikipedia for a list."
+        title="Five ways to ask Wikipedia for a list."
         intro={
           <>
             A builder turns a question into article titles. Each one reads from a different
@@ -15,11 +34,47 @@ export function Builders() {
         }
         aside={
           <p className="label leading-relaxed">
-            Status: the Wikimedia client and build queue are done. The four builders land with
-            milestone M2.
+            Status: the Wikimedia client, build queue, versions, schedules and combinations are
+            done. The builder logic itself is being written by hand and lands before launch; until
+            then a build ends with &ldquo;not implemented yet&rdquo;.
           </p>
         }
       />
+
+      <Section index="00" title="Which builder?">
+        <div className="prose-shelf">
+          <p>
+            Start from what you already know about the list. Most collections end up as two or three
+            simple lists combined, rather than one clever query.
+          </p>
+        </div>
+        <div className="my-8 overflow-hidden rounded-2xl border hairline">
+          <table className="w-full text-left text-sm">
+            <thead className="bg-ink-2 text-xs text-dim">
+              <tr>
+                <th scope="col" className="px-4 py-3 font-normal">
+                  You have
+                </th>
+                <th scope="col" className="px-4 py-3 font-normal">
+                  Use
+                </th>
+                <th scope="col" className="hidden px-4 py-3 font-normal sm:table-cell">
+                  Why
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {CHOOSE.map(([have, use, why]) => (
+                <tr key={use} className="border-t hairline align-top">
+                  <td className="px-4 py-3 text-paper/80">{have}</td>
+                  <td className="px-4 py-3 font-serif text-lg text-paper">{use}</td>
+                  <td className="hidden px-4 py-3 text-paper/55 sm:table-cell">{why}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Section>
 
       <Section index="01" title="Category">
         <div className="prose-shelf">
@@ -113,7 +168,56 @@ export function Builders() {
         <Code label="Parameters">{`{ "kind": "pageviews", "year": 2026, "month": 8, "limit": 1000 }`}</Code>
       </Section>
 
-      <Section index="05" title="Limits">
+      <Section index="05" title="Combination">
+        <div className="prose-shelf">
+          <p>
+            Join or subtract lists you already have. A combination takes 2 to 10 of your lists on
+            the same wiki and an operation, and is built from the latest ready version of each. It
+            rebuilds by itself whenever one of its sources gets a new version, so a chain like
+            <em> (Physics or Chemistry) minus Biographies</em> stays current without a schedule.
+          </p>
+        </div>
+        <SetOperations />
+        <div className="prose-shelf">
+          <ul>
+            <li>
+              Sources are read already sorted by page ID and merged in one pass, so combining lists
+              of 100,000 articles uses no more memory than combining ten.
+            </li>
+            <li>
+              A source that has never built successfully fails the combination with its name in the
+              reason, instead of producing a partial result.
+            </li>
+            <li>
+              A list that a combination uses cannot be deleted until the combination is deleted.
+            </li>
+          </ul>
+        </div>
+        <Code label="Parameters">{`{
+  "kind": "combination",
+  "operation": "difference",
+  "sources": [12, 31]
+}`}</Code>
+      </Section>
+
+      <Section index="06" title="Reading the report">
+        <div className="prose-shelf">
+          <p>
+            Every successful build stores a small report next to its articles, shown in the{' '}
+            <Link to="/app">app</Link> under <em>Details</em>. It is how you find the gaps: titles
+            that do not exist, Wikidata items with no article in your language, ranking entries that
+            were not articles. Lists in the report show their first few entries and a count.
+          </p>
+        </div>
+        <Code label="A pasted list, built">{`input: 412
+found: 398
+redirected: 37
+missing: 9 (Gauss law, Maxwells equations, ...)
+invalid: 1 (Talk:)
+not articles: 4 (Portal:Physics, ...)`}</Code>
+      </Section>
+
+      <Section index="07" title="Limits">
         <Facts
           items={[
             ['Category depth', '0 to 5'],
@@ -122,6 +226,7 @@ export function Builders() {
             ['Top by pageviews', '1,000 articles'],
             ['Articles per list', '100,000'],
             ['Lists per account', '100'],
+            ['Combination sources', '2 to 10 lists, same wiki'],
             ['Builds', '20 per hour per account'],
           ]}
         />
@@ -134,7 +239,7 @@ export function Builders() {
       <NextPage
         to="/exports"
         title="Exports"
-        text="TSV, a static HTML bundle, and ZIM for Kiwix."
+        text="Take a list offline: TSV, a static HTML bundle, and ZIM for Kiwix next."
       />
     </article>
   )

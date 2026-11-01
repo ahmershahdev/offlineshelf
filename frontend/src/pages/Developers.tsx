@@ -1,5 +1,6 @@
 import { Callout, Code, ExternalLink, NextPage, PageHeader, Section } from '../components/Page'
 import { SITE } from '../seo/site'
+import { Steps } from '../components/Visuals'
 
 const ENDPOINTS: [string, string, string][] = [
   ['GET', '/api/v1/health', 'Database and Redis status'],
@@ -17,6 +18,10 @@ const ENDPOINTS: [string, string, string][] = [
   ['GET', '/api/v1/lists/{id}/versions', 'Build history'],
   ['GET', '/api/v1/lists/{id}/versions/{v}', 'One version and its report'],
   ['GET', '/api/v1/lists/{id}/versions/{v}/articles', 'Articles in a version'],
+  ['GET', '/api/v1/lists/{id}/versions/{v}/export.tsv', 'Stream a version as TSV'],
+  ['POST', '/api/v1/lists/{id}/versions/{v}/exports', 'Queue an HTML bundle'],
+  ['GET', '/api/v1/lists/{id}/versions/{v}/exports', 'Recent bundles and their progress'],
+  ['GET', '/api/v1/lists/{id}/exports/{e}/download', 'Download a ready bundle'],
 ]
 
 export function Developers() {
@@ -84,7 +89,66 @@ curl -c jar -b jar -H 'X-CSRF-Token: <new token>' -H 'Content-Type: application/
 curl -X POST ... /api/v1/lists/42/build`}</Code>
       </Section>
 
-      <Section index="03" title="Errors">
+      <Section index="03" title="Quickstart">
+        <Steps
+          steps={[
+            {
+              title: 'Get a token and sign in',
+              body: (
+                <p>
+                  Keep a cookie jar between calls. <code>GET /auth/csrf</code> returns a token; send
+                  it in <code>X-CSRF-Token</code> on every unsafe request. Sign-in answers with a
+                  new one.
+                </p>
+              ),
+            },
+            {
+              title: 'Create a list',
+              body: (
+                <p>
+                  <code>POST /lists</code> with a name, a wiki and the builder parameters. The
+                  answer is <code>201</code> with the list and a <code>Location</code> header.
+                </p>
+              ),
+            },
+            {
+              title: 'Build and poll',
+              body: (
+                <p>
+                  <code>POST /lists/{'{id}'}/build</code> answers <code>202</code>. Poll{' '}
+                  <code>GET /lists/{'{id}'}/versions?limit=1</code> every few seconds until the
+                  status is <code>ready</code> or <code>failed</code>.
+                </p>
+              ),
+            },
+            {
+              title: 'Read or export',
+              body: (
+                <p>
+                  Page through <code>/articles</code>, stream <code>/export.tsv</code>, or queue a
+                  bundle with <code>POST /exports</code> and poll it until it is ready to download.
+                </p>
+              ),
+            },
+          ]}
+        />
+        <Code label="Export a ready version">{`# TSV, streamed
+curl -b jar -o vaccines.tsv   https://offlineshelf.ahmershah.dev/api/v1/lists/42/versions/7/export.tsv
+
+# HTML bundle: queue, poll, download
+curl -b jar -c jar -H 'X-CSRF-Token: <token>' -H 'Content-Type: application/json'   -d '{"format": "html"}' https://offlineshelf.ahmershah.dev/api/v1/lists/42/versions/7/exports
+# {"id": 3, "status": "queued", "progress": 0, "total": 312, ...}
+curl -b jar https://offlineshelf.ahmershah.dev/api/v1/lists/42/versions/7/exports
+# {"items": [{"id": 3, "status": "ready", "size_bytes": 4182233, "expires_at": "2026-12-08T10:02:11Z", ...}]}
+curl -b jar -OJ https://offlineshelf.ahmershah.dev/api/v1/lists/42/exports/3/download`}</Code>
+        <Code label="A combination">{`{
+  "name": "Physics minus biographies",
+  "wiki": "en.wikipedia.org",
+  "params": { "kind": "combination", "operation": "difference", "sources": [12, 31] }
+}`}</Code>
+      </Section>
+
+      <Section index="04" title="Errors">
         <div className="prose-shelf">
           <p>
             Every error is an RFC 9457 problem document with the content type{' '}
@@ -104,7 +168,7 @@ curl -X POST ... /api/v1/lists/42/build`}</Code>
 }`}</Code>
       </Section>
 
-      <Section index="04" title="Builds and versions">
+      <Section index="05" title="Builds and versions">
         <div className="prose-shelf">
           <p>
             <code>POST /lists/{'{id}'}/build</code> answers <code>202</code> with a version in{' '}
@@ -119,7 +183,32 @@ curl -X POST ... /api/v1/lists/42/build`}</Code>
         </div>
       </Section>
 
-      <Section index="05" title="Rate limits">
+      <Section index="06" title="Exports">
+        <div className="prose-shelf">
+          <p>
+            <code>export.tsv</code> streams a ready version directly. HTML bundles are jobs:{' '}
+            <code>POST /exports</code> answers <code>202</code> with an export in{' '}
+            <code>queued</code>, and <code>progress</code> counts articles fetched out of{' '}
+            <code>total</code>. Asking again for the same version returns the bundle that is already
+            queued, running or ready.
+          </p>
+          <ul>
+            <li>
+              <code>409</code> if the version is not ready, <code>422</code> if it has more than
+              1,000 articles.
+            </li>
+            <li>
+              Downloads answer <code>404</code> until the bundle is ready and <code>410</code> once
+              it has expired (after 7 days).
+            </li>
+            <li>
+              All timestamps are UTC with a <code>Z</code> suffix.
+            </li>
+          </ul>
+        </div>
+      </Section>
+
+      <Section index="07" title="Rate limits">
         <div className="prose-shelf">
           <ul>
             <li>300 requests a minute per IP across the API.</li>

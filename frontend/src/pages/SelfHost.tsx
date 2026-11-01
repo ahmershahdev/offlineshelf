@@ -8,6 +8,7 @@ import {
   Section,
 } from '../components/Page'
 import { SITE } from '../seo/site'
+import { StackDiagram } from '../components/Visuals'
 
 export function SelfHost() {
   return (
@@ -18,18 +19,22 @@ export function SelfHost() {
         intro={
           <>
             OfflineShelf is MIT licensed and ships as one Docker Compose file: the web server, the
-            API, a build worker, MariaDB and Redis. A small virtual server or a spare machine in a
-            library is enough.
+            API, a build worker, a scheduler, MariaDB and Redis. A small virtual server or a spare
+            machine in a library is enough, and the whole install takes about ten minutes.
           </>
         }
       />
+
+      <Section index="00" title="What runs">
+        <StackDiagram />
+      </Section>
 
       <Section index="01" title="Requirements">
         <Facts
           items={[
             ['Docker', 'Docker Engine 24+ with Compose v2'],
             ['Memory', '2 GB is comfortable; 1 GB works for small lists'],
-            ['Disk', '5 GB plus room for exports'],
+            ['Disk', '5 GB, plus room for HTML bundles (kept 7 days)'],
             ['Network', 'Outbound HTTPS to *.wikipedia.org, wikidata.org, wikimedia.org'],
             ['Ports', '8080 for the site; put TLS in front (Caddy, nginx, a load balancer)'],
           ]}
@@ -69,6 +74,25 @@ docker compose up -d --build`}</Code>
             ['OFFLINESHELF_MAX_PASTED_TITLES', 'Default 20000'],
             ['OFFLINESHELF_MAX_ARTICLES_PER_LIST', 'Default 100000'],
             ['OFFLINESHELF_RATE_LIMIT_BUILD', 'Default "20 per hour"'],
+            ['OFFLINESHELF_MAX_BUNDLE_ARTICLES', 'Default 1000'],
+            ['OFFLINESHELF_EXPORT_DAYS', 'Days a bundle is kept. Default 7'],
+          ]}
+        />
+        <div className="prose-shelf">
+          <h3>Failure emails</h3>
+          <p>
+            When a build fails, the list owner gets one email a day at most. Email is off until you
+            set an SMTP host; any provider works (Resend, Postmark, Amazon SES, your own server).
+            Send-only credentials are enough.
+          </p>
+        </div>
+        <Facts
+          items={[
+            ['OFFLINESHELF_SMTP_HOST', 'For example smtp.resend.com. Empty turns email off'],
+            ['OFFLINESHELF_SMTP_PORT', 'Default 587 (STARTTLS)'],
+            ['OFFLINESHELF_SMTP_USERNAME', 'For Resend: resend'],
+            ['OFFLINESHELF_SMTP_PASSWORD', 'An API key or password; keep it in .env only'],
+            ['OFFLINESHELF_MAIL_FROM', 'A sender on a domain verified with your provider'],
           ]}
         />
         <Callout title="Behind a TLS proxy">
@@ -86,13 +110,45 @@ docker compose up -d --build`}</Code>
 docker compose up -d --build   # migrations run on start`}</Code>
         <div className="prose-shelf">
           <p>
-            Only list settings, versions and titles live in the database, so backups stay small.
-            Exports can always be rebuilt.
+            Only list settings, versions and titles live in the database, so backups stay small. The{' '}
+            <code>exports-data</code> volume does not need a backup: bundles expire after a week and
+            can be made again from any version.
           </p>
         </div>
       </Section>
 
-      <Section index="05" title="Being a good Wikimedia neighbour">
+      <Section index="05" title="Troubleshooting">
+        <div className="prose-shelf">
+          <ul>
+            <li>
+              <strong>Builds stay queued.</strong> The worker is not running or cannot reach Redis:{' '}
+              <code>docker compose logs worker</code>.
+            </li>
+            <li>
+              <strong>Monthly lists never rebuild.</strong> Check the scheduler:{' '}
+              <code>docker compose logs scheduler</code> should show the hourly check.
+            </li>
+            <li>
+              <strong>No failure emails.</strong> <code>OFFLINESHELF_SMTP_HOST</code> is empty, or
+              the provider rejected the sender; the worker log says which.
+            </li>
+            <li>
+              <strong>Sign-in fails with a CSRF error behind a proxy.</strong>{' '}
+              <code>OFFLINESHELF_SITE_URL</code> must match the public address exactly, scheme
+              included.
+            </li>
+            <li>
+              <strong>Everyone shares one rate limit.</strong> The proxy count is wrong; set{' '}
+              <code>OFFLINESHELF_TRUSTED_PROXIES</code> to the number of proxies in front of the
+              API.
+            </li>
+          </ul>
+        </div>
+        <Code label="Health check">{`curl -s http://localhost:8080/api/v1/health
+# {"status": "ok", "checks": {"database": "ok", "redis": "ok"}}`}</Code>
+      </Section>
+
+      <Section index="06" title="Being a good Wikimedia neighbour">
         <div className="prose-shelf">
           <p>
             Your install talks to Wikimedia's public APIs. The client already follows the{' '}
