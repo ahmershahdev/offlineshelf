@@ -30,7 +30,7 @@ Last updated: 2026-11-01. Update at the end of every work session.
   ahmershah.dev) (PR #11). The `/app` page signs in, creates, builds and deletes lists.
 - **Repo:** only `main`, no open PRs. `main` requires `backend`, `frontend`, `codeql (python)`
   and `codeql (javascript-typescript)`, squash merges, linear history.
-- Tests: 142 backend (MariaDB 11.4 + Redis), 32 frontend.
+- Tests: 143 backend (MariaDB 11.4 + Redis), 32 frontend.
 
 ## Run it
 
@@ -57,8 +57,8 @@ proxies `/api`). `npm run dev:down` stops the containers. Needs Docker, uv and N
    Wikidata, pageviews) and `backend/app/core/combine.py`, with 100% branch coverage, per
    `docs/core-contract.md`.
 2. Read the About page copy and confirm it says what you want about yourself.
-3. M3: version diff (added and removed articles) once core has a diff function; large lists
-   (100k titles) written in batches.
+3. M3: version diff (added and removed articles) once core has a diff function. The 100k-article
+   build and export are tested (`tests/jobs/test_large_list.py`).
 4. M5: diffs between versions and download buttons (after M4 exports); check `/app` on a phone.
 5. Install SonarQube Cloud and CodeRabbit on the repository (needs the owner's GitHub
    authorisation), then add them as required checks in `.github/rulesets/protect-main.json`.

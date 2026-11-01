@@ -47,7 +47,7 @@ const MILESTONES: {
       ['Email when a build fails, at most once a day per list', true],
       ['Monthly rebuilds that catch up after downtime', true],
       ['Articles added and removed between versions', false],
-      ['Lists of 100,000 articles tested end to end', false],
+      ['Lists of 100,000 articles tested end to end', true],
     ],
   },
   {

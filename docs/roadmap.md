@@ -38,7 +38,7 @@ in CI, and seed data.
 - [x] Email when a build fails (one per list per day at most)
 - [x] Monthly rebuilds (hourly dispatcher, `scheduler` service)
 - [ ] Each version stores its added and removed articles (needs the diff function in core)
-- [ ] Large lists (100k titles) written in batches without loading everything in memory
+- [x] Large lists (100k titles) written in batches without loading everything in memory (tested: build peaks near 2 MiB, TSV export near 3 MiB)
 
 ## M4. Combinations and exports (target 2026-12-27)
 
