@@ -6,3 +6,9 @@ contact_links:
   - name: Security vulnerability
     url: https://github.com/ahmershahdev/offlineshelf/security/advisories/new
     about: Report security problems privately.
+  - name: Question or idea
+    url: https://github.com/ahmershahdev/offlineshelf/discussions
+    about: Ask how to do something or share an idea in Discussions.
+  - name: Guides
+    url: https://github.com/ahmershahdev/offlineshelf/wiki
+    about: Getting started, builders, exports, self-hosting and troubleshooting.
