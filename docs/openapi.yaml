@@ -129,6 +129,20 @@ paths:
       responses:
         '200': { description: In insertion order, content: { application/json: { schema: { $ref: '#/components/schemas/ArticlePage' } } } }
         '404': { $ref: '#/components/responses/Problem' }
+  /lists/{listId}/versions/{versionId}/export.tsv:
+    parameters:
+      - { name: listId, in: path, required: true, schema: { type: integer } }
+      - { name: versionId, in: path, required: true, schema: { type: integer } }
+    get:
+      operationId: exportTsv
+      description: >-
+        Streams the articles of a ready version as tab-separated values with the columns
+        title, page_id and revision_id. Lines starting with "#" before the column header carry
+        the source wiki, build time and CC BY-SA 4.0 attribution.
+      responses:
+        '200': { description: TSV file, content: { text/tab-separated-values: { schema: { type: string } } } }
+        '404': { $ref: '#/components/responses/Problem' }
+        '409': { $ref: '#/components/responses/Problem' }
 components:
   responses:
     Problem:

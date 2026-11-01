@@ -180,7 +180,16 @@ export function ListDetail({
 
       {shown ? (
         <div>
-          <p className="label mb-3">Articles from {when(shown.finished_at)}</p>
+          <div className="mb-3 flex flex-wrap items-baseline justify-between gap-4">
+            <p className="label">Articles from {when(shown.finished_at)}</p>
+            <a
+              href={`/api/v1/lists/${list.id}/versions/${shown.id}/export.tsv`}
+              download
+              className="label link-draw hover:text-paper"
+            >
+              Download TSV
+            </a>
+          </div>
           {reportLines(shown.report).length ? (
             <ul className="mb-4 text-xs text-dim">
               {reportLines(shown.report).map((line) => (
