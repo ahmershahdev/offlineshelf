@@ -7,7 +7,17 @@ function day(iso: string | null): string {
   return iso ? new Date(iso).toLocaleDateString(undefined, { dateStyle: 'medium' }) : ''
 }
 
-export function BundleExport({ list, version }: { list: ShelfList; version: ListVersion }) {
+const LABEL = { html: 'HTML bundle', zim: 'ZIM file for Kiwix' } as const
+
+export function BundleExport({
+  list,
+  version,
+  format = 'html',
+}: {
+  list: ShelfList
+  version: ListVersion
+  format?: 'html' | 'zim'
+}) {
   const [latest, setLatest] = useState<Export | null | undefined>(undefined)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
@@ -19,7 +29,7 @@ export function BundleExport({ list, version }: { list: ShelfList; version: List
       api
         .exports(list.id, version.id)
         .then((page) => {
-          if (live) setLatest(page.items[0] ?? null)
+          if (live) setLatest(page.items.find((e) => e.format === format) ?? null)
         })
         .catch(() => {
           if (live) setLatest((prev) => prev ?? null)
@@ -31,13 +41,13 @@ export function BundleExport({ list, version }: { list: ShelfList; version: List
       live = false
       clearInterval(timer)
     }
-  }, [list.id, version.id, active])
+  }, [list.id, version.id, active, format])
 
   function start(): void {
     setBusy(true)
     setError(null)
     api
-      .createExport(list.id, version.id)
+      .createExport(list.id, version.id, format)
       .then(setLatest)
       .catch((err: unknown) => {
         setError(err instanceof ApiError ? err.message : 'The bundle could not be started.')
@@ -60,7 +70,7 @@ export function BundleExport({ list, version }: { list: ShelfList; version: List
             download
             className="label link-draw py-2 hover:text-paper"
           >
-            Download HTML bundle
+            Download {LABEL[format]}
           </a>
           <span>
             {formatBytes(latest.size_bytes ?? 0)}, available until {day(latest.expires_at)}
@@ -69,8 +79,8 @@ export function BundleExport({ list, version }: { list: ShelfList; version: List
         </>
       ) : active ? (
         <span aria-live="polite">
-          Making HTML bundle: {latest.progress.toLocaleString()} of {latest.total.toLocaleString()}{' '}
-          articles
+          Making {LABEL[format]}: {latest.progress.toLocaleString()} of{' '}
+          {latest.total.toLocaleString()} articles
         </span>
       ) : (
         <>
@@ -80,10 +90,10 @@ export function BundleExport({ list, version }: { list: ShelfList; version: List
             disabled={busy}
             onClick={start}
           >
-            {busy ? 'Starting' : 'Make HTML bundle'}
+            {busy ? 'Starting' : `Make ${LABEL[format]}`}
           </button>
           {latest?.status === 'failed' ? (
-            <span className="text-signal">The last bundle failed: {latest.error}</span>
+            <span className="text-signal">The last export failed: {latest.error}</span>
           ) : null}
         </>
       )}

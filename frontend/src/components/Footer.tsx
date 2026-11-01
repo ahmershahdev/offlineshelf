@@ -37,7 +37,7 @@ const COLUMNS: { title: string; links: [string, string][] }[] = [
 
 const FACTS: [string, string][] = [
   ['5', 'ways to build a list'],
-  ['2', 'export formats, ZIM next'],
+  ['3', 'export formats, ZIM for Kiwix'],
   ['8', 'Wikimedia projects, any language'],
   ['MIT', 'open source licence'],
 ]

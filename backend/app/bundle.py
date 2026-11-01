@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from html import escape
 from pathlib import Path
+from typing import Any, Protocol
 from urllib.parse import quote, unquote
 
 from app.exports import LICENSE_URL
@@ -144,8 +145,20 @@ def attribution_html(name: str, wiki: str, articles: list[BundleArticle], site_u
     return _page(f"Attribution: {name}", body)
 
 
-def write_bundle(
-    path: Path,
+class PageSink(Protocol):
+    def add(self, path: str, title: str, html: str, *, article: bool) -> None: ...
+
+
+class ZipSink:
+    def __init__(self, zf: zipfile.ZipFile) -> None:
+        self.zf = zf
+
+    def add(self, path: str, title: str, html: str, *, article: bool) -> None:  # noqa: ARG002
+        self.zf.writestr(path, html)
+
+
+def write_pages(
+    sink: PageSink,
     *,
     name: str,
     wiki: str,
@@ -155,7 +168,8 @@ def write_bundle(
     fetch: Callable[[BundleArticle], str | None],
     on_progress: Callable[[int], None] | None = None,
 ) -> BundleResult:
-    """Write a zip with one HTML file per article, an index and an attribution page.
+    """Fetch, rewrite and hand every page to `sink`: one per article, an index and an
+    attribution page. The HTML bundle and the ZIM file share this and differ only in the sink.
 
     `fetch` returns None for a page that no longer exists; it is listed as not available.
     Articles are fetched and written one at a time, so memory stays flat.
@@ -163,22 +177,34 @@ def write_bundle(
     local = {a.title: a.page_id for a in articles}
     missing: set[str] = set()
     written = 0
-    with zipfile.ZipFile(path, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=6) as zf:
-        for i, article in enumerate(articles, start=1):
-            html = fetch(article)
-            if html is None:
-                missing.add(article.title)
-            else:
-                zf.writestr(
-                    f"articles/{article_file(article.page_id)}",
-                    rewrite_html(html, wiki, local, article),
-                )
-                written += 1
-            if on_progress is not None:
-                on_progress(i)
-        zf.writestr("index.html", index_html(name, wiki, built, articles, missing))
-        zf.writestr("ATTRIBUTION.html", attribution_html(name, wiki, _sorted(articles), site_url))
+    for i, article in enumerate(articles, start=1):
+        html = fetch(article)
+        if html is None:
+            missing.add(article.title)
+        else:
+            sink.add(
+                f"articles/{article_file(article.page_id)}",
+                article.title,
+                rewrite_html(html, wiki, local, article),
+                article=True,
+            )
+            written += 1
+        if on_progress is not None:
+            on_progress(i)
+    sink.add("index.html", name, index_html(name, wiki, built, articles, missing), article=False)
+    sink.add(
+        "ATTRIBUTION.html",
+        f"Attribution: {name}",
+        attribution_html(name, wiki, _sorted(articles), site_url),
+        article=False,
+    )
     return BundleResult(written=written, missing=sorted(missing))
+
+
+def write_bundle(path: Path, **pages: Any) -> BundleResult:
+    """Write the pages into a zip that opens from any folder."""
+    with zipfile.ZipFile(path, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=6) as zf:
+        return write_pages(ZipSink(zf), **pages)
 
 
 def _sorted(articles: Iterable[BundleArticle]) -> list[BundleArticle]:

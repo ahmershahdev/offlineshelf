@@ -1,5 +1,6 @@
 import io
 import os
+import shutil
 import time
 import zipfile
 from datetime import datetime, timedelta
@@ -34,7 +35,10 @@ GONE = "OfflineShelf no such page 7731"
 def _empty_exports_dir():
     yield
     for path in exports_dir().glob("*"):
-        path.unlink()
+        if path.is_dir():
+            shutil.rmtree(path)
+        else:
+            path.unlink()
 
 
 @pytest.fixture
@@ -256,6 +260,16 @@ def test_cleanup_removes_expired_exports_and_stale_files(signed_in) -> None:
     fresh.unlink()
 
 
+def test_cleanup_removes_stale_folders_too(signed_in) -> None:
+    stale = exports_dir() / "export-99.zim.part_fulltext.idx.tmp"
+    stale.mkdir()
+    (stale / "segment").write_bytes(b"x")
+    week_ago = time.time() - 8 * 86400
+    os.utime(stale, (week_ago, week_ago))
+    delete_expired_exports()
+    assert not stale.exists()
+
+
 def test_cleanup_without_a_directory(monkeypatch, tmp_path) -> None:
     settings = get_settings().model_copy(update={"exports_dir": str(tmp_path / "none")})
     monkeypatch.setattr(export_module, "get_settings", lambda: settings)
@@ -267,3 +281,30 @@ def _raise(error: Exception):
         raise error
 
     return fail
+
+
+def test_zim_export_end_to_end(signed_in, redis, replay) -> None:
+    from libzim.reader import Archive  # type: ignore[import-untyped]
+
+    list_id, version_id = ready_version(signed_in)
+    resp = signed_in.send("POST", exports_url(list_id, version_id), {"format": "zim"})
+    assert resp.status_code == 202
+    html = signed_in.send("POST", exports_url(list_id, version_id), {"format": "html"})
+    assert html.get_json()["id"] != resp.get_json()["id"]
+    work(redis)
+
+    items = signed_in.get(exports_url(list_id, version_id)).get_json()["items"]
+    zim = next(e for e in items if e["format"] == "zim")
+    assert zim["status"] == "ready"
+    assert zim["missing"] == [GONE]
+    download = signed_in.get(f"/api/v1/lists/{list_id}/exports/{zim['id']}/download")
+    assert download.mimetype == "application/x-zim"
+    assert f"offlineshelf-{list_id}-v{version_id}.zim" in download.headers["Content-Disposition"]
+    path = exports_dir() / f"download-{zim['id']}.zim"
+    path.write_bytes(download.get_data())
+    download.close()
+    archive = Archive(str(path))
+    assert archive.has_entry_by_path("articles/31427769.html")
+    assert archive.main_entry.get_item().path == "index.html"
+    del archive
+    assert not [p for p in exports_dir().iterdir() if ".part" in p.name]

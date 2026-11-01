@@ -44,12 +44,12 @@ export const FAQ_ALL: Faq[] = [
   {
     topic: 'Exports',
     q: 'What does OfflineShelf export?',
-    a: 'A TSV file of titles, page IDs and revision IDs, and a static HTML bundle of the articles with attribution. ZIM export for Kiwix is planned for small lists.',
+    a: 'A TSV file of titles, page IDs and revision IDs, and a static HTML bundle of the articles with attribution. and a ZIM file that the Kiwix apps open, with full-text search.',
   },
   {
     topic: 'Exports',
     q: 'Can I use an export with Kiwix?',
-    a: 'The TSV works with Kiwix tooling such as mwoffliner today. A direct ZIM export, which Kiwix opens as is, is a stretch goal for small lists.',
+    a: 'Yes. Make a ZIM file from any ready version of up to 1,000 articles and open it in Kiwix on a phone, a computer or a Kiwix hotspot. For bigger collections, the TSV works with Kiwix tooling such as mwoffliner.',
   },
   {
     topic: 'Project',
@@ -99,7 +99,7 @@ export const FAQ_ALL: Faq[] = [
   {
     topic: 'Exports',
     q: 'Are images included?',
-    a: 'Images are linked, not copied, so they show when a device is online. Bundling images is planned with the ZIM export, where file size can be controlled.',
+    a: 'Images are linked, not copied, so they show when a device is online. HTML bundles and ZIM files carry text only, which keeps them small.',
   },
   {
     topic: 'Exports',

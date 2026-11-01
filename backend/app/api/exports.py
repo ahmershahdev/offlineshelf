@@ -7,13 +7,14 @@ from app.api.lists import _owned, _owned_version
 from app.api.util import json_body, require_user
 from app.config import current_settings
 from app.db import SessionLocal
-from app.jobs.export import enqueue_export, exports_dir
+from app.jobs.export import EXTENSIONS, enqueue_export, exports_dir
 from app.models import ExportStatus, ListExport, ListVersion, VersionStatus, utcnow
 from app.schemas import ExportCreate, ExportOut
 from app.security.ratelimit import limit_from, limiter
 
 bp = Blueprint("exports", __name__, url_prefix="/lists")
 RECENT_EXPORTS = 10
+MIMETYPES = {"html": "application/zip", "zim": "application/x-zim"}
 
 
 def _out(export: ListExport) -> dict[str, object]:
@@ -37,7 +38,9 @@ def create(list_id: int, version_id: int) -> tuple[Response, int]:
     if version.article_count > cap:
         abort(
             422,
-            description=f"HTML bundles hold up to {cap:,} articles. Use the TSV export instead.",
+            description=(
+                f"HTML and ZIM exports hold up to {cap:,} articles. Use the TSV export instead."
+            ),
         )
     export = enqueue_export(SessionLocal(), version, data.format)
     return jsonify(_out(export)), 202
@@ -70,8 +73,8 @@ def download(list_id: int, export_id: int) -> Response:
         abort(410, description="This export has expired. Make a new one.")
     return send_file(
         Path(path).resolve(),
-        mimetype="application/zip",
+        mimetype=MIMETYPES[export.format],
         as_attachment=True,
-        download_name=f"offlineshelf-{shelf.id}-v{export.version_id}.zip",
+        download_name=f"offlineshelf-{shelf.id}-v{export.version_id}.{EXTENSIONS[export.format]}",
         max_age=0,
     )

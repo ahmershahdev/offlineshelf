@@ -5,7 +5,7 @@
 OfflineShelf helps a school, library or clinic decide which Wikipedia articles to carry offline. You
 build a list from a category, a Wikidata query, a pasted list of titles or the most-read articles,
 combine lists, rebuild them every month, and export the result as a TSV file or a static HTML
-bundle that opens from a USB stick. ZIM export for Kiwix comes next.
+bundle that opens from a USB stick, or a ZIM file that the Kiwix apps open.
 
 > Status: every builder, combinations, schedules and both exports work end to end. Public launch
 > at `offlineshelf.ahmershah.dev` in February 2027. See [docs/roadmap.md](docs/roadmap.md) and

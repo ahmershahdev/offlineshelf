@@ -21,8 +21,7 @@ reviews:
     - path: "backend/app/core/**"
       instructions: >-
         Plain Python only: no Flask, SQLAlchemy, Redis or network imports. Needs 100% branch
-        coverage. This code is written by the maintainer; review it, never suggest replacing it
-        wholesale.
+        coverage.
     - path: "backend/app/wiki/**"
       instructions: >-
         The only module that may call Wikimedia APIs. Every request needs the project User-Agent
