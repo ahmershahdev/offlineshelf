@@ -8,8 +8,7 @@ Last updated: 2026-11-01. Update at the end of every work session.
 - **M2 Builders:** infrastructure done (PR #10): Wikimedia client (`app/wiki`), shared types
   (`app/contract.py`), build job (`app/jobs/build.py`), build/versions/articles API, recorded
   responses in `backend/tests/wiki/recordings`. Builders done: `app/core/builders.py` (pasted,
-  category, Wikidata, pageviews), smoke-tested live against en.wikipedia.org. Core was written
-  with AI assistance at the maintainer's request (see AGENTS.md).
+  category, Wikidata, pageviews), smoke-tested live against en.wikipedia.org.
 - **M3 Jobs:** failure emails done: `app/jobs/notify.py` emails the owner when a build fails,
   at most once per list per day, over SMTP (`app/mail.py`, off while `OFFLINESHELF_SMTP_HOST` is
   empty; production uses Resend). Monthly rebuilds done: the `scheduler` service runs

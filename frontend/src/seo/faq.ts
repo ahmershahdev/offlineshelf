@@ -114,7 +114,7 @@ export const FAQ_ALL: Faq[] = [
   {
     topic: 'Project',
     q: 'Who makes OfflineShelf?',
-    a: 'Syed Ahmer Shah, an independent developer, in the open on GitHub. The core list logic is written by hand so every line can be explained, because the project is part of a proposal to the Kiwix community.',
+    a: 'Syed Ahmer Shah, an independent developer, in the open on GitHub. The project is part of a proposal to the Kiwix community.',
   },
   {
     topic: 'Project',
