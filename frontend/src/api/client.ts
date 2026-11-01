@@ -88,6 +88,11 @@ export const api = {
       'GET',
       `/lists/${id}/versions/${versionId}/articles?limit=100${cursor ? `&cursor=${cursor}` : ''}`,
     ),
+  changes: (id: number, versionId: number, kind: 'added' | 'removed', cursor?: number) =>
+    request<ArticlePage>(
+      'GET',
+      `/lists/${id}/versions/${versionId}/changes?kind=${kind}&limit=100${cursor ? `&cursor=${cursor}` : ''}`,
+    ),
   exports: (id: number, versionId: number) =>
     request<ExportList>('GET', `/lists/${id}/versions/${versionId}/exports`),
   createExport: (id: number, versionId: number) =>

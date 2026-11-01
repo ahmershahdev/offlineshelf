@@ -155,17 +155,18 @@ const VERSIONS: {
   status: 'ready' | 'failed'
   when: string
   count?: string
+  delta?: string
   note?: string
 }[] = [
-  { v: 'v4', status: 'ready', when: '1 Dec, 00:12', count: '1,284' },
+  { v: 'v4', status: 'ready', when: '1 Dec, 00:12', count: '1,284', delta: '+31 / -4' },
   {
     v: 'v3',
     status: 'failed',
     when: '1 Nov, 00:10',
     note: 'Gave up after 5 retries: HTTP 503. v2 stays current.',
   },
-  { v: 'v2', status: 'ready', when: '1 Oct, 00:09', count: '1,257' },
-  { v: 'v1', status: 'ready', when: '14 Sep, 16:40', count: '1,245' },
+  { v: 'v2', status: 'ready', when: '1 Oct, 00:09', count: '1,257', delta: '+12 / -0' },
+  { v: 'v1', status: 'ready', when: '14 Sep, 16:40', count: '1,245', delta: 'first build' },
 ]
 
 export function VersionHistory() {
@@ -202,7 +203,10 @@ export function VersionHistory() {
                 <span className="ml-3 text-dim">{row.when}</span>
                 {row.note ? <span className="mt-1 block text-xs text-dim">{row.note}</span> : null}
               </span>
-              <span className="text-right font-mono">{row.count ?? ''}</span>
+              <span className="text-right font-mono">
+                {row.count ?? ''}
+                {row.delta ? <span className="block text-xs text-dim">{row.delta}</span> : null}
+              </span>
             </li>
           ))}
         </ul>

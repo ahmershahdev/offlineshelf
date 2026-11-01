@@ -122,6 +122,4 @@ combine: Combiner
 
 ## Later milestones
 
-- M3: version diff (articles added and removed between two versions), given two sorted
-  iterators of page IDs.
 - With list editing: cycle detection between combinations.

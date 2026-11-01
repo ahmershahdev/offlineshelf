@@ -225,6 +225,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/lists/{listId}/versions/{versionId}/changes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                listId: number;
+                versionId: number;
+            };
+            cookie?: never;
+        };
+        /** @description Articles added since the previous ready version, or removed from it, by page ID. */
+        get: operations["listChanges"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/lists/{listId}/versions/{versionId}/export.tsv": {
         parameters: {
             query?: never;
@@ -401,6 +421,12 @@ export interface components {
             report: {
                 [key: string]: unknown;
             } | null;
+            /** @description The ready version this one was compared with */
+            previous_version_id: number | null;
+            /** @description Articles not in the previous ready version */
+            added_count: number | null;
+            /** @description Articles of the previous ready version that are gone */
+            removed_count: number | null;
         };
         VersionPage: {
             items: components["schemas"]["ListVersion"][];
@@ -837,6 +863,35 @@ export interface operations {
                 };
             };
             404: components["responses"]["Problem"];
+        };
+    };
+    listChanges: {
+        parameters: {
+            query?: {
+                kind?: "added" | "removed";
+                limit?: number;
+                cursor?: number;
+            };
+            header?: never;
+            path: {
+                listId: number;
+                versionId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Changed articles */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ArticlePage"];
+                };
+            };
+            404: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
         };
     };
     exportTsv: {

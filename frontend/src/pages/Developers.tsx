@@ -18,6 +18,11 @@ const ENDPOINTS: [string, string, string][] = [
   ['GET', '/api/v1/lists/{id}/versions', 'Build history'],
   ['GET', '/api/v1/lists/{id}/versions/{v}', 'One version and its report'],
   ['GET', '/api/v1/lists/{id}/versions/{v}/articles', 'Articles in a version'],
+  [
+    'GET',
+    '/api/v1/lists/{id}/versions/{v}/changes',
+    'Articles added or removed since the last version',
+  ],
   ['GET', '/api/v1/lists/{id}/versions/{v}/export.tsv', 'Stream a version as TSV'],
   ['POST', '/api/v1/lists/{id}/versions/{v}/exports', 'Queue an HTML bundle'],
   ['GET', '/api/v1/lists/{id}/versions/{v}/exports', 'Recent bundles and their progress'],

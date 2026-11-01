@@ -4,8 +4,8 @@ from importlib import import_module
 from itertools import islice
 
 from rq import Retry, get_current_job
-from sqlalchemy import delete, func, insert, select
-from sqlalchemy.orm import Session
+from sqlalchemy import Select, delete, func, insert, select
+from sqlalchemy.orm import Session, aliased
 
 from app.config import Settings, get_settings
 from app.contract import Builder, BuildResult, Combiner, Limits, Page, WikiSource
@@ -28,6 +28,7 @@ log = logging.getLogger(__name__)
 
 INSERT_BATCH = 1000
 ACTIVE = (VersionStatus.QUEUED, VersionStatus.BUILDING)
+changed_article = aliased(ListArticle)
 NETWORK_RETRY = Retry(max=3, interval=[60, 300, 900])
 
 
@@ -232,6 +233,7 @@ def run_build(version_id: int) -> None:
         version.finished_at = utcnow()
         version.article_count = count
         version.report = result.report or None
+        _record_changes(session, version)
         session.commit()
         rebuild_dependents(session, shelf.id)
     finally:
@@ -272,6 +274,38 @@ def _mark(session: Session, version_id: int, status: VersionStatus, error: str) 
     if status is VersionStatus.FAILED:
         version.finished_at = utcnow()
     session.commit()
+
+
+def changed_pages(new_version: int, old_version: int) -> Select[ListArticle]:
+    """Articles in `new_version` whose page is not in `old_version`, by page ID. Swap the
+    arguments for the removed ones."""
+    in_old = (
+        select(ListArticle.id)
+        .where(
+            ListArticle.version_id == old_version, ListArticle.page_id == changed_article.page_id
+        )
+        .exists()
+    )
+    return select(changed_article).where(changed_article.version_id == new_version, ~in_old)
+
+
+def _record_changes(session: Session, version: ListVersion) -> None:
+    previous = session.scalar(
+        select(func.max(ListVersion.id)).where(
+            ListVersion.list_id == version.list_id,
+            ListVersion.status == VersionStatus.READY,
+            ListVersion.id < version.id,
+        )
+    )
+    if previous is None:
+        return
+    version.previous_version_id = previous
+    version.added_count = _count(session, changed_pages(version.id, previous))
+    version.removed_count = _count(session, changed_pages(previous, version.id))
+
+
+def _count(session: Session, query: Select[ListArticle]) -> int:
+    return session.scalar(select(func.count()).select_from(query.subquery())) or 0
 
 
 def _fail(session: Session, version_id: int, error: str) -> None:

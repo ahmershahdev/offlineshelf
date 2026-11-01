@@ -26,6 +26,9 @@ function version(id: number, status: ListVersion['status'], extra: Partial<ListV
     article_count: status === 'ready' ? 2 : 0,
     error: null,
     report: null,
+    previous_version_id: null,
+    added_count: null,
+    removed_count: null,
     ...extra,
   } satisfies ListVersion
 }
@@ -108,6 +111,40 @@ describe('ListDetail', () => {
       await vi.advanceTimersByTimeAsync(POLL_MS * 3)
     })
     expect(versions.mock.calls.length).toBe(calls)
+  })
+
+  it('shows what changed since the previous version', async () => {
+    vi.spyOn(api, 'versions').mockResolvedValue({
+      items: [
+        version(3, 'ready', { previous_version_id: 2, added_count: 2, removed_count: 0 }),
+        version(2, 'ready'),
+      ],
+      next_cursor: null,
+    })
+    vi.spyOn(api, 'articles').mockResolvedValue(page([]))
+    const changes = vi.spyOn(api, 'changes').mockResolvedValue(
+      page([
+        { page_id: 8, title: 'Malaria vaccine', revision_id: 1 },
+        { page_id: 9, title: 'mRNA vaccine', revision_id: 2 },
+      ]),
+    )
+    render(<ListDetail list={LIST} onStatus={vi.fn()} />)
+    await flush()
+    await flush()
+
+    expect(screen.getByLabelText('2 added, 0 removed')).toBeTruthy()
+    expect(screen.getByText('first')).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'removed 0' }).hasAttribute('disabled')).toBe(true)
+
+    fireEvent.click(screen.getByRole('button', { name: 'added 2' }))
+    await flush()
+    expect(changes).toHaveBeenCalledWith(7, 3, 'added', undefined)
+    expect(screen.getByRole('link', { name: 'Malaria vaccine' }).getAttribute('href')).toBe(
+      'https://en.wikipedia.org/wiki/Malaria_vaccine',
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'added 2' }))
+    expect(screen.queryByRole('link', { name: 'Malaria vaccine' })).toBeNull()
   })
 
   it('says when a list has never been built', async () => {
