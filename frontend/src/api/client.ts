@@ -6,6 +6,9 @@ export type ListPage = components['schemas']['ListPage']
 export type ListCreate = components['schemas']['ListCreate']
 export type Problem = components['schemas']['Problem']
 export type ListVersion = components['schemas']['ListVersion']
+export type VersionPage = components['schemas']['VersionPage']
+export type Article = components['schemas']['Article']
+export type ArticlePage = components['schemas']['ArticlePage']
 
 export class ApiError extends Error {
   constructor(
@@ -76,4 +79,11 @@ export const api = {
   createList: (data: ListCreate) => request<ShelfList>('POST', '/lists', data),
   deleteList: (id: number) => request<undefined>('DELETE', `/lists/${id}`),
   buildList: (id: number) => request<ListVersion>('POST', `/lists/${id}/build`),
+  versions: (id: number, limit = 10) =>
+    request<VersionPage>('GET', `/lists/${id}/versions?limit=${limit}`),
+  articles: (id: number, versionId: number, cursor?: number) =>
+    request<ArticlePage>(
+      'GET',
+      `/lists/${id}/versions/${versionId}/articles?limit=100${cursor ? `&cursor=${cursor}` : ''}`,
+    ),
 }

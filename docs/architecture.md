@@ -166,6 +166,7 @@ Mono for code, all self-hosted.
 | Neutral `app/contract.py` | Core stays importable without Flask, SQLAlchemy or httpx, and is tested with fakes |
 | SMTP with `smtplib`, no mail library or provider SDK | Any provider speaks SMTP; one fewer dependency; self-hosters use their own server |
 | Hourly idempotent dispatcher, not a cron entry on the 1st | A cron run missed during downtime would wait a month; the hourly check catches up and needs no extra state |
+| Naive UTC in the database, `Z` in the API | MariaDB `DATETIME` has no zone; the response schemas attach UTC so browsers show local time correctly |
 | Failure email timestamp on `list_version` | Writing to `shelf_list` would bump `row_version` and turn the owner's next edit into a false 409 |
 | Pageviews project without `.org` | The REST API answers 404 for `en.wikipedia.org`; it wants `en.wikipedia` |
 

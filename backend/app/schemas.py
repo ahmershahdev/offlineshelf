@@ -1,7 +1,8 @@
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 from typing import Annotated, Literal
 
 from pydantic import (
+    AfterValidator,
     BaseModel,
     ConfigDict,
     EmailStr,
@@ -13,6 +14,9 @@ from pydantic import (
 from app.config import current_settings
 from app.models import BuilderKind, Schedule, VersionStatus
 from app.security.wiki_hosts import is_allowed_wiki
+
+# The database stores naive UTC; without an offset in the JSON, browsers read it as local time.
+UtcDateTime = Annotated[datetime, AfterValidator(lambda d: d.replace(tzinfo=UTC))]
 
 # MediaWiki caps titles at 255 bytes of UTF-8. This only rejects input that can never be a
 # title; normalising (underscores, first-letter case, namespaces) belongs to app/core.
@@ -147,7 +151,7 @@ class ListOut(BaseModel):
     builder: BuilderKind
     params: dict[str, object]
     schedule: Schedule
-    created_at: datetime
+    created_at: UtcDateTime
     latest_status: VersionStatus | None = None
 
 
@@ -161,8 +165,8 @@ class VersionOut(BaseModel):
 
     id: int
     status: VersionStatus
-    started_at: datetime | None
-    finished_at: datetime | None
+    started_at: UtcDateTime | None
+    finished_at: UtcDateTime | None
     article_count: int
     error: str | None
     report: dict[str, object] | None

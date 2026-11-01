@@ -71,7 +71,7 @@ def test_build_end_to_end(signed_in, redis, builder) -> None:
     assert v["status"] == "ready"
     assert v["article_count"] == 3
     assert v["report"] == {"missing": []}
-    assert v["finished_at"]
+    assert str(v["finished_at"]).endswith("Z")
     assert builder.calls[0]["params"] == {"category": "Vaccines", "depth": 1}
     assert builder.calls[0]["limits"].max_category_depth == 5
 

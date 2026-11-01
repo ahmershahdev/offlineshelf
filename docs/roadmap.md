@@ -51,7 +51,8 @@ in CI, and seed data.
 ## M5. Web app (target 2027-01-17)
 
 - [ ] React + TypeScript + Tailwind app: list overview, builder forms, combination editor
-- [ ] Build progress, version history with diffs, download buttons
+- [x] Build progress (polls while a build runs), version history, articles per version
+- [ ] Diffs between versions, download buttons
 - [ ] Generated API types from the OpenAPI schema, checked in CI
 - [ ] Accessible forms (labels, keyboard, contrast), works on a phone
 - [ ] `frontend` CI job added as a required check
