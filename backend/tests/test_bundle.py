@@ -47,6 +47,16 @@ def test_links_keep_fragments_and_unknown_pages_go_to_the_wiki() -> None:
     assert "<script" not in out
 
 
+def test_scripts_are_removed_in_every_spelling() -> None:
+    html = (
+        "<p>a</p><script>x()</script\t\n bar><p>b</p>"
+        '<SCRIPT type="module">y()</SCRIPT ><p>c</p><script>never closed'
+    )
+    out = rewrite_html(html, WIKI, {}, KIWIX)
+    assert "script" not in out.lower()
+    assert "<p>a</p><p>b</p><p>c</p>" in out
+
+
 def test_footer_without_body_tag_and_without_revision() -> None:
     out = rewrite_html("<p>x</p>", WIKI, {}, BundleArticle(1, "AC/DC", None))
     assert out.endswith("</footer>")

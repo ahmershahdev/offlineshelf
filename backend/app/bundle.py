@@ -12,7 +12,8 @@ from app.exports import LICENSE_URL
 # Parsoid HTML is machine-generated and regular, so attribute rewriting with patterns is safe
 # here; it would not be for arbitrary HTML.
 BASE_TAG = re.compile(r"<base\b[^>]*>", re.IGNORECASE)
-SCRIPT = re.compile(r"<script\b.*?</script\s*>", re.IGNORECASE | re.DOTALL)
+# An unclosed <script> drops the rest of the document, which is the safe side.
+SCRIPT = re.compile(r"<script\b.*?(?:</script\b[^>]*>|$)", re.IGNORECASE | re.DOTALL)
 URL_ATTR = re.compile(r'(\s(?:href|src|resource|about))="([^"]*)"')
 SRCSET = re.compile(r'(\ssrcset)="([^"]*)"')
 BODY_END = re.compile(r"</body\s*>", re.IGNORECASE)
