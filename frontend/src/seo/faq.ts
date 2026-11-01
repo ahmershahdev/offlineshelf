@@ -39,7 +39,7 @@ export const FAQ_ALL: Faq[] = [
   {
     topic: 'Lists',
     q: 'Can I combine lists?',
-    a: 'Yes, with union, intersection and difference of up to ten lists, for example Physics minus Biographies. A combination rebuilds when one of its source lists changes. This arrives with milestone M4.',
+    a: 'Yes, with union, intersection and difference of up to ten lists, for example Physics minus Biographies. A combination rebuilds by itself when one of its source lists gets a new version. Sources must be your own lists on the same wiki.',
   },
   {
     topic: 'Exports',
@@ -60,6 +60,66 @@ export const FAQ_ALL: Faq[] = [
     topic: 'Project',
     q: 'Is OfflineShelf part of Wikimedia?',
     a: 'No. It is an independent open source project built on Wikimedia public APIs. Wikipedia is a trademark of the Wikimedia Foundation.',
+  },
+  {
+    topic: 'Basics',
+    q: 'Do I need to install anything?',
+    a: 'No. Lists are built in your browser through the hosted app, and an HTML bundle opens in any browser straight from a USB stick. Schools and libraries that want their own server can self-host with Docker Compose.',
+  },
+  {
+    topic: 'Basics',
+    q: 'Does it work without internet?',
+    a: 'Building a list needs internet, because the articles are looked up on Wikipedia. Reading an exported HTML bundle does not: once it is unzipped on a device, every article on the list opens offline.',
+  },
+  {
+    topic: 'Lists',
+    q: 'Which builder should I use?',
+    a: 'Category for topics Wikipedia already groups, Wikidata for things that share a property (every river in a country), pasted titles for a syllabus you already have, pageviews for what people actually read, and a combination to join or subtract lists. The Builders page has a table to help choose.',
+  },
+  {
+    topic: 'Lists',
+    q: 'How do monthly rebuilds work?',
+    a: 'Lists marked monthly are rebuilt once per calendar month (UTC). The scheduler checks every hour, so a server that was down on the first catches up within the hour. Each rebuild is a new version; earlier versions stay available.',
+  },
+  {
+    topic: 'Lists',
+    q: 'Why did my build fail?',
+    a: 'The reason is shown in the build history under Details: a category that does not exist, a SPARQL query that timed out, a list over 100,000 articles, or Wikimedia being unreachable after several retries. The previous good version stays current, and you get one email a day at most.',
+  },
+  {
+    topic: 'Lists',
+    q: 'Can I edit a list after creating it?',
+    a: 'Not yet. Make a new list with the settings you want, or combine lists to adjust one. Editing comes with the account settings work; until then lists keep the settings they were made with, which also makes every version reproducible.',
+  },
+  {
+    topic: 'Exports',
+    q: 'What is in an HTML bundle?',
+    a: 'A zip with one page per article, an index and an attribution page. Links between articles on the list open the local copies; other links go to Wikipedia. Each page ends with its source revision and the CC BY-SA licence.',
+  },
+  {
+    topic: 'Exports',
+    q: 'Are images included?',
+    a: 'Images are linked, not copied, so they show when a device is online. Bundling images is planned with the ZIM export, where file size can be controlled.',
+  },
+  {
+    topic: 'Exports',
+    q: 'Why do downloads expire after 7 days?',
+    a: 'Bundles contain article text, which OfflineShelf does not keep. After a week the file is deleted; you can make a new one from the same version at any time and get the same articles, because each version pins exact revisions.',
+  },
+  {
+    topic: 'Exports',
+    q: 'Can I share an export with others?',
+    a: 'Yes. Wikipedia text is licensed CC BY-SA 4.0, which allows sharing as long as the authors are credited and the licence travels with the text. Every export already includes both; keep the attribution page with the bundle.',
+  },
+  {
+    topic: 'Project',
+    q: 'Who makes OfflineShelf?',
+    a: 'Syed Ahmer Shah, an independent developer, in the open on GitHub. The core list logic is written by hand so every line can be explained, because the project is part of a proposal to the Kiwix community.',
+  },
+  {
+    topic: 'Project',
+    q: 'How can I help?',
+    a: 'Try it with a real collection and say what is missing, report bugs on GitHub, or suggest wikis and use cases. Schools, libraries and offline projects that want to pilot it are especially welcome; write to support@ahmershah.dev.',
   },
 ]
 
