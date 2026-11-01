@@ -60,7 +60,7 @@ user          id, email (unique), password_hash, session_epoch, created_at
 shelf_list    id, owner_id, name, wiki, builder, params (JSON), schedule, row_version, created_at
 combination_source  combination_id, position, source_list_id (RESTRICT on delete)
 list_version  id, list_id, status, started_at, finished_at, article_count, error, report (JSON),
-              notified_at
+              notified_at, previous_version_id, added_count, removed_count
 list_article  id, version_id, page_id, title (utf8mb4_bin), revision_id; unique (version_id, page_id)
 list_export   id, version_id, format, status, file_name, size_bytes, progress, missing (JSON),
               error, created_at, finished_at, expires_at
@@ -86,6 +86,14 @@ Built: see `docs/openapi.yaml` (health, auth, lists, build, versions, articles).
    the list row and skips the email if any version of the list has a `notified_at` in the last
    24 hours, so the owner gets at most one email per list per day. `notified_at` is set only
    after SMTP accepts the message; an SMTP error raises and RQ retries after 1, 5 and 15 minutes.
+
+### Changes between versions
+
+When a build becomes `ready`, the job compares it with the list's previous ready version (failed
+versions are skipped) and stores `previous_version_id`, `added_count` and `removed_count`. Both
+counts are SQL anti-joins on the `(version_id, page_id)` unique index, so nothing is loaded into
+Python. `GET /lists/<id>/versions/<v>/changes?kind=added|removed` pages through the titles with
+the same query. The first version of a list has no counts.
 
 ### Combinations
 

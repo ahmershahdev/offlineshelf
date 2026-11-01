@@ -87,6 +87,101 @@ function Articles({ list, version }: { list: ShelfList; version: ListVersion }) 
   )
 }
 
+type ChangeKind = 'added' | 'removed'
+
+function Changes({ list, version }: { list: ShelfList; version: ListVersion }) {
+  const [kind, setKind] = useState<ChangeKind | null>(null)
+  const [items, setItems] = useState<Article[]>([])
+  const [cursor, setCursor] = useState<number | null>(null)
+  const [error, setError] = useState(false)
+  const counts: Record<ChangeKind, number> = {
+    added: version.added_count ?? 0,
+    removed: version.removed_count ?? 0,
+  }
+
+  function load(next: ChangeKind, from?: number): void {
+    setError(false)
+    api
+      .changes(list.id, version.id, next, from)
+      .then((page) => {
+        setItems((prev) => (from === undefined ? page.items : [...prev, ...page.items]))
+        setCursor(page.next_cursor)
+      })
+      .catch(() => {
+        setError(true)
+      })
+  }
+
+  return (
+    <div className="mb-6">
+      <div
+        className="flex flex-wrap items-center gap-x-5 gap-y-1"
+        role="group"
+        aria-label="Changes"
+      >
+        <span className="label">Since the previous version</span>
+        {(['added', 'removed'] as const).map((k) => (
+          <button
+            key={k}
+            type="button"
+            aria-pressed={kind === k}
+            disabled={counts[k] === 0}
+            className={`label link-draw py-2 disabled:opacity-40 ${kind === k ? 'text-paper' : 'hover:text-paper'}`}
+            onClick={() => {
+              if (kind === k) {
+                setKind(null)
+                return
+              }
+              setKind(k)
+              setItems([])
+              load(k)
+            }}
+          >
+            {k} {counts[k].toLocaleString()}
+          </button>
+        ))}
+      </div>
+      {error ? <p className="text-sm text-signal">The changes could not be loaded.</p> : null}
+      {kind && !error ? (
+        <ul
+          className="mt-2 max-h-60 overflow-y-auto font-mono text-sm"
+          aria-label={`Articles ${kind}`}
+          tabIndex={0}
+        >
+          {items.map((a) => (
+            <li key={a.page_id} className="border-b hairline py-1.5">
+              <span className={kind === 'added' ? 'text-signal' : 'text-dim'} aria-hidden="true">
+                {kind === 'added' ? '+ ' : '- '}
+              </span>
+              <a
+                href={articleUrl(list.wiki, a.title)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="link-draw hover:text-paper"
+              >
+                {a.title}
+              </a>
+            </li>
+          ))}
+          {cursor !== null ? (
+            <li>
+              <button
+                type="button"
+                className="label link-draw py-2"
+                onClick={() => {
+                  load(kind, cursor)
+                }}
+              >
+                Show more
+              </button>
+            </li>
+          ) : null}
+        </ul>
+      ) : null}
+    </div>
+  )
+}
+
 export function ListDetail({
   list,
   onStatus,
@@ -151,6 +246,9 @@ export function ListDetail({
             <th scope="col" className="py-1 text-right font-normal">
               Articles
             </th>
+            <th scope="col" className="hidden py-1 text-right font-normal sm:table-cell">
+              Changes
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -179,6 +277,19 @@ export function ListDetail({
               <td className="py-2 text-right font-mono">
                 {v.status === 'ready' ? v.article_count.toLocaleString() : ''}
               </td>
+              <td className="hidden py-2 text-right font-mono text-xs text-dim sm:table-cell">
+                {v.added_count !== null && v.removed_count !== null ? (
+                  <span
+                    aria-label={`${v.added_count.toLocaleString()} added, ${v.removed_count.toLocaleString()} removed`}
+                  >
+                    +{v.added_count.toLocaleString()} / -{v.removed_count.toLocaleString()}
+                  </span>
+                ) : v.status === 'ready' ? (
+                  'first'
+                ) : (
+                  ''
+                )}
+              </td>
             </tr>
           ))}
         </tbody>
@@ -206,6 +317,9 @@ export function ListDetail({
           <div className="mb-4">
             <BundleExport key={shown.id} list={list} version={shown} />
           </div>
+          {shown.previous_version_id !== null ? (
+            <Changes key={`changes-${shown.id}`} list={list} version={shown} />
+          ) : null}
           <Articles key={shown.id} list={list} version={shown} />
         </div>
       ) : null}

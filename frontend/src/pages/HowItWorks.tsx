@@ -107,7 +107,7 @@ export function HowItWorks() {
               body: (
                 <p>
                   On the first of every month the list rebuilds. Each build is a new version next to
-                  the old ones, and you can open or export any of them.
+                  the old ones, with the articles added and removed since the last good build.
                 </p>
               ),
             },

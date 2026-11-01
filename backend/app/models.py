@@ -131,6 +131,13 @@ class ListVersion(Base):
     error: Mapped[str | None] = mapped_column(Text)
     report: Mapped[dict[str, Any] | None] = mapped_column(JSON)
     notified_at: Mapped[datetime | None] = mapped_column(DateTime)
+    # The ready version this one was compared with. SET NULL keeps the counts readable if that
+    # version's list history is ever trimmed.
+    previous_version_id: Mapped[int | None] = mapped_column(
+        ForeignKey("list_version.id", ondelete="SET NULL")
+    )
+    added_count: Mapped[int | None] = mapped_column(Integer)
+    removed_count: Mapped[int | None] = mapped_column(Integer)
 
     shelf_list: Mapped[ShelfList] = relationship(back_populates="versions")
 

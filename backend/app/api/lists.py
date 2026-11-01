@@ -7,7 +7,7 @@ from app.api.util import json_body, require_user
 from app.config import current_settings
 from app.db import SessionLocal
 from app.exports import tsv_header, tsv_rows
-from app.jobs.build import BuildInProgressError, enqueue_build
+from app.jobs.build import BuildInProgressError, changed_article, changed_pages, enqueue_build
 from app.jobs.export import remove_files
 from app.models import (
     CombinationSource,
@@ -225,6 +225,29 @@ def articles(list_id: int, version_id: int) -> Response:
     if cursor is not None:
         query = query.where(ListArticle.id > cursor)
     rows = list(SessionLocal.scalars(query.order_by(ListArticle.id).limit(limit + 1)))
+    page = ArticlePage(
+        items=[ArticleOut.model_validate(a) for a in rows[:limit]],
+        next_cursor=rows[limit - 1].id if len(rows) > limit else None,
+    )
+    return jsonify(page.model_dump(mode="json"))
+
+
+@bp.get("/<int:list_id>/versions/<int:version_id>/changes")
+def changes(list_id: int, version_id: int) -> Response:
+    found = _owned_version(list_id, version_id)
+    kind = request.args.get("kind", "added")
+    if kind not in ("added", "removed"):
+        abort(422, description="kind must be added or removed.")
+    previous = found.previous_version_id
+    if previous is None:
+        abort(404, description="This version has no earlier version to compare with.")
+    limit, cursor = _page_args(default=100, maximum=1000)
+    query = (
+        changed_pages(found.id, previous) if kind == "added" else changed_pages(previous, found.id)
+    )
+    if cursor is not None:
+        query = query.where(changed_article.id > cursor)
+    rows = list(SessionLocal.scalars(query.order_by(changed_article.id).limit(limit + 1)))
     page = ArticlePage(
         items=[ArticleOut.model_validate(a) for a in rows[:limit]],
         next_cursor=rows[limit - 1].id if len(rows) > limit else None,

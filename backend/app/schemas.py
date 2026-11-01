@@ -187,6 +187,9 @@ class VersionOut(BaseModel):
     article_count: int
     error: str | None
     report: dict[str, object] | None
+    previous_version_id: int | None
+    added_count: int | None
+    removed_count: int | None
 
 
 class VersionPage(BaseModel):

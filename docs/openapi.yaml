@@ -130,6 +130,21 @@ paths:
       responses:
         '200': { description: In insertion order, content: { application/json: { schema: { $ref: '#/components/schemas/ArticlePage' } } } }
         '404': { $ref: '#/components/responses/Problem' }
+  /lists/{listId}/versions/{versionId}/changes:
+    parameters:
+      - { name: listId, in: path, required: true, schema: { type: integer } }
+      - { name: versionId, in: path, required: true, schema: { type: integer } }
+    get:
+      operationId: listChanges
+      description: Articles added since the previous ready version, or removed from it, by page ID.
+      parameters:
+        - { name: kind, in: query, schema: { type: string, enum: [added, removed], default: added } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 1000, default: 100 } }
+        - { name: cursor, in: query, schema: { type: integer } }
+      responses:
+        '200': { description: Changed articles, content: { application/json: { schema: { $ref: '#/components/schemas/ArticlePage' } } } }
+        '404': { $ref: '#/components/responses/Problem' }
+        '422': { $ref: '#/components/responses/Problem' }
   /lists/{listId}/versions/{versionId}/export.tsv:
     parameters:
       - { name: listId, in: path, required: true, schema: { type: integer } }
@@ -302,7 +317,7 @@ components:
         next_cursor: { oneOf: [{ type: integer }, { type: 'null' }] }
     ListVersion:
       type: object
-      required: [id, status, started_at, finished_at, article_count, error, report]
+      required: [id, status, started_at, finished_at, article_count, error, report, previous_version_id, added_count, removed_count]
       properties:
         id: { type: integer }
         status: { $ref: '#/components/schemas/VersionStatus' }
@@ -311,6 +326,9 @@ components:
         article_count: { type: integer }
         error: { oneOf: [{ type: string }, { type: 'null' }] }
         report: { oneOf: [{ type: object, additionalProperties: true }, { type: 'null' }] }
+        previous_version_id: { oneOf: [{ type: integer }, { type: 'null' }], description: The ready version this one was compared with }
+        added_count: { oneOf: [{ type: integer }, { type: 'null' }], description: Articles not in the previous ready version }
+        removed_count: { oneOf: [{ type: integer }, { type: 'null' }], description: Articles of the previous ready version that are gone }
     VersionPage:
       type: object
       required: [items, next_cursor]
