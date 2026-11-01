@@ -26,7 +26,8 @@ app only calls the API. Builds never run inside a web request.
 | `backend/app/wiki/` | The only code that calls Wikimedia: `client.py` (User-Agent, maxlag, retries, continuation), `source.py` (implements `WikiSource`) |
 | `backend/app/api/` | Blueprints: `health`, `auth`, `lists`; `errors.py` (problem+json), `util.py` |
 | `backend/app/security/` | Password hashing, CSRF, session cookie, headers, rate limits, wiki allow list |
-| `backend/app/jobs/` | RQ queue; `build.py` queues and runs builds |
+| `backend/app/jobs/` | RQ queue; `build.py` queues and runs builds; `notify.py` sends failure emails |
+| `backend/app/mail.py` | Plain-text email over SMTP (standard library); off when `OFFLINESHELF_SMTP_HOST` is empty |
 | `backend/scripts/record_wiki.py` | Re-records the Wikimedia responses in `tests/wiki/recordings` (manual, never in CI) |
 | `backend/app/schemas.py` | Pydantic request and response models; all input limits live here |
 | `backend/migrations/` | Alembic |
@@ -54,7 +55,8 @@ Built (migrations `512c42b8a106`, `7f9fad1c53cf`):
 ```
 user          id, email (unique), password_hash, session_epoch, created_at
 shelf_list    id, owner_id, name, wiki, builder, params (JSON), schedule, row_version, created_at
-list_version  id, list_id, status, started_at, finished_at, article_count, error, report (JSON)
+list_version  id, list_id, status, started_at, finished_at, article_count, error, report (JSON),
+              notified_at
 list_article  id, version_id, page_id, title (utf8mb4_bin), revision_id; unique (version_id, page_id)
 ```
 
@@ -76,6 +78,10 @@ Built: see `docs/openapi.yaml` (health, auth, lists, build, versions, articles).
    left: back to `queued` and RQ retries after 1, 5 and 15 minutes. Anything else: `failed`,
    partial rows rolled back, earlier versions untouched. Unexpected errors are logged and shown
    to the user only as "The build failed unexpectedly."
+4. A `failed` version enqueues `send_failure_email` (job ID `failure-email-<version>`). It locks
+   the list row and skips the email if any version of the list has a `notified_at` in the last
+   24 hours, so the owner gets at most one email per list per day. `notified_at` is set only
+   after SMTP accepts the message; an SMTP error raises and RQ retries after 1, 5 and 15 minutes.
 
 ## Security
 
@@ -149,6 +155,8 @@ Mono for code, all self-hosted.
 | Cookie sessions, not server-side | No session store to run; `session_epoch` covers revocation |
 | httpx for Wikimedia | Timeouts and connection pooling built in; `MockTransport` replays recordings without a mocking library |
 | Neutral `app/contract.py` | Core stays importable without Flask, SQLAlchemy or httpx, and is tested with fakes |
+| SMTP with `smtplib`, no mail library or provider SDK | Any provider speaks SMTP; one fewer dependency; self-hosters use their own server |
+| Failure email timestamp on `list_version` | Writing to `shelf_list` would bump `row_version` and turn the owner's next edit into a false 409 |
 | Pageviews project without `.org` | The REST API answers 404 for `en.wikipedia.org`; it wants `en.wikipedia` |
 
 ## Open questions
