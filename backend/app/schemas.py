@@ -122,8 +122,25 @@ class PageviewsParams(Strict):
         return value
 
 
+MAX_COMBINATION_SOURCES = 10
+
+
+class CombinationParams(Strict):
+    kind: Literal[BuilderKind.COMBINATION] = BuilderKind.COMBINATION
+    operation: Literal["union", "intersection", "difference"]
+    sources: list[int] = Field(min_length=2, max_length=MAX_COMBINATION_SOURCES)
+
+    @field_validator("sources")
+    @classmethod
+    def distinct(cls, value: list[int]) -> list[int]:
+        if len(set(value)) != len(value):
+            raise ValueError("each source list can appear only once")
+        return value
+
+
 BuilderParams = Annotated[
-    CategoryParams | WikidataParams | PastedParams | PageviewsParams, Field(discriminator="kind")
+    CategoryParams | WikidataParams | PastedParams | PageviewsParams | CombinationParams,
+    Field(discriminator="kind"),
 ]
 
 

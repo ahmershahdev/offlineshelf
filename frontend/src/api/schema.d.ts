@@ -315,7 +315,7 @@ export interface components {
             csrf: string;
         };
         /** @enum {string} */
-        BuilderKind: "category" | "wikidata" | "pasted" | "pageviews";
+        BuilderKind: "category" | "wikidata" | "pasted" | "pageviews" | "combination";
         /** @enum {string} */
         Schedule: "none" | "monthly";
         /** @enum {string} */
@@ -356,11 +356,22 @@ export interface components {
             month: number;
             limit: number;
         };
+        /** @description Union, intersection or difference (the first list minus the others) of the latest ready versions of 2 to 10 of your lists on the same wiki. Rebuilds when a source list gets a new version. */
+        CombinationParams: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "combination";
+            /** @enum {string} */
+            operation: "union" | "intersection" | "difference";
+            sources: number[];
+        };
         ListCreate: {
             name: string;
             /** @example en.wikipedia.org */
             wiki: string;
-            params: components["schemas"]["CategoryParams"] | components["schemas"]["WikidataParams"] | components["schemas"]["PastedParams"] | components["schemas"]["PageviewsParams"];
+            params: components["schemas"]["CategoryParams"] | components["schemas"]["WikidataParams"] | components["schemas"]["PastedParams"] | components["schemas"]["PageviewsParams"] | components["schemas"]["CombinationParams"];
             schedule?: components["schemas"]["Schedule"];
         };
         ShelfList: {
@@ -723,6 +734,7 @@ export interface operations {
                 content?: never;
             };
             404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
         };
     };
     buildList: {

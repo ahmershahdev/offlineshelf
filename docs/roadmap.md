@@ -42,8 +42,9 @@ in CI, and seed data.
 
 ## M4. Combinations and exports (target 2026-12-27)
 
-- [ ] Union, intersection and difference of up to 10 lists; no cycles between lists
-- [ ] A combination rebuilds when one of its source lists gets a new version
+- [x] Combinations of up to 10 lists: API, sources table, build job, form in `/app` ([core-contract.md](core-contract.md))
+- [ ] Union, intersection and difference in `app/core/combine.py` (maintainer)
+- [x] A combination rebuilds when one of its source lists gets a new version
 - [x] Export TSV (title, page ID, revision ID), streamed, with attribution lines
 - [x] Export a static HTML bundle (Parsoid HTML, local links rewritten, attribution page)
 - [x] Downloads are streamed and expire after 7 days
