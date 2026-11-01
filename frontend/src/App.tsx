@@ -3,6 +3,7 @@ import { Outlet, Route, Routes } from 'react-router'
 import { Cursor } from './components/Cursor'
 import { Footer } from './components/Footer'
 import { Header } from './components/Header'
+import { RouteTransition } from './components/RouteTransition'
 import { SmoothScroll } from './components/SmoothScroll'
 import { About } from './pages/About'
 import { AppPage } from './pages/AppPage'
@@ -34,7 +35,9 @@ function Layout() {
       <SmoothScroll />
       <Header />
       <main id="main">
-        <Outlet />
+        <RouteTransition>
+          <Outlet />
+        </RouteTransition>
       </main>
       <Footer />
       <Cursor />

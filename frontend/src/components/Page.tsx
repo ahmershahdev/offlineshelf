@@ -14,13 +14,13 @@ type HeaderProps = {
 export function PageHeader({ eyebrow, title, intro, aside }: HeaderProps) {
   return (
     <header className="gutter relative pt-40 pb-24 md:pt-52 md:pb-32">
-      <div className="grid gap-10 md:grid-cols-12">
+      <div className="grid grid-cols-1 gap-10 md:grid-cols-12">
         <p className="label md:col-span-3">{eyebrow}</p>
         <div className="md:col-span-9">
           <Split as="h1" text={title} className="text-headline font-serif" />
         </div>
       </div>
-      <div className="mt-14 grid gap-10 md:grid-cols-12">
+      <div className="mt-14 grid grid-cols-1 gap-10 md:grid-cols-12">
         <Reveal className="text-xl leading-snug text-paper/75 md:col-span-6 md:col-start-4 md:text-2xl">
           {intro}
         </Reveal>
@@ -45,7 +45,7 @@ export function Section({ index, title, id, children }: SectionProps) {
       className="gutter border-t hairline py-20 md:py-28"
       aria-labelledby={`${anchor}-h`}
     >
-      <div className="grid gap-10 md:grid-cols-12">
+      <div className="grid grid-cols-1 gap-10 md:grid-cols-12">
         <div className="md:col-span-3">
           <div className="md:sticky md:top-28">
             <span className="mb-4 block font-mono text-xs text-signal">{index}</span>

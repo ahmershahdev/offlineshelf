@@ -37,7 +37,7 @@ const LIMITS = [
 export function HowItWorks() {
   return (
     <article className="gutter pt-40 pb-32">
-      <header className="mb-24 grid gap-8 md:grid-cols-12">
+      <header className="mb-24 grid grid-cols-1 gap-8 md:grid-cols-12">
         <p className="label md:col-span-3">How it works</p>
         <div className="md:col-span-9">
           <Split
@@ -66,7 +66,7 @@ export function HowItWorks() {
         ))}
       </ol>
 
-      <section className="mb-32 grid gap-12 md:grid-cols-12" aria-labelledby="limits">
+      <section className="mb-32 grid grid-cols-1 gap-12 md:grid-cols-12" aria-labelledby="limits">
         <div className="md:col-span-4">
           <h2 id="limits" className="mb-4 font-serif text-5xl">
             Limits
@@ -86,7 +86,7 @@ export function HowItWorks() {
         </dl>
       </section>
 
-      <section className="grid gap-12 md:grid-cols-12" aria-labelledby="api">
+      <section className="grid grid-cols-1 gap-12 md:grid-cols-12" aria-labelledby="api">
         <div className="md:col-span-4">
           <h2 id="api" className="mb-4 font-serif text-5xl">
             API

@@ -23,7 +23,7 @@ export function Faq() {
           className="gutter border-t hairline py-20 md:py-24"
           aria-labelledby={`faq-${topic}`}
         >
-          <div className="grid gap-10 md:grid-cols-12">
+          <div className="grid grid-cols-1 gap-10 md:grid-cols-12">
             <div className="md:col-span-3">
               <span className="mb-4 block font-mono text-xs text-signal">0{i + 1}</span>
               <h2 id={`faq-${topic}`} className="text-title font-serif md:sticky md:top-28">

@@ -236,7 +236,7 @@ function NewList({ lists, onCreated }: { lists: ShelfList[]; onCreated: (l: Shel
             {lists.length < 2 ? (
               <p className="text-sm text-dim">Make at least two lists first.</p>
             ) : (
-              <div className="grid gap-2 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                 {[...lists].reverse().map((l) => (
                   <label key={l.id} className="flex items-center gap-3 text-sm">
                     <input
@@ -409,7 +409,7 @@ export function AppPage() {
         </button>
       </header>
 
-      <div className="grid gap-16 lg:grid-cols-12">
+      <div className="grid grid-cols-1 gap-16 lg:grid-cols-12">
         <div className="lg:col-span-7">
           <p className="label mb-4">
             {lists.length} {lists.length === 1 ? 'list' : 'lists'}

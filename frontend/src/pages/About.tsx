@@ -67,7 +67,7 @@ export function About() {
       </Section>
 
       <Section index="03" title="Who makes it">
-        <div className="grid gap-10 md:grid-cols-[1fr_auto] md:items-end">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-[1fr_auto] md:items-end">
           <div className="prose-shelf">
             <p>
               OfflineShelf is designed and built by <strong>{SITE.author.name}</strong>. The core

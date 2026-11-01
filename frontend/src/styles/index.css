@@ -577,3 +577,131 @@ html[data-cursor-mode='text'] .torch-shade {
     animation: none;
   }
 }
+
+/* Menu: the panel wipes down from the header, rows rise in order, the side column fades in last.
+   Closing runs faster than opening so the page comes back without waiting. */
+.menu-panel {
+  visibility: hidden;
+  clip-path: inset(0 0 100% 0);
+  transition:
+    clip-path 0.55s var(--ease-in-out-quart),
+    visibility 0s linear 0.55s;
+}
+.menu-panel[data-open='true'] {
+  visibility: visible;
+  clip-path: inset(0 0 0 0);
+  transition:
+    clip-path 0.85s var(--ease-in-out-quart),
+    visibility 0s;
+}
+.menu-rise {
+  display: inline-block;
+  transform: translateY(110%);
+  transition: transform 0.35s var(--ease-in-out-quart);
+}
+.menu-panel[data-open='true'] .menu-rise {
+  transform: none;
+  transition: transform 1s var(--ease-out-expo) calc(0.3s + var(--i, 0) * 45ms);
+}
+.menu-row {
+  border-bottom-color: transparent;
+  transition: border-color 0.3s;
+}
+.menu-panel[data-open='true'] .menu-row {
+  border-bottom-color: var(--color-line);
+  transition: border-color 0.8s calc(0.35s + var(--i, 0) * 45ms);
+}
+.menu-fade {
+  opacity: 0;
+  transform: translateY(1rem);
+  transition:
+    opacity 0.25s,
+    transform 0.25s;
+}
+.menu-panel[data-open='true'] .menu-fade {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.9s var(--ease-out-expo) 0.6s,
+    transform 0.9s var(--ease-out-expo) 0.6s;
+}
+.menu-label {
+  transition: transform 0.6s var(--ease-in-out-quart);
+}
+.menu-label[data-open='true'] {
+  transform: translateY(-50%);
+}
+.menu-icon > span {
+  transition:
+    transform 0.6s var(--ease-in-out-quart),
+    top 0.6s var(--ease-in-out-quart);
+}
+.menu-icon[data-open='true'] > span:first-child {
+  top: 0.25rem;
+  transform: rotate(45deg);
+}
+.menu-icon[data-open='true'] > span:last-child {
+  top: 0.25rem;
+  transform: rotate(-45deg);
+}
+
+/* Route change: a paper curtain lifts off the new page while the page rises into place. The first
+   page a visitor lands on never animates (route-first), so prerendered content paints at once. */
+.route-curtain {
+  display: none;
+}
+html[data-motion='on'] .route-curtain {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  pointer-events: none;
+  background: var(--color-paper);
+  transform-origin: top;
+  animation: curtain-lift 0.9s var(--ease-in-out-quart) both;
+}
+html[data-motion='on'] .route-curtain::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0;
+  height: 2px;
+  background: var(--color-signal);
+}
+html[data-motion='on'] .route:not([data-first]) {
+  animation: route-rise 1.1s var(--ease-out-expo) 0.35s both;
+}
+@keyframes curtain-lift {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-100%);
+  }
+}
+@keyframes route-rise {
+  from {
+    opacity: 0;
+    transform: translateY(3rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Footer glow: a soft warm light behind the call to action. */
+.footer-glow {
+  background:
+    radial-gradient(60% 120% at 85% 0%, rgb(255 90 31 / 0.16), transparent 60%),
+    radial-gradient(50% 90% at 10% 100%, rgb(255 179 122 / 0.08), transparent 70%),
+    var(--color-ink-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-panel,
+  .menu-panel *,
+  .menu-label,
+  .menu-icon > span {
+    transition: none !important;
+  }
+}
