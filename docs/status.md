@@ -25,7 +25,7 @@ Last updated: 2026-11-01. Update at the end of every work session.
   `app/core/combine.py` (one merge pass over sorted sources).
 - **M6:** seed command (`python -m app.seed <email>` adds three example lists and builds them),
   README with setup steps and screenshots (`docs/screenshots`).
-- **M6 ZIM:** `format: "zim"` exports write a ZIM file with libzim 3.9.0 (same pages as the HTML
+- **M6 ZIM:** `format: "zim"` exports write a ZIM file with libzim 4.0.0 (same pages as the HTML
   bundle, full-text index, Kiwix metadata), offered in the Details panel. Checked live.
 - **Quality gates:** SonarQube Cloud (automatic analysis) and CodeRabbit are installed and are
   required checks on `main` alongside backend, frontend and CodeQL.
@@ -73,7 +73,7 @@ proxies `/api`). `npm run dev:down` stops the containers. Needs Docker, uv and N
 
 - `npm audit`: moderate advisory in `minimatch` via ESLint and openapi-typescript (dev tooling
   only, not shipped). The suggested fix downgrades typescript-eslint; wait for upstream.
-- Docker images pin minor versions (`mariadb:11.4`, `redis:8.0-alpine`,
+- Docker images pin minor versions (`mariadb:11.4`, `redis:8.10-alpine`,
   `nginx-unprivileged:1.30-alpine`, `python:3.12-slim`, `node:24-alpine`). Dependabot ignores
   bumps that would leave those lines (Python 3.12, MariaDB 11.4 LTS, Node LTS, nginx stable,
   TypeScript 5); those upgrades are made on purpose.

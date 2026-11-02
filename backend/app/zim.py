@@ -91,7 +91,7 @@ def write_zim(path: Path, *, list_id: int, **pages: Any) -> BundleResult:
     built: datetime | None = pages.get("built")
     with Creator(str(path)).config_indexing(True, language) as creator:
         creator.set_mainpath("index.html")
-        creator.add_illustration(48, ILLUSTRATION.read_bytes())
+        creator.add_illustration(ILLUSTRATION.read_bytes(), 48)
         for key, value in {
             "Name": zim_name(wiki, list_id),
             "Title": name[:TITLE_MAX],

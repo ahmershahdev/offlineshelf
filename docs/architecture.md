@@ -225,7 +225,7 @@ Mono for code, all self-hosted.
 | Recorded API responses in tests | No live Wikimedia calls in CI; real calls only in a manual smoke test |
 | One `User-Agent` with a contact address, `maxlag`, backoff | Wikimedia's API etiquette; being blocked would stop every build |
 | Versions instead of overwriting a list | A failed rebuild must never lose the last good list, and diffs need the previous version |
-| ZIM through `libzim` 3.9.0, capped like bundles | Official openZIM bindings with wheels for Linux and Windows; the same pages as the bundle, so links and attribution need no second implementation |
+| ZIM through `libzim` 4.0.0, capped like bundles | Official openZIM bindings with wheels for Linux and Windows; the same pages as the bundle, so links and attribution need no second implementation |
 | Email and password accounts (Argon2id) first | Works for self-hosters without registering an OAuth app; Wikimedia OAuth can be added beside it |
 | Prerendered SPA instead of a Node SSR server | Public pages are static; one fewer runtime to run and secure, and nginx can set the nonce |
 | PyMySQL driver | Pure Python, same on Windows, Linux and CI; speed is irrelevant next to Wikimedia API latency |
