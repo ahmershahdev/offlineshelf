@@ -73,7 +73,7 @@ proxies `/api`). `npm run dev:down` stops the containers. Needs Docker, uv and N
 
 - `npm audit`: moderate advisory in `minimatch` via ESLint and openapi-typescript (dev tooling
   only, not shipped). The suggested fix downgrades typescript-eslint; wait for upstream.
-- Docker images pin minor versions (`mariadb:11.4`, `redis:8.0-alpine`,
+- Docker images pin minor versions (`mariadb:11.4`, `redis:8.10-alpine`,
   `nginx-unprivileged:1.30-alpine`, `python:3.12-slim`, `node:24-alpine`). Dependabot ignores
   bumps that would leave those lines (Python 3.12, MariaDB 11.4 LTS, Node LTS, nginx stable,
   TypeScript 5); those upgrades are made on purpose.
