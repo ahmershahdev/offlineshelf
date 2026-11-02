@@ -3,7 +3,7 @@ from datetime import datetime
 from libzim.reader import Archive  # type: ignore[import-untyped]
 
 from app.bundle import BundleArticle
-from app.zim import write_zim, zim_language, zim_name
+from app.zim import ILLUSTRATION, write_zim, zim_language, zim_name
 
 WIKI = "en.wikipedia.org"
 
@@ -49,6 +49,7 @@ def test_writes_a_zim_that_kiwix_can_open(tmp_path) -> None:
     assert zim.get_metadata("Date").decode() == "2026-11-01"
     assert zim.get_metadata("License").decode() == "CC BY-SA 4.0"
     assert zim.has_illustration(48)
+    assert bytes(zim.get_illustration_item(48).content) == ILLUSTRATION.read_bytes()
 
     page = bytes(zim.get_entry_by_path("articles/1.html").get_item().content).decode()
     assert 'href="3.html"' in page
