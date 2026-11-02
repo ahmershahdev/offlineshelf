@@ -1,6 +1,6 @@
 # Project status
 
-Last updated: 2026-11-01. Update at the end of every work session.
+Last updated: 2026-11-02. Update at the end of every work session.
 
 ## Where we are
 
@@ -40,6 +40,9 @@ Last updated: 2026-11-01. Update at the end of every work session.
 - **Repo:** only `main`, no open PRs. `main` requires `backend`, `frontend`, `codeql (python)`
   and `codeql (javascript-typescript)`, squash merges, linear history.
 - Tests: 196 backend (MariaDB 11.4 + Redis), 38 frontend.
+- **Dependencies (2026-11-02):** libzim 4.0.0 (`add_illustration` now takes the bytes first),
+  redis 8.10-alpine, Actions group bumped. M5 is complete; M6 deploy and the pre-launch tests
+  remain.
 
 ## Run it
 
